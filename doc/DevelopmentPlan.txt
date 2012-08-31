@@ -1,0 +1,260 @@
+
+LSST Simulator Development Plan
+F. Pierfederici, K. Cook
+
+
+High Level View
+0. Prerequisites
+  a. Generate field list.
+
+1. Start up
+  a. Check status (weather, sky, telescope, history...).
+  b. Read proposals.
+  c. Rank fields per night.
+  d. Choose first pointing.
+
+2. After each observation
+  a. Check status (weather, sky, telescope, history...).
+  b. Choose candidate field/filter combinations.
+  c. Assign priorities to each field/filter.
+  d. Compute slew and dome rotation penalty for each field.
+  e. Compute filter change penalty for each field/filter.
+  f. Choose best field/filter.
+  g. Move to position and expose.
+
+3. Output
+  a. Generate reports and graphs of the results.
+
+4. Documentation and Testing
+    a. Documentation.
+    b. Unit testing.
+    c. Scientific validation.
+
+
+
+Detailed Level View
+0. Prerequisites
+  a. Generate field list
+  Either the simulator, or some other external code generates a list of 
+  fields to observe (given the location and the FoV of the 
+  telescope/camera). Each field will be given a unique ID that proposals 
+  will reference (if needed).
+
+
+1. Start up
+  a. Check status (weather, sky, telescope, history...)
+  The simulator checks the current weather conditions, the current state
+  of the astronomical sky (which fields are visible?) and the current
+  telescope status (pointing, filter...). The observation history is
+  retrieved as well.
+  
+  b. Read proposals
+  The simulator reads one of more (text) files containing a description 
+  of the observing strategy of each proposal. From the information in 
+  each input file, the simulator is able to initialize the necessary 
+  instances of the Proposal class.
+
+  c. Rank fields per night
+  Given the parameters in each Proposal instance (describing the 
+  proposal's observing strategy and requirements) each proposal instance 
+  assigns initial priorities to each of the fields/filter combinations.
+
+  d. Choose first pointing
+  In principle, because of the need to minimize, among other things, 
+  telescope slew time and to maximize the scientific exploitation of the 
+  facility, particular care should be given to the choice of the initial 
+  pointing. A possible approach would be to execute the simulation with 
+  different initial condition to find the most efficient one.
+
+
+2. After each observation
+  a. Check status (weather, sky, telescope, history...)
+  The simulator checks the current weather conditions, the current state 
+  of the astronomical sky (which fields are visible?) and the current 
+  telescope status (pointing, filter...). The observation history is 
+  retrieved as well.
+
+  b. Choose candidate field/filter combinations.
+  Given the pieces of information in point 2.a. the simulator chooses 
+  the subset of fields/filter that are both visible and reasonably close 
+  to the current telescope position and filter.
+  
+  c. Assign priorities to each field/filter.
+  For each field/filter identified in point 2.b. and using the 
+  information from both the observation history and the proposal's 
+  needs, each Proposal instance assigns new priorities to each 
+  field/filter.
+  
+  d. Compute slew and dome rotation penalty for each field
+  Knowing the current telescope position and the position of each 
+  field/filter (identified in point 2.b.) the TelescopeOperator instance 
+  computes the time it would take to point to each field. This includes 
+  both telescope slew time and dome rotation time.
+  
+  e. Compute filter change penalty for each field/filter
+  Knowing the current filter in use and the filter requirements of each 
+  field/filter (identified in point 2.b.) the TelescopeOperator instance 
+  computes the time it would take to switch filter.
+  
+  f. Choose best field/filter
+  Using the priorities set by all the Proposal instances on the 
+  available fields/filters (identified in point 2.b.), the 
+  TelescopeOperator instance computes the global priority per 
+  field/filter (across proposals). This global priority takes also into 
+  consideration the need to make sure that every proposal receives the 
+  same attention (averaged over one year). Given the global priorities 
+  and a weighting formula, the best (i.e. highest priority) field is 
+  chosen and observed.
+  
+  g. Move to position and expose
+  Move telescope/dome to new field, execute observing sequence and 
+  update database(s).
+
+
+3. Output
+  a. Generate reports and graphs of the results
+  Once the simulation is completed, the visit history of each field is 
+  available. The simulator will then generate a few pre-cooked reports 
+  showing the area covered and the depth of the survey. The time spent 
+  not observing will also be an interesting parameter/result.
+
+
+4. Documentation and Testing
+  a. Documentation
+  Write a detailed description of the algorithms being used and a 
+  complete user manual for the main simulation software.
+  
+  b. Unit testing
+  Write unit tests to validate performance of each software module.
+  
+  c. Scientific validation
+  Write a set of tests to validate the scientific output of the code.
+
+
+
+What is needed and how long will it take (approximately)?
+0. Prerequisites [1.0 weeks]
+  a. Generate field list [1.0 weeks]
+    i.   A way of generating the list of available field positions given 
+         the observatory location and the camera FoV (partially 
+         implemented).
+    ii.  A way of discarding fields falling inside one or more 
+         user-defined exclusion zones.
+    iii. A way to define fields with overlaps.
+    iv.  A way of assigning unique ID to each field (partially 
+         implemented).
+    v.   A field list parser (partially implemented).
+
+
+1. Start up [>1.5 weeks]
+  a. Read proposals [1.0 weeks]
+    i.   A way of describing the observation strategy/priorities of each 
+         proposal that is both machine intelligible and user friendly.
+    ii.  A proposal description file parser.
+    
+  b. Rank fields per night [0.5 weeks]
+    i.   A way of translating proposal observing strategy, priorities 
+         and observation history into objective rules for field/filter 
+         ranking. Use Abi Saha algorithms?
+    
+  c. Choose first pointing [needs similar to 2a-f plus scienctist
+     testing]
+    i.   TBD
+
+
+2. After each observation [5.2 weeks]
+  a. Check status (weather, sky, telescope, history...) [2.0 weeks]
+    i.   Historic weather data/model (partially there).
+    ii.  Weather data file parser (partially implemented).
+    iii. Weather data database (partially implemented).
+    iv.  Interpolation routines.
+    v.   Ephemeris lookup tables/routines.
+    vi.  Observation history database.
+    
+  b. Choose candidate field/filter combinations [0.2 weeks]
+    i.   Ephemeris lookup tables querying capabilities.
+    
+  c. Assign priorities to each field/filter [1.0 weeks]
+    i.   A way of translating proposal observing strategy, priorities 
+         and observation history into objective rules for field/filter 
+         ranking.
+    
+  d. Compute slew and dome rotation penalty for each field [0.2 weeks]
+    i.   Telescope slew timings/model.
+    ii.  Dome rotation timings/model.
+    
+  e. Compute filter change penalty for each field/filter [0.2 weeks]
+    i.   Telescope filter switching timings.
+    
+  f. Choose best field/filter [1.0 weeks]
+    i.   Develop an algorithm that assigns weights to both field/filter 
+         rankings and to penalties in order to choose the "best" 
+         field/filter combination. A possibility might be to generalize 
+         the algorithms developed by Abi Saha.
+  
+  g. Move to position and expose [0.6 weeks]
+    i.   Create a database for the simulation.
+    ii.  Define database tables/schema.
+    iii. Define database access 
+    i.   Store/modify observation parameters in the database. 
+    iv.  Pause simulation for N seconds to take into account telescope 
+         and dome slew time, filter change time and, in general, dead 
+         time.
+
+
+3. Output [2.0 weeks]
+  a. Generate reports and graphs of the results [2.0 weeks]
+    i.   Simulation results in a database-like storage (partially 
+         implemented).
+    ii.  Querying capabilities.
+    iii. Identification of the parameters of interest.
+    iv.  Integration with plotting libraries (partially implemented).
+    v.   Report generation engine (template based).
+
+
+4. Documentation and Testing [>2.5 weeks]
+  a. Documentation [1.5 weeks]
+    i.   Description of the algorithms.
+    ii.  User manual
+    
+  b. Unit testing [1.0 weeks]
+    i.   Unit tests.
+    
+  c. Scientific validation [?? weeks by scientist(s)]
+    i.   Scientific validation test suit.
+
+
+TOTAL: >12.2 weeks
+
+
+
+Notes on time estimates
+1. Times are approximate estimates and they assume full time work at 
+   100% level with no distractions in contiguous blocks of time of the     
+   order to several days (in order to reduce context switching).
+
+2. It is assumed that there will be more that one software release with 
+   different levels of sophistication. The time estimates are for the 
+   first 1.0 release.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

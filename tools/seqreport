@@ -1,0 +1,92 @@
+#!/bin/sh
+#  report - summarizes the LSST simulation log file 
+#           The simultion should have been run with verbose = 1
+#   Syntax: 
+#       report
+#           Uses default log filename: lsst.log
+#
+#       seqreport <sessionID>
+#           Uses log filename: lsst.log_<sessionID> 
+#
+if [ $# -eq 0 ] ; then
+    FILE="lsst.log"
+else
+    FILE="lsst.log_$1"
+fi
+echo "Using $FILE"
+
+echo
+echo "Weak Lensing sequences reaching % progress"
+rm -rf WLprog.tmp
+grep WeakLensingProp $FILE | grep progress= > WLprog.tmp
+for filter in g r i y z
+do
+    echo "filter=$filter"
+    progress=1
+    while [ $progress != 201 ]
+    do
+        pp=`grep progress=$progress% WLprog.tmp | grep filter=$filter | wc | awk '{print $1}'`
+        if [ $pp != 0 ] ; then
+            echo $progress% $pp
+        fi
+        progress=`expr $progress + 1`
+    done
+done
+
+echo
+echo "Weak Lensing TransSubSeq sequences reaching % progress"
+rm -rf WLTSSprog.tmp
+grep WeakLensingTSSProp $FILE | grep progress= > WLTSSprog.tmp
+    progress=1
+    while [ $progress != 201 ]
+    do
+        pp=`grep progress=$progress% WLTSSprog.tmp | wc | awk '{print $1}'`
+        if [ $pp != 0 ] ; then
+            echo $progress% $pp
+        fi
+        progress=`expr $progress + 1`
+    done
+
+
+echo
+echo "Near Earth Asteroids sequences reaching % progress"
+rm -rf NEAprog.tmp
+grep NearEarth $FILE | grep progress= > NEAprog.tmp
+progress=1
+while [ $progress != 101 ]
+do
+    pp=`grep progress=$progress% NEAprog.tmp | wc | awk '{print $1}'`
+    if [ $pp != 0 ] ; then
+        echo $progress% $pp
+    fi
+    progress=`expr $progress + 1`
+done
+
+echo
+echo "Super Nova SubSeq sequences reaching % progress"
+rm -rf SNSSprog.tmp
+grep SuperNovaSubSeq $FILE | grep progress= > SNSSprog.tmp
+progress=1
+while [ $progress != 101 ]
+do
+    pp=`grep progress=$progress% SNSSprog.tmp | wc | awk '{print $1}'`
+    if [ $pp != 0 ] ; then
+        echo $progress% $pp
+    fi
+    progress=`expr $progress + 1`
+done
+
+echo
+echo "Kuiper Belt Object sequences reaching % progress"
+rm -rf KBOprog.tmp
+grep KuiperBelt $FILE | grep progress= > KBOprog.tmp
+progress=1
+while [ $progress != 101 ]
+do
+    pp=`grep progress=$progress% KBOprog.tmp | wc | awk '{print $1}'`
+    if [ $pp != 0 ] ; then
+        echo $progress% $pp
+    fi
+    progress=`expr $progress + 1`
+done
+

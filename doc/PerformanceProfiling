@@ -1,0 +1,21 @@
+...doc/PerformanceProfiling
+
+This document shows how to create a performance profile
+
+
+In order to generate profiling data, use the simulator command line 
+argument '--profile'. The profiling information will be output 
+to: 'ProfileData' over the course of the simulation.
+
+Subsequent execution of the code: '.../src/LsstProfile.py' , will
+generate a profiling report.  The user should modify the particulars
+of 'LsstProfile.py' to reflect the report desired.
+
+The user should ensure the simulation elapsed time is short in duration 
+(1 week, if possible) since long runs generate extensive profiling output. 
+
+Also, note that generating the final report is very slow; be patient.
+
+An example:
+   cronos% ./main.py --profile=yes
+   cronos% ./LsstProfile.py  > Profile.output

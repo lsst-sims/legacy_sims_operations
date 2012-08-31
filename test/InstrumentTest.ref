@@ -1,0 +1,89 @@
+Setting up Instrument logger
+13.3305009004
+22.5
+9.89065355027
+9.89065355027
+2.0
+2.0
+22.1134805875
+DATETIME-STAMP INFO Instrument: init()
+DATETIME-STAMP INFO Instrument: PARK
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): COMPUTING OBSERVATION DELAY
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=0.100000 DEC=-30.100000 FILTER=r EXPTIME=20.000000 DATE=0.000000
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=64.275401 AZ=262.525492 PA=97.757868 HA=1.988702
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAlt  = 9.241533
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAz  = 10.122876
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for DomAlt  = 5.620767
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for DomAz  = 13.330501
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Rotator  = 6.430993
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Readout  = 2.000000
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): OBSERVATION DELAY = 13.330501
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): COMPUTING OBSERVATION DELAY
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=0.000000 DEC=-90.000000 FILTER=g EXPTIME=10.000000 DATE=60.000000
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=30.165278 AZ=180.000000 PA=30.181218 HA=2.012081
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAlt  = 20.611574
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAz  = 17.000000
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for DomAlt  = 11.305787
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for DomAz  = 22.500000
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Rotator  = 2.676734
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Filter  = 5.000000
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Readout  = 2.000000
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): OBSERVATION DELAY = 22.500000
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): COMPUTING OBSERVATION DELAY
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=30.000000 DEC=-30.000000 FILTER=r EXPTIME=10.000000 DATE=0.000000
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=89.824131 AZ=20.003056 PA=-160.031764 HA=-0.004631
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAlt  = 1.048256
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAz  = 3.651763
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for DomAlt  = 0.907817
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for DomAz  = 4.714405
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Rotator  = 9.890654
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Readout  = 2.000000
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): OBSERVATION DELAY = 9.890654
+DATETIME-STAMP INFO Instrument: Observe(): PERFORMING AN OBSERVATION
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): COMPUTING OBSERVATION DELAY
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=30.000000 DEC=-30.000000 FILTER=r EXPTIME=10.000000 DATE=0.000000
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=89.824131 AZ=20.003056 PA=-160.031764 HA=-0.004631
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAlt  = 1.048256
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAz  = 3.651763
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for DomAlt  = 0.907817
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for DomAz  = 4.714405
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Rotator  = 9.890654
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Readout  = 2.000000
+DATETIME-STAMP INFO Instrument: GetSlewDelay(): critical path: Rotator=9.89065355027 
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): OBSERVATION DELAY = 9.890654
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=30.000000 DEC=-30.000000 FILTER=r EXPTIME=10.000000 DATE=0.000000
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=89.824131 AZ=20.003056 PA=-160.031764 HA=-0.004631
+DATETIME-STAMP INFO Instrument: Observe(): PERFORMING AN OBSERVATION
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): COMPUTING OBSERVATION DELAY
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=30.000000 DEC=-30.000000 FILTER=r EXPTIME=10.000000 DATE=9.890654
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=89.832938 AZ=8.388558 PA=-171.625548 HA=-0.001876
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAz  = 0.000000
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Readout  = 2.000000
+DATETIME-STAMP INFO Instrument: GetSlewDelay(): critical path: Readout=2.0 
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): OBSERVATION DELAY = 2.000000
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=30.000000 DEC=-30.000000 FILTER=r EXPTIME=10.000000 DATE=9.890654
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=89.832938 AZ=8.388558 PA=-171.625548 HA=-0.001876
+DATETIME-STAMP INFO Instrument: Observe(): PERFORMING AN OBSERVATION
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): COMPUTING OBSERVATION DELAY
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=30.000000 DEC=-30.000000 FILTER=r EXPTIME=10.000000 DATE=11.890654
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=89.833838 AZ=5.919084 PA=-174.090833 HA=-0.001319
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Readout  = 2.000000
+DATETIME-STAMP INFO Instrument: GetSlewDelay(): critical path: Readout=2.0 
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): OBSERVATION DELAY = 2.000000
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=30.000000 DEC=-30.000000 FILTER=r EXPTIME=10.000000 DATE=11.890654
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=89.833838 AZ=5.919084 PA=-174.090833 HA=-0.001319
+DATETIME-STAMP INFO Instrument: Observe(): PERFORMING AN OBSERVATION
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): COMPUTING OBSERVATION DELAY
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=30.000000 DEC=-40.000000 FILTER=r EXPTIME=10.000000 DATE=13.890654
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=80.165273 AZ=179.948738 PA=-0.057855 HA=-0.000762
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAlt  = 4.223051
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for TelAz  = 16.710110
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for DomAlt  = 3.111526
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for DomAz  = 22.113481
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Rotator  = 10.806692
+DATETIME-STAMP INFO Instrument: GetDelayAfter(): delay for Readout  = 2.000000
+DATETIME-STAMP INFO Instrument: GetSlewDelay(): critical path: DomAz=22.1134805875 
+DATETIME-STAMP INFO Instrument: GetDelayForObservation(): OBSERVATION DELAY = 22.113481
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): RA=30.000000 DEC=-40.000000 FILTER=r EXPTIME=10.000000 DATE=13.890654
+DATETIME-STAMP INFO Instrument: GetStateForObservation(): ALT=80.165273 AZ=179.948738 PA=-0.057855 HA=-0.000762
+DATETIME-STAMP INFO Instrument: PARK

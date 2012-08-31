@@ -1,0 +1,56 @@
+Using a previous Production release
+===================================
+
+All Production releases are archived on ariadne:prodRelease/lsst_Prod-*.tgz .
+Use them to recover an old software release.  The CVS repository is NOT 
+tagged with respect to the Production releases.
+
+-----------------------------------------------------------
+Using MYSQL to directly access an old Release's DB Tables
+-----------------------------------------------------------
+If you're going to access the DB directly through MYSQL commands and do NOT 
+need any of simulator codes (newextract.py, etc),  you can access the 
+old release directly and not worry about other users being affected by your
+use if you do the following.  First, create a new Database named the 
+same as the old Release directory. Second, use the new database's name in the 
+Mysql command line.  Then you are able to access the old release's db tables.
+via the usual sql operations.
+
+The account should be mysql:root since that account has the privileges to 
+create new Databases. We usually setup the 'mysql:root' account with same 
+pswd as for user: mysql:www.
+
+# first, as mysql 'root' create a valid database of same name as 
+#    old release's directory name
+mysqladmin -u root -p create LSST_Prod-<version>
+    <zxcvbnm>
+# Now access the old release as the 'www' user
+mysql -u www -p LSST_Prod-<version>
+    <zxcvbnm>
+    show tables;
+    ...
+    quit
+
+NOTE: On completion, do NOT remove the DATABASE structure specially 
+fabricated for the appropriately named DB tables.  The DB tables would
+get garbage collected, if you did.
+
+--------------------------------------------------------------------
+Accessing old Release's DB Tables through Simulator codes
+--------------------------------------------------------------------
+If you want to use the matching software, then you need to break the current
+links and reset them to the appropriate version.  You want to do this only
+after you have coordinated with anyone else who might be using the Production
+source and data tables.
+
+cd $SRCROOT
+rm lsst
+ln -s lsst_Prod-<version> lsst
+cd $DBDATA
+rm LSST
+ln -s LSST_Prod-<version> LSST
+
+Now, you're ready to access the old DB Tables as you always have.
+
+Remember to re-establish the links to the 'correct' version when you are
+done with the old one.

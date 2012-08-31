@@ -1,0 +1,3 @@
+#!/bin/tcsh
+mv $1 $1.sav 
+cat $1.sav | sed -e "s/gumtree/cronos/" -e "s/data1/data0/" > $1 

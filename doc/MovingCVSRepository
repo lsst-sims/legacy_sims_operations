@@ -1,0 +1,68 @@
+Moving the CVS Repository from Gumtree to Cronos 
+================================================
+
+Following is needed only if you want to continue working in an existing
+CVS working directory after the CVS source repository has changed machines.
+We are assuming that the actual source directory pathname remains the same no 
+matter where it is moved.
+
+Use the following scenario as a prototype to be tuned accordingly.
+
+
+
+The following will convert your gumtree based source directory into a
+cronos based directory.
+                                                                                
+You should:
+1) install the file: fixit  (found below) onto your home account on cronos.
+
+2) uncomment the line for "converting existing cronos working directory"
+                                                                                
+3) run the following command to change the CVS/Root in each source
+    directory
+                                                                                
+            find . -name Root -exec ~/fixit {} \;
+                                                                                
+4) check that all Root files were altered:
+        find . -name Root -exec cat {} \;
+                                                                                
+5) alter your cronos .cshrc definition for CVSROOT to be:
+    setenv CVSROOT /data1/simulator/REPOSITORY
+                                                                                
+6) ensure that all your existing cronos windows update their CVSROOT alias
+   Simplest way is to logout/login again.
+                                                                                
+You should now be able to 'cvs update' against the cronos CVS release
+in order to check its functioning.
+                                                                                
+                                                                                
+If you maintain a CVS directory on a secondary machine, then you need to do
+a modified version of the above procedure.
+                                                                                
+1) change the 'gumtree' in your ~/.cshrc definition of CVSROOT to 'cronos'
+                                                                                
+2) move the 'fixit' routine over to your remote system and  uncomment the
+   command to convert non-gumtree/cronos systems' working directories.
+   Also comment-out the command for cronos/gumtree conversion.
+   (It's obvious once you see the 4 line script.)
+                                                                                
+3) run the script as above on your remote system.
+                                                                                
+
+
+Script 'fixit':
+===============
+#!/bin/tcsh
+mv $1 $1.sav
+                                                                                
+# Following for non-cronos and non-gumtree  CVS working directiories
+#cat $1.sav | sed -e "s/gumtree/cronos/"  > $1
+                                                                                
+# Following for converting existing cronos working directory
+#cat $1.sav | sed -e "s^.*:^^" > $1
+ 
+# following to convert the original gumtree working directory
+cat $1.sav | sed -e "s-^-:ext:robyn@cronos.tuc.noao.edu:-" > $1
+ 
+
+

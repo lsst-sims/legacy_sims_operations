@@ -1,0 +1,107 @@
+Queries which might be posed after a Simulation Run
+===================================================
+
+
+o.t. == overtime
+
+Proposal/Target
+===============
+Data Collected:
+	why selected (bonus enhancements satisfied, cadence satisfied)
+	when selected (simtime)
+	satisfying what proposals
+	environmental specifics (field,filter,seeing,airmass,temp,...)
+	time delay (exposure and instrument setup)
+
+To Answer:
+    What is:
+	coverage for {all proposals, each proposal} o.t.
+	order of Field selection o.t.
+	# targets satisfying multiple proposals
+	Science Proposal ranking of top target and Master Scheduler ranking 
+		of selected target o.t.
+
+Weather
+=======
+Data Collected: 
+	seeing/transparency for each observation
+
+To Answer:
+    What is:
+	the seeing  for {all Fields, each Field} o.t.
+	# {adequate, good, bad} seeing hours
+	# potential seeing hours 
+
+Astronomical Sky
+================
+Data Collected:
+	airmass at observation for target
+
+To Answer:
+    What is:
+	airmass for observations for {all fields, each field} o.t.
+
+Filter
+========
+Data Collected: 
+	when mounted and for what reason (proposal/target, start of night)
+
+To Answer:
+    What is:
+	filter use o.t.
+	filter change (reposition or reload) and change penalty o.t.
+
+Instrument
+==========
+Data Collected: 
+	adjustment activity (focus, move, ...) and time delay 
+
+To Answer:
+    What is:
+	device adjustment and time penalty for adjustment o.t.
+
+Field
+=====
+Data Collected: 
+	see target/proposal
+
+To Answer:
+    Overlay Field selection count {1 filter, any filter} over Field map 
+
+
+Non-Observing Blocks
+=====================
+Data Collected: 
+	when block initiated, elapsed time, simulation of what time block,
+		?occurred during observing period?
+
+To Answer:
+    What is:
+	% potential observable time lost due to {type of non-Science imaging} 	
+		time
+
+
+Observing Cycles
+=================
+Data Collected:
+	TOD (time of Day) for startup of night's observing 
+	TOD (time of Day) for end of night's observing
+To Answer:
+	?
+
+
+Setup
+======
+Data Collected:
+	all input files  (either CVS version # or actual text)
+To Answer:
+	what {cuts, bonuses) were used in {all proposals, each proposal}
+	what  was weather model
+	what proposals
+
+Completion
+===========
+Data Collected:
+	simulation restart checkpoint  (python 'pickling')
+To Answer:
+	continue simulation from where it left off.

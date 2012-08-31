@@ -1,0 +1,209 @@
+set_default
+	ltype 0
+	ptype 0 0
+	lweight 0
+	ctype black
+	lines 0 0
+
+aitoff	# Plot Aitoff projection
+	#lim -3 3 1 1 
+	do dec = -90, 90, 30 {
+	  parallel $dec lam phi
+	  project lam phi x y 1.0
+	  con x y
+	}
+	do ra = -180, 180, 30 {
+	  meridian $ra lam phi
+	  project lam phi x y 1.0
+	  con x y  
+	}
+	return
+
+aitoff_shaded 1
+	# Plot Aitoff projection, shaded black
+        #lim -3 3 1 1
+	set dimen(tx) = 0
+	set dimen(ty) = 0
+        do dec = -90, 90, 30 {
+          parallel $dec lam phi
+          project lam phi x y 1.0
+          con x y
+        }
+        do ra = -180, 180, 30 {
+          meridian $ra lam phi
+          project lam phi x y 1.0
+          con x y
+	  if ( $ra==-180 ) {
+            set tx = tx concat x
+	    set ty = ty concat y
+	  }
+	  if ( $ra==180 ) {
+	    set tx = tx concat x
+	    set ty = ty concat y
+	  }
+        }
+	shade $1 tx ty
+        return
+
+
+aitoff_e
+	# plot Aitoff projection + ecliptic plane
+        lim -3 3 1 1
+        do dec = -90, 90, 30 {
+          parallel $dec lam phi
+          project lam phi x y 1.0
+          con x y
+        }
+        do ra = -180, 180, 30 {
+          meridian $ra lam phi
+          project lam phi x y 1.0
+          con x y
+        }
+	#ctype red
+	ctype black
+	set ra = -180, 180, 1
+	set dec = atan(sin(ra*pi/180)*tan(23.43333*pi/180))*180/pi
+	project ra dec x y 1.0
+	lweight 3
+	con x y
+	ctype black
+	lweight 0
+        return
+
+
+parallel 3
+	set $2 = -180, 180
+	set $3 = $2*0 + $1
+	return
+
+meridian 3
+	set $3 = -90, 90
+	set $2 = $3*0 + $1
+	return
+
+project 5
+	set a$0 = $1*pi/180.0
+	set d$0 = $2*pi/180.0
+	set z$0 = sqrt((1+cos(d$0)*cos(a$0/2.0))*0.5)
+	set $3 = 2*cos(d$0)*sin(a$0/2.0)/z$0
+	set $4 = sin(d$0)/z$0
+	delete a$0
+	delete d$0
+	delete z$0
+	return
+
+docir 4 # plots LSST FOV ("circle") in Aitoff projection  
+        # ($3,$4) = (radius,nobs)
+	set phi = 0, 360, 30
+	set db = $2 + $3*cos(phi*pi/180)
+	set rb = $1 - $3*sin(phi*pi/180)/cos(db*pi/180)
+        project rb db x$0 y$0 1.0
+	if ( $4 > 0 && $4 <= $(col_vec[0])  ) { ctype blue }
+        if ( $4 > $(col_vec[0]) && $4 <= $(col_vec[1]) ) { ctype cyan }
+        if ( $4 > $(col_vec[1]) && $4 <= $(col_vec[2]) ) { ctype green }
+        if ( $4 > $(col_vec[2]) && $4 <= $(col_vec[3]) ) { ctype yellow }
+        if ( $4 > $(col_vec[3]) && $4 <= $(col_vec[4]) ) { ctype red }
+        if ( $4 > $(col_vec[4]) ) { ctype magenta }
+        if ( $4 > 0 ) {
+	  shade 10 x$0 y$0
+          con x$0 y$0
+	}
+        delete x$0
+        delete y$0
+
+kemtile	# plot Kem's tiling pattern (hexagons)
+	local define print_noheader 1
+	erase set_default
+	#lim -2.9 2.9 -2.1 1.8
+	lim -3 3 -2 2
+	aitoff
+	set dimen(rac) = 0
+        set dimen(dcc) = 0
+	define   sep   (3.031088913)
+	# declination circles
+	set d = -89.25, 89.25, 2.625
+	set n = 1, dimen(d)
+	set nra = int(360*cos(d*pi/180)/$sep+0.9999999999999)
+	set dra = 360/nra
+	set ra0 = (n%2) ? 0 : $sep*0.5/cos(d*pi/180)
+	print dura { d n nra dra ra0 }
+	do i = 0, dimen(d)-1 {
+	  set r = $(ra0[$i]), 359.9, $(dra[$i])
+	  # Convert RA to range [-180,180]
+          set r = (r > 180.0) ? r-360.0 : r
+          do j = 0, dimen(r)-1 {
+            docir1 $(r[$j]) $(d[$i]) 1.75
+          }
+	  set d1 = r*0 + $(d[$i])
+	  set rac = rac concat r
+	  set dcc = dcc concat d1
+	}
+        print coords '%10.6f %10.6f %d\n' { rac dcc n }
+	echo Total number of fields: $(sum(nra))
+	return
+
+kemtile1 
+	# plot Kem's tiling pattern (circles instead of hexagons)
+	local define print_noheader 1
+        erase set_default
+        #lim -2.9 2.9 -2.1 1.8
+        lim -3 3 -2 2
+        aitoff_shaded 1 
+	set dimen(rac) = 0
+	set dimen(dcc) = 0
+        define   sep   (3.031088913)
+        # declination circles
+        set d = -89.25, 89.25, 2.625
+        set n = 1, dimen(d)
+        set nra = int(360*cos(d*pi/180)/$sep+0.9999999999999)
+        set dra = 360.0/nra
+        set ra0 = (n%2) ? 0.0 : $sep*0.5/cos(d*pi/180)
+	define    top    (359.9)
+        do i = 0, dimen(d)-1 {
+          set r = $(ra0[$i]), $top, $(dra[$i])
+          # Convert RA to range [-180,180]
+          set r = (r > 180.0) ? r-360.0 : r
+	  if ( dimen(r) != $(nra[$i]) ) {
+	    echo $i: $(dimen(r)) $(nra[$i]) $(dra[$i]) $(ra0[$i])
+	    print dura1 { r }
+	    return
+	  }
+          do j = 0, dimen(r)-1 {
+            docir2 $(r[$j]) $(d[$i]) 1.75
+          }
+          set d1 = r*0 + $(d[$i])
+          set rac = rac concat r
+          set dcc = dcc concat d1
+        }
+	print coords '%10.6f %10.6f %d\n' { rac dcc n}
+	echo Total number of fields: $(sum(nra))
+        return
+
+ 
+docir1 3 
+	# plots LSST FOV ("circle") in Aitoff projection
+        # ($3) = (radius)
+        set phi = 0, 360, 60
+        set db = $2 + $3*cos(phi*pi/180)
+        set rb = $1 - $3*sin(phi*pi/180)/cos(db*pi/180)
+        project rb db x$0 y$0 1.0
+        #  shade 10 x$0 y$0
+        con x$0 y$0
+        delete x$0
+        delete y$0
+	return
+
+docir2 3
+        # plots LSST FOV ("circle") in Aitoff projection
+        # ($3) = (radius)
+        set phi = 0, 360, 10
+        set db = $2 + $3*cos(phi*pi/180)
+        set rb = $1 - $3*sin(phi*pi/180)/cos(db*pi/180)
+        project rb db x$0 y$0 1.0
+	ctype white
+        shade 3 x$0 y$0
+        con x$0 y$0
+        delete x$0
+        delete y$0
+        return
+

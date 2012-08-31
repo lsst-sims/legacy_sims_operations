@@ -1,0 +1,123 @@
+#!/bin/sh
+#  report - summarizes the LSST simulation log file 
+#           The simultion should have been run with verbose = 1
+#   Syntax: 
+#       report
+#           Uses default log filename: lsst.log
+#
+#       report <sessionID>
+#           Uses log filename: lsst.log_<sessionID> 
+#
+if [ $# -eq 0 ] ; then
+    FILE="lsst.log"
+else
+    FILE="lsst.log_$1"
+fi
+echo "Using $FILE"
+
+echo "Number of nights"
+grep startNight $FILE | grep cheduler | wc | awk '{print $1}'
+echo "Number of lunations"
+grep FinishLunation $FILE | wc | awk '{print $1}'
+echo
+echo "Number of exposures"
+grep slew $FILE | grep expose | wc | awk '{print $1}'
+echo
+
+echo "Number of observations"
+rm -rf OBS.tmp
+grep Prop: $FILE | grep closeObservation | grep filter > OBS.tmp
+wc OBS.tmp | awk '{print $1}'
+for filter in g r i y z
+do
+    grep filter=$filter OBS.tmp | wc | echo $filter `awk '{print $1}'`
+done
+
+echo
+echo "Weak Lensing observations"
+rm -rf OBSWL.tmp
+grep WeakLensingProp OBS.tmp > OBSWL.tmp
+wc OBSWL.tmp | awk '{print $1}'
+for filter in g r i y z
+do
+    rm -rf OBSWL$filter.tmp
+    grep filter=$filter OBSWL.tmp > OBSWL$filter.tmp
+    wc OBSWL$filter.tmp | echo $filter `awk '{print $1}'`
+done
+
+echo
+echo "Weak Lensing TransSubSeq observations"
+rm -rf OBSWLTSS.tmp
+grep WeakLensingTSSProp OBS.tmp > OBSWLTSS.tmp
+wc OBSWLTSS.tmp | awk '{print $1}'
+for filter in g r i y z
+do
+    rm -rf OBSWLTSS$filter.tmp
+    grep filter=$filter OBSWLTSS.tmp > OBSWLTSS$filter.tmp
+    wc OBSWLTSS$filter.tmp | echo $filter `awk '{print $1}'`
+done
+echo "complete sequences"
+grep COMPLETE $FILE | grep WeakLensingTSS | wc | awk '{print $1}'
+                                                                                                                                                                                                            
+
+echo
+echo "Near Earth Asteroids observations"
+rm -rf OBSNEA.tmp
+grep NearEarth OBS.tmp > OBSNEA.tmp
+wc OBSNEA.tmp | awk '{print $1}'
+for filter in g r i y z
+do
+    grep filter=$filter OBSNEA.tmp | wc | echo $filter `awk '{print $1}'`
+done
+echo "complete sequences"
+grep COMPLETE $FILE | grep NearEarth | wc | awk '{print $1}'
+echo "lost sequences"
+grep LOST $FILE | grep NearEarth | wc | awk '{print $1}'
+echo "lost due to lunation"
+grep LOST $FILE | grep NearEarth | grep cycle | wc | awk '{print $1}'
+echo "lost due to missed event"
+grep LOST $FILE | grep NearEarth | grep event | wc | awk '{print $1}'
+
+echo
+echo "Super Nova observations"
+rm -rf OBSSN.tmp
+grep SuperNovaProp OBS.tmp > OBSSN.tmp
+wc OBSSN.tmp | awk '{print $1}'
+for filter in g r i y z
+do
+    grep filter=$filter OBSSN.tmp | wc | echo $filter `awk '{print $1}'`
+done
+echo "complete sequences"
+grep COMPLETE $FILE | grep SuperNovaProp | wc | awk '{print $1}'
+echo "lost sequences"
+grep LOST $FILE | grep SuperNovaProp | wc | awk '{print $1}'
+
+echo
+echo "Super Nova SubSeq observations"
+rm -rf OBSSNSS.tmp
+grep SuperNovaSubSeq OBS.tmp > OBSSNSS.tmp
+wc OBSSNSS.tmp | awk '{print $1}'
+for filter in g r i y z
+do
+    grep filter=$filter OBSSNSS.tmp | wc | echo $filter `awk '{print $1}'`
+done
+echo "complete sequences"
+grep COMPLETE $FILE | grep SuperNovaSubSeqProp | wc | awk '{print $1}'
+echo "lost sequences"
+grep LOST $FILE | grep SuperNovaSubSeqProp | wc | awk '{print $1}'
+
+echo
+echo "Kuiper Belt Object observations"
+rm -rf OBSKBO.tmp
+grep KuiperBelt OBS.tmp > OBSKBO.tmp
+wc OBSKBO.tmp | awk '{print $1}'
+for filter in g r i y z
+do
+    grep filter=$filter OBSKBO.tmp | wc | echo $filter `awk '{print $1}'`
+done
+echo "complete sequences"
+grep COMPLETE $FILE | grep KuiperBeltProp | wc | awk '{print $1}'
+echo "lost sequences"
+grep LOST $FILE | grep KuiperBeltProp | wc | awk '{print $1}'
+echo
+

@@ -1,0 +1,52 @@
+5 July 05
+README:  lsst/simulator/doc/README  this file  
+
+Current How-To Docs:
+    README.Requirements         3rd Party software requirements
+    InstallationGuide.txt       Installation Procedure for Simulator
+    NewUserInfo                 Setting up a new user
+    MySqlUse                    Useful MySQL commands
+    Movies                      Create Movies of a Simulation's target selection
+    MovingCVSRepository         Relocating the CVS Repository 
+    PerformanceProfiling        Procedure to generate performance stats
+    ReleaseUpgrade              Procedure to install a new release of Simulator
+
+Miscellaneous Docs
+    CurrentCapabilities         Current capabilities of the Simulator
+    PostSimulationQueries.txt   Minimalist use cases driving DB contents 
+    SimulatorToDo               Record of tasks awaiting implementation 
+                                or consideraton
+
+
+Original Design Docs:  (mostly obsolete)
+    Classes.pdf
+    DataModel.pdf
+    Scheduler_UML.pdf
+    Requirements.pdf
+    Requirements.rtf
+    ProposalDB.pdf
+
+    Classes.graffle             Mac OS graffle output
+    DataModel.graffle           Mac OS graffle output
+    Scheduler_UML.graffle       Mac OS graffle output
+
+    DevelopmentPlan.txt         
+    Milestones.txt          
+    TestPlan.txt
+
+Original PYDOC on major classes: (obsolete)
+    ./html:
+        AstronomicalSky.html
+        LSSTObject.html
+        Observation.html
+        Proposal.html
+        Scheduler.html
+        TAC.html
+        TelescopeOperator.html
+        Weather.html
+
+Obsolete documentation: 
+    ./superceded:
+        Development2Production
+        UsingProduction
+

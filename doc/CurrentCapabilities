@@ -1,0 +1,358 @@
+=========================================================================
+Capabilities Implemented
+=========================================================================
+
+(circa 05 Aug 2005)
+Global Science Program Options
+------------------------------
+    Field Selection options
+    ------------------------
+        * Limit fields to those within user specified regions (userRegion[])
+        * Minimum and maximum declination of allowable observations (maxReach)
+        * Galactic plane exclusion (taperL, taperB, peakL)
+        * Potentially visible fields bracketted by:
+            [LST@sunSet-deltaLST : LST@sunRise+deltaLST],
+            [Dec-arccos(1/maxAirmass: Dec+arccos(1/maxAirmass] (deltaLST)
+        * Ecliptic inclusion zone (EB)
+        * Limit east/west of potential Fields to visit each night
+                (newFieldsLimitEast_afterLSTatSunset, 
+                 newFieldsLimitWest_beforeLSTatSunrise)
+
+    Target Selection Characteristics
+    ---------------------------------
+        * Exposure time per visit (ExposureTime)
+        * Min acceptable cloud transparency upto hard limit=.9 (minTransparency)
+        * Max acceptable seeing (MaxSeeing)
+        * Max acceptable airmass (MaxAirmass)
+
+    Cross Science Program Ranking Characteristics
+    -----------------------------------------------
+	* Relative priority scaling for proposal (RelativeProposalPriority) 
+	* Bonus added to promote targets close to cur pos (MaxProximityBonus) 
+        * Slew time bonus promoting minimum slew (MaxSlewTimeBonus)
+        * Bonus for serendipitous target hit across multiple programs
+
+Science Program Specific Cadence and Ranking
+---------------------------------------------
+      Simple Cadence Options (WL)
+      ----------------------
+        * Max seeing per filter based on airmass-adj seeing (filter[Seeing])
+        * Desired number of visits per filter (FilterVisits[filter])
+        * Ranking: Scale factor (RankScale)
+
+      Comprehensive Sequenced Cadence Characteristics (SNSS and KBO)
+      -----------------------------------------------
+	* Maximum number of sequences active simultaneously 
+                 (MaxNumberActiveSequences) 
+	* Restart sequences which were terminated (RestartLostSequences) 
+	* Restart sequences which completed (RestartCompleteSequences) 
+	* Primary filter (MasterFilter)    
+        * Parameters per Filter in Sequence
+	    * Filter name (SeqFilter)
+	    * Requested Number of Events per Completed Sequence (SeqEvents) 
+	    * Maximum # events allowed to miss in sequence without declaring 
+              it as lost (SeqMaxMissed)    
+	    * Miniumum time interval between events in Sequence (SeqInterval) 
+            * Sequence Ranking for Window of Opportunity
+	        * Time event's priority starts rising (SeqWindowStart)
+	        * Time event's priority reaches max priority (SeqWindowMax)    
+	        * Time event is abandoned (SeqWindowEnd)    
+        
+      Original Sequenced Cadence Options (SN and NEA)
+      ----------------------------------
+	* Maximum number of sequences active simultaneously 
+                 (MaxNumberActiveSequences) 
+	* Restart sequences which were terminated (RestartLostSequences) 
+	* Restart sequences which completed (RestartCompleteSequences) 
+        * Maximum missed events in a sequence (MaxMissedEvents)
+        * Table of intervals between consecutive visits within a cycle
+                    (VisitInterval[])
+        * Number of repetitions of the cycle within a sequence (CycleRepeat)
+        * Interval between repetitions of the cycle (CycleInterval)
+        * Duration of the sequence (SequenceDuration)
+        * List of filters for the sequences, first is primary (SeqFilter[])
+        * Sequence Ranking for Window of Opportunity
+	    * Time event's priority starts rising (WindowStart)
+	    * Time event's priority reaches max priority (WindowMax)    
+	    * Time event is abandoned (WindowEnd)    
+        * Ranking:
+            * Max ranking scale for time window (RankTimeMax)
+            * Rank bonus for sky-filter present in event-filter (RankFilter)
+            * Rank for idle sequence, i.e. not started yet. (RankIdleSeq)
+	    * Maximum rank bonus for a sequence that has no room for misses 
+              (RankLossRiskMax) 
+      Note: SN & NEA cadence to be subsumed into above Sequenced Cadence model.
+
+Science Program Specific Options
+--------------------------------
+    Weak Lensing proposal
+    ---------------------
+        * Dark sky brightness (SkyBrightness, MinBrightness[filter], 
+                                MaxBrightness[filter])
+    NEA Specific Options
+    ---------------------
+        * Maximum accepted illuminated fraction of the moon (MaxMoonPhase)
+        * Sequence can/cannot continue in next lunation (CrossLunation)
+
+
+Non-Observing-Blocks Options
+----------------------------
+    * Type of Non-Observing Block being defined (nobType)
+    * Simulate Telescope Park during Non-observing Block (parkIt)
+    * Absolute Priority ranking of this Non-Observing Block (nobPriority)
+    * Periodicity of Sequence Repetition (seqnType)
+    * Simulated downtime duration (delayTime)
+    * Times within a Sequence to trigger Non-Observing Blocks (triggerAt)
+    * Time to start Sequence relative to simulation start (seqnStart)
+    * Indicate all idle time should be recorded in NOBHistory (dumpIdle)
+
+
+Instrument Characterization
+---------------------------
+    * Filter characterization (MinBrightness[filter],MaxBrightness[filter],
+        Wavelength[filter])
+    * Cinematic and delay parameters for slew time computation
+    * Absolute position limits due to cable wrap
+    * Filter change times
+    * Table of Dependencies between the slew activities
+    * Initial state for the mounted filters
+    * (List of speeds in each degree of freedom for the Telescope Optics)
+    * (List of speeds in each degree of freedom for the Instrument Optics)
+    * (Speed of ADC rotation)
+    * (Post-movement Settle times)
+
+
+Simulation Management Options
+-----------------------------
+    * Number of simulation years  (nRun)
+    * Jan 1 of year onto which the seeing data is applied (seeingEpoch)
+    * Days relative to seeingEpoch from which simulation commences (simStartDay)
+    * Field of View (fov)
+    * Site characteristics (lat, long, height, pressure, temp, relHumidity)
+    * Scaling Factor bringing reference data into alignment with site
+        * scale factor applied to all WeatherDB seeing (weatherSeeingFudge)
+        * telescope effects factor applied to all seeing (systemSeeingFactor)
+    * Delay time when no target is available for observation (idleDelay)
+    * Filters and their minimum and maximum brightness limits, wavelengths,
+        and allowable proximity to moon for observing (latter not used)
+    * Pathnames to Proposal configurations (weakLensConf[],nearEarthConf[],
+        superNovaConf[],superSubSeqConf[], kuiperConf[]) 
+    * Pathname of Logging File
+    * Logging verbosity
+
+
+Simulator Performance Optimizations
+------------------------------------
+    * Number of Targets which Proposals provide to ObsScheduler for
+        final ranking and selection (NumSuggestedObsPerProposal)
+    * Number of Observations to be selected using precalculated science 
+        quantities (reuseRankingCount)
+    * Value for which provided seeing is "Too Good To Be True" and is
+        therefore, tossed as unrealistic (tooGoodSeeingLimit)
+    * Using combination of Knobs - simulate systematic and thorough observation
+      of large sky patch: 1) create Field DB with FOV=patch size; 2) define 
+      uber-exposure time = (normal_exposure * normal_Fields_overlapping_patch);
+      3) select uber-patch via normal simulator metrics.
+
+
+=========================================================================
+=========================================================================
+Cadence Philosophy
+------------------
+    * Weak Lensing proposal
+        * continuous observation
+        * cover entire visible sky with specified number of observations 
+            per Field/filter, uniformly distributed over time .
+    * Near Earth Asteroid proposal
+        * implement the Ivezic scheme (with a bit more versatility)
+    * Super Nova proposal
+        * 100 day sequence composed of a visit every 3 days.
+    * Transients proposals (SNSS, KBO)
+        * comprehensive user-definable cadence sequences
+    * Non-observing blocks 
+        * simulate non-observing due to routine maintenance
+        * simulate non-observing due to unplanned downtime
+
+==========================================================================
+Priority Ranking Scheme across all Proposals
+
+   All proposals reward low slew and close proximity to previous target.
+
+   All proposals use the same ranking scale of values [0.0 : 1.0] .
+       Rank 0.0  indicates that, in the current context of the proposal,
+           a Field should not be observed.
+       Rank 0.1 is a 'stand-by' rank indicating that the Field is ready to
+           be observed (but there is no urgency).
+       Rank 0.5 indicates increasing urgency to observe the Field due to
+           the Proposal's scheduling requirements. Few Fields at any moment
+           should have such a high priority.
+       Rank 1.0 indicates urgent need to observe the Field.  Failure to
+           observe immediately will cause the current subsequence to abort.
+
+====================================================================
+Priority Ranking within a Simple Cadence Proposal
+    Weak Lensing Proposals attach a bonus to fields with smallest number 
+       of past visits.
+
+====================================================================
+Priority Ranking within a Sequenced-Events Proposal
+
+   A Sequenced-event proposal uses the closeness between the current
+       Simulation Time and the Next Event time as the primary ranking
+       criteria for a Field.
+
+       A timing window is constructed from the time interval between
+       the next Visit and the previous Visit. From that interval an urgency
+       scale is created to the precision required.
+
+   The normalized time scale used is as follows:
+       normalizedT = (currentTime-nextVisitTime)/(nextVisitTime-lastVisitTime)
+
+   The priority ranking of an observing visit starts rising at "WindowStart";
+       it reaches a maximum value at "WindowMax"; and it is
+       abandoned at "WindowEnd" if it still hasn't been observed.
+
+   Using defaults: WindowStart=-0.20, WindowMax=0.20; WindowEnd=4.0,
+       The priority begins rising at (0.2 * normalizedT) before the Visit time;#       it reaches the maximum priority at (0.2 * normalizedT) after the event
+       time; and returns to lowest prioirty at (0.4 * normalizedT) after
+       the Visit time.
+       Note: negative indicates *before* Visit time, positive is *after* Visit.
+
+==========================================================================
+             SNSS and KBO Sample Sequence setup and description
+==========================================================================
+# Note: Parameter descriptions, defaults, units are defined in the appropriate
+# template configuration  file.
+
+MasterSubSequence = main
+
+SubSeqName              = main
+SubSeqFilters           = r i
+SubSeqExposures         = 3 4
+SubSeqEvents            = 4
+SubSeqMaxMissed         = 1
+SubSeqInterval          = 1*24*60*60
+SubSeqWindowStart       =-0.5
+SubSeqWindowMax         = 0.35
+SubSeqWindowEnd         = 0.50
+
+SubSeqName              = extra
+SubSeqFilters           = g
+SubSeqExposures         = 10
+SubSeqEvents            = 3
+SubSeqMaxMissed         = 1
+SubSeqInterval          = 2*24*60*60
+SubSeqWindowStart       =-0.30
+SubSeqWindowMax         = 0.30
+SubSeqWindowEnd         = 0.50
+
+SubSeqName              = last
+SubSeqFilters           = r  i y
+SubSeqExposures         = 10 3 2
+SubSeqEvents            = 2
+SubSeqMaxMissed         = 0
+SubSeqInterval          = 4*24*60*60
+SubSeqWindowStart       =-0.50
+SubSeqWindowMax         = 0.30
+SubSeqWindowEnd         = 0.50
+
+--------------------------------------------------------------------
+1 Several subsequences can be defined with no limits.
+
+2 Each subsequence needs a name, any single-word-string or number.
+
+3 The SubSeqFilters keyword describes the series of filters to use in a
+  single event (or complex event).
+
+4 The SubSeqExposures keyword describes the number of repeated exposures for
+  each one of the respective filters in SubSeqFilters. All these exposures will
+  be taken in a single observation block, one after the other, changing the
+  filter as indicated. There is no limit in the number of filters to use in
+  this "microsequence". Other proposals cannot interrupt the completion of
+  this complex event, but will analyze the exposures for serendipity. The
+  complex-event can be interrupted by downtime like clouds, end of night, etc.
+  In case of interruption, the event is missed.
+
+5 The event is proposed only if all the required filters are available from
+  sky brightness criteria.
+
+6 The example above says that the master subsequence is "main", the whole
+  sequence must start with that one. The "main" subsequence needs 4 events
+  with an interval of 1 day; each interval is composed of 3 r consecutive
+  exposures followed by 4 i exposures. Only 1 event can be missed without
+  loosing the whole sequence.
+  The subsequence "extra" has 3 events, each one composed of 10 consecutive g
+  exposures.
+  The subsequence "last" has 2 events, none can be missed, each one composed
+  of 10 r exposures, followed by 3 i and finally 2 y.
+
+7 The ObsScheduler was modified to support this complex-events. It works the
+  same way as before, computing 20 (actually, reuseRankingCount) observations 
+  in a block to save cpu. If one observation from a sequenced proposal is 
+  taken, then this proposal gains the exclusive attention from the scheduler 
+  while the complex-event is observed.
+
+  Each exposure is sent with a special flag to all the other proposals to
+  check for serendipity. Once the complex-event is finished, the scheduler
+  returns to its normal block of 20 (actually, reuseRankingCount) mode.
+
+===========================================================================
+             NEA Sample Sequence setup and description (coming obsolescence)
+===========================================================================
+# Note: Parameter descriptions, defaults, units are defined in the appropriate
+# template configuration  file.
+
+# Note: SN and NEA to be subsumed into Comprehensive Sequenced Cadence model.
+
+MaxNumberActiveSequences = 800
+RestartLostSequences = False
+RestartCompleteSequences = True
+MaxMissedEvents = 1
+VisitInterval =      30*60.0
+VisitInterval = 5*24*60*60.0
+VisitInterval =      30*60.0
+VisitInterval = 5*24*60*60.0
+VisitInterval =      30*60.0
+CycleRepeats  = 1
+CycleInterval = 0.0
+SequenceDuration = 0.0
+SeqFilter = r
+SeqFilter = g
+SeqFilter = i
+
+-----------------------------------------------------------------------
+
+The Near Earth Asteroid program uses a non-terminating observing
+schedule of user-defined sequences of observations. The user-defined
+sequence is further refined into repeating cycles of observation visits.
+The distribution of sequences is, optimally, uniform; the distribution of
+cycles within a sequence is also uniform; however, the distribution of
+visits within a cycle need not be uniform.
+
+   Using the graphic below, consider a Sequence to be indicated by {}:
+      ..{}...{}...{}...
+
+   Consider a Cycle to be indicated by <>:
+       ..{<>..<>..<>}...{<>..<>..<>}...{<>..<>..<>}...
+       The number of cycles within a sequence is defined by "CycleRepeats".
+       The interval between consecutive cycles is "CycleInterval".
+
+   Consider a Visit to be indicated by |:
+       ..{<|..|...|.|>..<|..|...|.|>..<|..|...|.|>}...{<|..|...|.|>..
+       The number of visits per cycle is determined by the number
+       of "VisitInterval" defined. "VisitInterval" defines the spacing
+       between visits.
+
+   For maximum flexibility, "SequenceDuration" is overloaded to mean:
+       when >0: overwrite CycleRepeats with the number of full cycles that
+               fills the time specified in "SequenceDuration".
+       when = 0: make the system compute the effective Duration based on the
+           "CycleRepeats" value specified.
+
+   The filter choice used during the visits, depends on "SeqFilter" list.
+       The first listed is considered the primary filter which will be used
+       whenever the seeing meets the filter requirements. The additional
+       filters are backup filters used when the primary filter is
+       inappropriate.
+       abandoned at "WindowEnd" if it still hasn't been observed.
+

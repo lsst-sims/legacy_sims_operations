@@ -1,0 +1,35 @@
+Author: Kem Cook
+Date:   Jan. 2006
+
+The tiling using Kem's brain-dead algorithm is not perfect.  There are some
+places where there is too much overlap and some where there are some gaps,
+but it will work for now.  "makefields.sm" contains some supermongo
+macros which calculate the field centers and plot them on an Aitoff
+projection (thank you Sergei).
+
+kemtile plots the inscribed hexagons for each field
+kemtile1 makes the Aitoff sky black and then makes each field white which
+allows one to easily see where there are gaps.
+
+both produce files with coordinates
+
+3.5 degrees is hardcoded in the docir macro (make a circle) with a 1.75
+radius.  If you change this then you need to recompute the $sep variable
+and the declination step (d) as well.  Off hand they should just be 3/3.5
+* current values, if, for example, one wanted a 3.0 degree FOV.  I imagine 
+that the algorithm will work better with smaller fields.
+
+HOW TO GENERATE FIELD INGEST FILE
+---------------------------------
+1. Create file of RA/Dec centers
+	Run supermongo interpreter
+	shell> sm
+	: macro read makefields.sm
+	>> kemtile
+	: q
+
+2. Add galactic exclusion zone to set of fields
+       shell>./AddGalEcl < coords > fields.ingest
+
+3. Ingest fields into Field table in DB
+       shell> ../ingesetTargetsByFov.py --fov=3.5 --fields=fields.ingest

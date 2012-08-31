@@ -1,0 +1,160 @@
+Release Notes for Opsim3.alpha.0                        Aug. 31, 2012
+==================================
+New deployment structure:
+  * New directory structure for better handling of code, logs, tools
+    and configuration files.
+    Execution is operational, but installation is not.
+
+Release Notes for Opsim2.6.1                            Aug. 30, 2012
+==================================
+New fix:
+  * Fixed bug that disabled twilight visits by the end of some nights,
+    due to poorly implemented reuse count in a per proposal basis.
+    The suggestObservation loop in ObsScheduler was rewritten,
+    using a single global reuse count, and only one targets table.
+
+Release Notes for Opsim2.6                              Jul. 19, 2012
+==================================
+New feature:
+  * New Database access layer
+      Using a single connection variable to the database.
+  * Improved repeatability
+      Sorted keys in dictionaries for handling targets.
+  * Nested Sub-sequences
+      A subsequence can have a nested subsequence for new deep-drilling
+      science programs.
+  * Telescope model optimizations
+      Transform activity tree building from dynamic to static.
+  * Added functionality for different filters to have different exposure times
+      By adding a new parameter in Filters.conf
+
+Release Notes for Opsim2.5-Michelle                     Jul. 19, 2012
+==================================
+rTag :
+  * rTagging version with all of Michelle's changes
+
+Release Notes for OpSim2.5				Jul.  6, 2011
+============================
+New feature: Scheduled downtime
+  * Added scheduled downtime into the scheduling code, replacing our stopgap
+	solution of static downtimes injected into the weather dataset.
+  * The timing and duration of scheduled downtimes is now user-settable with
+	a configuration file, schedDown.conf.  The default file meets the
+	frequency specified by Chuck Claver.
+  * Removed old classes that are no longer used, namely NonObsScheduler,
+	NonObsHistory, NOB, and Operations.
+  * Removed code that creates the weather data with injected scheduled
+	downtime.
+
+New feature: Random downtime
+  * Added a tool to generate a sequence of random downtimes in the format of
+	an OpSim config file. A user can then choose which file to use in a
+	given simulation. 
+  * Created a new downtime table in database, downHist, so NOBHist can be
+	deprecated without breaking backwards compatibility with previous 
+	releases. 
+  * Scheduled downtime is given precedence in the case of conflicting
+	downtime events. Random downtime is allowed to finish the fraction
+	of time remaining, if any, after scheduled downtime completes.
+
+New feature: Optimization of cloud and seeing accesses
+  * Replaced a database read for every call to get cloudiness and seeing with
+	an access to in-core data dictionaries of clouds and seeing for
+	the night.
+  * The structures are built at the start of night.
+
+Minor changes and bug fixes:
+  * Separated system-level seeing degradation components. Only telescope
+	component degrades with zenith distance.
+  * Fix problem with exclusive block sequence code interacting with reuse
+	ranking by proposal code.
+  * Corrected assumption that more than one filter will be used by survey.
+ 	A simulation using just one filter can now be run.
+  * Fixed performance problem introduced by reuse ranking by proposal change.
+	getSeeing() and getTransparency() were being called for every
+	observation instead of every reuseCount observations.
+
+KNOWN Problems:
+  * Sometimes when completing a sequence, we try to remove the fieldID of
+	the completed sequence from Supernova deep drilling proposal's
+	self.tonightTargets[] and find it has already been deleted. Added
+	debugging in this release to help track how this is happening.
+    
+
+Release Notes for OpSim2.4				Jun. 16, 2010
+============================
+New feature: NEO Sweet Spot proposal
+  * Added hiatus to next night parameter to turn a proposal off for X nights.
+  * Track and report solar elongation of observation.  Observe if within
+	limits for NEO Sweet Spot proposals.  Added solar elongation
+	parameter.
+  * Fast revist times require reuse=1 or reuse=2, which slows simulation past
+	useable. Rewrote scheduling to allow each proposal to set its own
+	level of reuse so proposals with lengthy or no revisit needs can
+	have many observations taken without needing to be reranked.
+
+Minor changes:
+  * Local sidereal time should always be postive.
+  * Change name of SCP Galactic proposal (south celestial pole).
+  * Track and record count of nights with each observation (ObsHistory)
+	and in TimeHistory.
+  * Code cleanup to remove extra calls and unused code.
+  * Bringing NearEarthProp.py to running state with current code base.  It
+	has been unused.
+
+Release Notes for OpSim2.3.2				Aug. 14, 2009
+============================
+Minor changes and bug fixes have been made.
+  * Change seeing degradation from telescope/camera from stretch goal to
+	design goal and multiply effect by airmass to 3/5ths.
+  * Correct 'y' sky brightness in twilight to be the same as 'z'.
+  * Reset camera rotator to zero position during a filter change.
+  * Add sort to suggested observations list for low airmass, dark sky
+	brightness, and fieldID to help with reproducible runs 
+	(initial commit).
+  * Correct error in accessing weather table that kept opsim from using the
+	last year of weather data.
+
+
+Release Notes for OpSim2.3.1				Apr. 22, 2009
+============================
+Minor changes and bug fixes have been made.
+  * Add scheduled downtime to 10-year and 3-year weather datasets,
+      creating cloudTololoSD and cloud3yrTololoSD tables respectively.
+  * Record OPSIM_VERSION in run log.
+  * New Installation Guide.
+  * New post-processing tool to calculate filter sky brightness and
+      ETC sky brightness.
+  * Calculate and store actual airmass at time of observation.
+  * Remove sky brightness cache to enforce minimum distance to moon 
+      limit on observing.
+  * Change post-processing movie-making script to create a frame 
+      every X days and update documentation.
+  * Cleanup unneeded configuration saving routines.
+  * Add usage string for --startup_comment command-line option to 
+      main.py.
+  * Fix airmass cache to use correct parameters and set to off.
+  * Update configuration files to new baseline run (opsim1.29).
+  
+  
+
+Release Notes for OpSim2.3				Jan. 9, 2008
+==========================
+Only minor changes have been made to the Operations Simulator since the
+last release OpSim2.2.  
+
+  * Script that dumps sql table and data in a form that allows the table
+      to be reconstructed.
+  * Run tracking.  Production runs require a description.
+  * Enhance precision of time accounting (exposure vs. slew, end of night).
+  * Flush sky brightness cache at both twilight/dark time boundaries to
+      get crisp switch to or from twilight filters.
+  * Account for moon down in filter sky brightness calculations.
+  * Account for crawling motion of the dome in azimuth slew model.
+  * Tag each run with the code version that generated it
+  * Add a backup proposal to make sure telescope always has targets
+      to observe.
+  * Better tessellation of sky into fields.
+  * Account for scheduled downtime by changing the cloud tables.
+  * External library updates.
+

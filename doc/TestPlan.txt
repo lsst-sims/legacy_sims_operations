@@ -1,0 +1,31 @@
+
+LSST Observation Simulator Test Plan
+F. Pierfederici, K. Cook
+
+
+Introduction
+Testing the Observation Simulator is a two step process: on one hand one needs to make sure that every single software component works as expected. On the other hand, there is a clear need to verify that the output of the simulation makes sense from a scientific standpoint.
+
+
+Unit Tests
+Code that stress the functionality of the software in every class can be written quite systematically. These tests simply verify that a given piece of code is working as expected. They do not check the semantic content of the answer.
+
+
+Scientific Validation
+Scientific validation of the output of the simulation is probably the hardest test to automate. It is true, nevertheless, that some simulation values can be checked against their default ranges. In general, though, it is expected that a scientist will look at the results.
+
+It might be necessary for the project scientist to develop a reference simulation to validate our results against.
+
+
+Things We Want to Test (in no particular order)
+- Make sure that the telescope was not pointed in the exclusion zones (both static and dynamic).
+- Make sure that the size of the input field list is compatible with the FoV of the camera.
+- Make sure that, on average (over one year) all the science programs have been given the same attention/number of observations.
+- Make sure that the simulation reasonably minimized telescope dead-time.
+- Make sure that the number of observation that had to be discarded is acceptably low.
+- Make sure that each observation was taken at night.
+
+
+
+
+

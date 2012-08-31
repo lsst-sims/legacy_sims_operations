@@ -1,0 +1,20 @@
+#! /bin/csh -f
+
+rm -f ./InstrumentTest.log
+
+./InstrumentTest.py > InstrumentTest.out
+cat ./InstrumentTest.log | awk 'sub("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]","DATETIME-STAMP")' >> InstrumentTest.out
+
+diff InstrumentTest.out InstrumentTest.ref > InstrumentTest.dif
+
+set nlines=`wc InstrumentTest.dif | awk '{print $1}'`
+
+if ($nlines == 0) then
+    echo "test OK"
+else
+    echo "< out"
+    echo "> reference" 
+    cat InstrumentTest.dif
+    echo "test FAILED"
+endif
+

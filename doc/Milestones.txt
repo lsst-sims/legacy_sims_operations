@@ -1,0 +1,75 @@
+
+LSST Observation Simulator Development Milestones
+F. Pierfederici, K. Cook
+
+
+Introduction
+This document tries to identify functionality and components of the
+simulator that are to be consider essential and are to be present in the
+first release.
+
+Since the functionality of the simulator broadly falls into the two
+categories of Infrastructure and Algorithm/Science, this division is
+reflected in what follows. A tentative set of milestones for the core
+functionality is also presented.
+
+
+
+Core Functionality
+   1. Infrastructure Milestones (in order)
+     a.  A way of generating the list of available field positions given
+         the observatory location and the camera FoV.
+     b.  A way of discarding fields falling inside one or more
+         user-defined exclusion zones.
+     c.  A way to define fields with overlaps.
+     d.  A way of assigning unique ID to each field.
+     e.  A field list parser.
+     f.  A proposal description file parser.
+     g.  Historic weather data/model.
+     h.  Weather data file parser and randomizer.
+     i.  Weather data database.
+     i'  Weather interpolator.
+     l.  Ephemeris lookup tables/routines.
+     m.  Ephemeris lookup tables querying capabilities.
+     n.  Observation history database.
+     o.  Observation history querying capabilities.
+     p.  Telescope filter switching timings.
+
+   2. Algorithm/Science Milestones (in order)
+     a.  A way of describing the observation strategy/priorities of each
+         proposal that is both machine intelligible and user friendly.
+     b.  A way of translating proposal observing strategy, priorities
+         and observation history into objective rules for field/filter
+         ranking. Use Abi Saha algorithms?
+     c.  Choose first pointing.
+     d.  Develop an algorithm that assigns weights to both field/filter
+         rankings and to penalties in order to choose the "best"
+         field/filter combination. A possibility might be to generalize
+         the algorithms developed by Abi Saha.
+     e.  Telescope slew timings/model.
+     f.  Dome rotation timings/model.
+     g.  Seeing interpolation routines.
+
+
+Added Functionality
+3. Output
+   a. Generate reports and graphs of the results [2.0 weeks]
+     i.   Simulation results in a database-like storage (partially
+          implemented).
+     ii.  Querying capabilities.
+     iii. Identification of the parameters of interest.
+     iv.  Integration with plotting libraries (partially implemented).
+     v.   Report generation engine (template based).
+
+4. Documentation and Testing
+   a. Documentation
+     i.   Description of the algorithms.
+     ii.  User manual
+
+   b. Unit testing
+     i.   Unit tests.
+
+   c. Scientific validation
+     i.   Scientific validation test suit.
+
+Test Change

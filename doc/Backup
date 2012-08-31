@@ -1,0 +1,34 @@
+This is: doc/Backup
+
+It is only useful for NOAO personnel
+
+
+Archiving the simulator's root directory: cronos:/data1/simulator
+-----------------------------------------------------------------
+
+The NOAO CIS group is responsible for periodic backup of the users' home 
+directories on NOAO computer systems. They do NOT backup auxiliary data 
+directories.  
+
+The script:  <$LSST>/simulator/extern/SimBackup.py should be used 
+periodically to archive the simulator's environment.  Minimally, the backup 
+should be initiated soon after any major simulator software update.
+
+At the moment, the backup is orchestrated by hand whenever a new Production
+version is released or a major upgrade has been 'cvs committed'.
+
+To use:
+    % su
+    % cd ..../simulator/extern/
+    % ./SimBackup.py
+    .....wait a long time....
+    % ^D  (i.e. root logout)
+
+
+The script is marginal, at best.  When the destination disk runs out of space,
+the script exits with a failure notification informing you that you need
+to free up room on the destination disk.  It's envisioned that the oldest
+versions would be removed and then the backups rerun.
+
+There are many refinements possible.  Since a new directory is used for each
+invocation, static data is archived over and over.

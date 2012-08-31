@@ -1,0 +1,185 @@
+Update Simulator Production Environment
+=======================================
+
+The Production environment is composed of the Production source and the
+Production Database Tables.  
+
+
+It is only necessary to update the Production Database tables when:
+1) the DB table definition changed in the new Production source; or
+2) the user wants to maintain a 1:1 relationship with the source and DB table
+   versions  in order to keep configuration simple.
+
+For purposes of simplicity, I demonstrate below the method to keep the DB
+and source versions synchronized on the same production id.  
+
+At the very end of the file, I demonstrate how to use a previous release.
+It's not elegant but it works.
+
+============================================
+Set stage for all later Production Releases
+============================================
+
+Assume that a 'cvs checked out' Production Simulator Environment exists 
+at $SRCROOT and mysql Production DB Tables exist at $DBDATA.
+
+For example:
+    setenv SRCROOT ~robyn/CheckOut/
+    setenv DBDATA /data1/simulator/sw/mysql/data/
+
+Setup some links enabling easy swap in/out of releases
+    cd $SRCROOT
+    mv lsst lsst_Prod-<version>
+    ln -s lsst_Prod-<version> lsst
+
+    cd  $DBDATA             # usually at $MYSQL_RELEASE/data
+    mv LSST LSST_Prod-<version>
+    ln -s LSST LSST_Prod-<version>
+
+Setup convenience links 
+    cd $SRCROOT
+    ln -s lsst/simulator/src toSrc
+    ln -s lsst/simulator/sql toSql
+
+
+=================================
+Update Production Source Environment
+=================================
+
+If CVS repository is accessible:
+    cd $SRCROOT
+
+    # remove the link to now-obsolete lsst
+    rm lsst             
+
+    # install new lsst release
+    mkdir Prod-<version>
+    cd Prod-<version>
+    cvs co lsst
+    mv lsst lsst_Prod-<version>
+
+    # re-establish link to new lsst release
+    cd $SRCROOT
+    ln -s Prod-<version>/lsst_Prod-<version> lsst
+
+
+Using a provided tarball
+    cd $SRCROOT
+
+    # remove the link to now-obsolete lsst
+    rm lsst
+
+    # install new lsst release
+    mkdir Prod-<version>
+    cd Prod-<version>
+    tar xzf <tarball>    # assuming here that tarball contains 'lsst/'
+    mv lsst lsst_Prod-<version>
+
+    # re-establish link to new lsst release
+    cd $SRCROOT
+    ln -s Prod-<version>/lsst_Prod-<version> lsst
+
+=====================================
+Build the matching DB Environment
+=====================================
+
+
+If there is enough disk space to temporarily copy the old DB tables 
+over to New...
+    cd $DBDATA
+
+    # Simplify DB table rebuild - if there is enough disk space
+    cp -pr LSST LSST_Prod-<new_version>
+
+    # re-establish link to new lsst release
+    rm LSST
+    ln -s LSST_Prod-<new_version> LSST
+
+    cd $SRCROOT/toSql
+    mysql -u root -p LSST
+    <pswd>
+    # Reinitialize majority of tables --- See note below
+    source BuildNewVolatile.sql;        
+    # Need to remove on-demand tables from previous release
+    show tables;
+    drop table <list all olap tables separated by ','>;
+    quit;
+
+    Note: Weather and field data change so rarely, that I do not demonstrate 
+    how to update those tables.  Just go back to the original installation 
+    example for details on setting up new Fields and Weather.
+
+If there is not enough disk space for copy, rebuild all DB Tables using
+instruction provided in Installation Guide.  
+
+    cd $DBDATA
+
+    # remove the link (not the actual directory)
+    rm LSST
+
+    # build the complete new DB named: LSST
+    ...
+
+    #  re-establish link to new LSST tables 
+    cd $DBDATA
+    mv LSST LSST_Prod-<version>
+    ln -s LSST_Prod-<version> LSST
+
+
+=================================================================
+=================================================================
+For the Tucson contingent, I provide the original email discussing how
+to update the borrowed cluster. In this example, I only update the
+DB Tables when the source reflects a change to the DB table layout.
+
+I have used 'real' values for the name of the next source code (Prod-1-29)
+and the name of the current database instance (Prod-1-26). The database
+instance takes the name of the source code which matches its table alteration.
+
+========================================
+Update only the code and NOT the DB:
+========================================
+
+#On Cronos:
+cd ~
+mkdir Prod-1-29
+cd Prod-1-29
+cvs co lsst
+mv lsst lsst_Prod-1-29
+tar czf lsst_Prod-1-29.tgz lsst_Prod-1-29
+scp lsst_Prod-1-29.tgz <user>@orion:
+
+#On Ariadne (aka pc3):
+scp <user>@orion.tuc.noao.edu:lsst_Prod-1-29.tgz .
+scp lsst_Prod-1-29.tgz pc4:
+scp lsst_Prod-1-29.tgz pc5:
+scp lsst_Prod-1-29.tgz pc6:
+scp lsst_Prod-1-29.tgz pc7:
+
+# On pc3 only
+cp lsst_Prod-1-29.tgz prodReleases/
+
+# On each pc {3-7}
+rm lsst
+tar xzf lsst_Prod-1-29.tgz
+ln -s lsst_Prod-1-29 lsst
+rm lsst_Prod-1-29.tgz
+
+======================================================================
+To rebuild the database and save the old one
+======================================================================
+# On each pc {3-7}
+cd /data1/simulator/sw/mysql/data/
+rm LSST
+cp -pr LSST_Prod-1-26 LSST_Prod-1-29
+ln -s LSST_Prod-1-29 LSST
+cd ~/toSrc/../sql
+mysql -u root -p LSST
+    <pswd>
+    source BuildNewVolatile.sql;
+    quit;
+
+I do not show how to rebuild all the Field and Weather DB--that is contained
+within the initial Installation guide.
+
+============================================================================

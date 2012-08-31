@@ -1,0 +1,44 @@
+
+The weather data used for the simulator is the CTIO 2003 data complemented
+with the cloud coverage information for the same site and the same year.
+
+The files that were used are:
+CTIO2003.dat			(weather data)
+clouds/CTIO2003cloud.dat	(cloud coverage)
+
+The script used to parse the data files is:
+normalize_dates.py
+
+The script used to ingest data is:
+ingest_weather_data.py
+
+The script used to patch the weather database with the cloud data is:
+../src/patch_database.py
+
+==============================================================================
+Weather DB build
+==============================================================================
+cd lsst/simulator/test
+
+# remove non-data line from data file
+cp CTIO2003.dat truncCTIO2003.dat
+vi truncCTIO2003.dat
+    delete header line
+
+#convert the dates into seconds since incept
+./normalize_dates.py truncCTIO2003.dat > normCTIO2003.dat
+
+#initialize the Weather DB table
+cd ../sql
+mysql -u www -p LSST
+    source weather.sql;
+    quit;
+cd ../test
+
+# ingest the data
+./ingest_weather_data.py normCTIO2003.dat
+
+# moderate the weather data by cloud cover
+cd ../src
+./patch_database.py weather ../test/clouds/CTIO2003cloud.dat
+

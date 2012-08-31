@@ -1,0 +1,266 @@
+===========================================================================
+Hidden Assumptions embedded in simulator
+===========================================================================
+
+        a) seeing data transformation to filter specific value.
+        b) single exposure time for all proposals in a run
+        c) optimization expediencies
+            i) caching of skybrightness, airmass
+            ii) using precomputed values for more than one obs step
+                *moonProfile, targetProfile
+            iii) 
+        d) weather simplification
+            i) seeing acquired from nearest neighbor in time in SeeingDB
+            ii) cloud acquired from nearest neighbor in time in CloudDB
+        e) instrument simplification 
+            (get comments from Francisco)
+        f) max of 5 filters
+        g) default values for configuration parameters if not specified
+        h) NEA: no observation during full moon (comment in code)
+        
+
+===========================================================================
+Enhancements To Be Considered
+===========================================================================
+Leading '+' indicates required for First Run
+        #   indicates urgency level
+---------------------------------------------------------------------------
+
+   Short Term Needs for Dec 5 cluster abandonment
+   ----------------------------------------------------
+   * collect all log files and entire DB directories for 'good' cluster runs
+        save: /data1/simulator/sw/mysql/data/LSST_*     # DB dirs
+        save: ~lsst/lsst_*                              # src dir w/logs
+
+   Documentation
+   -------------
++  * describe the logic for ranking the various proposal types
++  * provide the 'what' and 'where' for all parameters defined in the
+       configuration files (LSST.conf, NOB.conf, Instrument.conf, Proposal.conf)
+   
+   Debug/Performance/Sanity Checks
+   --------------------------------
+   * Implement 'restart' dumps
++  * change convention of using dec.degrees for interface edges to radians.
+        * TBD: ra/dec from FieldDB, Astro:skyBrightness, Instrument;*Accel*, 
+             and Astro:caching indeces need to be converted.
+        * Instrument.py mostly converted to use radians internally
+        * dateProfile and obsProfile parameters converted to radians
+   * check that min slew time  bonus large enough  - newbri imdicates
+       that target fields are jumping around.  
+   * when code is ready for distribution: see if NCSA is willing to host source
+     and execution on their cluster so some management of source and DB is
+     possible. 
+            * Do we have enough SIDs allowed?
+            * Write up protocol to insert new DB table column. Won't be able
+              to zero-out tables henceforth.
+++ * implement remote CVS repository accessible from outside NOAO.
+++ * implement Production / Development branches for cvs development
+
+   Optimization
+   -------------
+   * libraries to C routines?  entire code to C++?
+   * Tony's comment: sort by longer wavelength. If satisfy constraints, then 
+     may be able to chop off end of list processing.  NOTE:However, this will 
+     not allow the easy search for serendipitous hits. ? How easy to build
+     single field check to determine if it is potential target for a proposal?
+   
+   Run Specification
+   --------------------
+   * Implement web front-end
+
+   Field  Management
+   -------------------
+   
+   Proposal
+   ---------------------
+    All Proposals
++      * Add yearStart/lunationStart method to reinitialize all summing 
+         variables for ranking.
+         Implement by adding year startup values to *all* counts at year 
+         boundary 
++++    * fix Bug in ObsScheduler so that exposure time is handled per proposal
+       * Filter handling
+            * apply conditions on filter use 
+              Kem will provide handful of specific conditions to implement
+       * Convert current ObsHistory fiducial skybrightness to filter-based
+         skybrightness.
+       * move code towards 2 generalized cadence programs: 
+         full sky coverage (currently WL) and 
+         transients  (currently SNSS, KBO, NEA, SN)
+       * Create parameter allowing user to define coord system used for 
+         userRegions input.  Helpful for planetary proposals.  FieldDB 
+         maintains RA/Dec centers in 3 diff coord types. Just choose correct
+         DB parameter when building the SQL command.
+
+
+    Transient Event Proposals
+        * random re-sort fields when creating limited number of sequences
+
+        Near Earth Asteroids 
+            *
+
+        SuperNova 
+            * WRT priority ranking: a target should not be dropped "vertically" 
+              at WindowEnd, but that priority should be allowed to decay 
+              softly....  probably with a "falling time" LONGER than the 
+              rise time.
+            * Pinto wants deep SN fields to get GRIZY obs every 3 days 
+              for 30 days. OK to miss some in sequence.
+
+        SuperNovaSubSequences
+
+        KBO
+
+    Weak Lensing 
++      * add alternate ranking scheme based on signal-to-noise (SNR)
+           Kem/Phil providing exposure time calculator
+       * restrict observations to max 6 times per night, x # per lunation.
+       * per kCook 1 dec 04:
+         right now I am requesting a large number of visits in each filter
+                to finesse the NormFactor which was a load balancing factor
+                put in place when it was thought that we should collect no
+                more than the requested number of visits.  What we really
+                want is at least the number of requested visits (if possible).
+                One possibility would be to fork the ranking using the old
+                logic up to the requsted number and new ranking for more than
+                the requested number
+
+    Solar System 
+       * acquire target selection and ranking rules from Zelco Ivezic
+       * implement 
+
+   Instrument  
+   ---------------------
+   * implement quarter positions for rotator (now only considers North -> Up)
+     (which implies that currently rotSkyPos is 0.0  for all Obs)
+   * add an optics alignment 'settle' time via 4 parameters: 
+	maximum distance slew in elevation before settle
+	settle time for elevation change
+	maximum distance slew in altitude before settle
+	settle time for altitude change
+	assessed settle time will be the larger of the two
+   * apply slew delay before the exposure (instead of after) 
+
+   DB 
+   ---------------------
+   * maintain on per observatory basis: atmospheric extinction coeff per filter
+   * maintain tags to the tagged static tables such as Weather, Field, Sites
+   * consider creating overarching DB maintaining Obs and NOB history.
+   * collect requestor's name for (future) session tracking.
+
+   Obs Scheduler
+   -------------
++  * logic to choose first observation of the night.
+     Currently whatever is least slew from Park position.
+   * allow dynamic ranking of proposals based on their advancement status
+   * define a better absolute ranking scale across proposals
+        Each proposal needs to maintain a hit list. And needs to supply a 
+        means to pass '%complete to date' for cross-all-proposals scheduling
+
+   Weather 
+   -----------
+   * change model for determining zenith seeing value at a particular time so
+     that seeing is paired with percent likelihood that observation would be
+     taken (that percent is precalculated based on cloud data)
+     * add new parameter to obsHistory: likelihood of Obs
+     * add new DB: Cloud maintaining all provided data and adding likelihood
+       field.
+     * alter getSeeing() to return (seeing,likelihood)
+   * determine if better to pre-calculate each evening's seeing/cloud values
+       or to access DB for each ObsStep.
++  * either install as configurable SeeingDB parameter or document fact that
+     raw seeing is assumed to be relative to a particular filter. 
+     See '0.5'      in Filters.py: 
+        self.basefilterWavelenSorted[ix] = 
+                        math.pow((0.5/float(self.filterWavelenSorted[ix])),0.2)
+
+
+   NOB
+   ----------
+   * add user specification of filter change on non-observing block
+
+   Plots
+   -----
+   * prepare interface to  LUCENT's mirage data mangler 
+   * define sql commands to pull out info on the distribution of visits
+     on a per-field basis with respect to seeing, airmass, skybrightness,
+     etc, and a quick display method
+   * newbri and newextract plot fields in different locations.
+        Note: seem to remember Phil saying the newbri kept locus on site.
+   NEWBRI
+   * validate model; "something doesn't feel right" accd to Phil and Tim
+   * setup movie making; create sequenced png output
+   NEWEXTRACT
+   * streamline movie making from png output
+
+   
+   Cronos Installation
+   -------------------
+   * Setup Cronos rsync
+   * Create cron job to remove old .png files from /srv/www/htdocs/lsst/images
+   * firewall issues for remote login
+   * create installation package for product installtion on fresh system
+        including OS levels, compilers, add=ons, DBs, etc.
+   * create archival area for obsolete but valuable DB sets
+   
+   Modifiability
+   --------------
+   
+   Modelling
+   ---------
+   * update the EA activity, domain, class diagrams
+
+Recommendations for Future enhancements
+----------------------------------------
+1) If the borrowed cluster is to remain the primary production system,
+   implement an automated backup of the cluster's database archive.
+   Currently no backup is done.
+                                                                                
+2) Implement automated backup of Cronos' database archive to reliable
+    backup medium. Currently setup for programmer-initiated backup to
+    secondary disk on gumtree.
+                                                                                
+3) Implement automated backup of Gumtree's software archive to reliable
+    backup medium. Currently setup for programmer-initiated backup to
+    secondary disk on gumtree.
+                                                                                
+4) Develop a software validation protocol
+    Develop unit testing framework for major modules
+    Develop system-wide testing of primary simulator modes
+                                                                                
+5) Develop a software release protocol including:
+        update relevant documentation:
+            function interface changes
+            DB Table changes
+            simulator configuration parameter changes
+            ToDo list
+        'CVS TAG' software and documentation repository
+        validate based on the software validation protocol
+        update DB
+            archive current DB
+            reinitialize new DB
+
+
+===================================================================
+Tricks:
+
+Simulating a scheduler where selection occurs for a block of
+    fields at a time and then all fields in that selection are observed.
+    * set fov = 15.25 to encompass fixed number (19) of fields
+    * set exposure time = 570 sec to include time need to perform all exposures.
+is selected for observing. 
+=======================================================================
+Zeljko analysis request: (email 08 Oct 2004)
+In ideal case I'd like to have a list of all field pairs observed with
+time separation of dtMin < delta(t)  < dtMax and then for each pair
+I need
+- the field center and the two times/bands of observation
+- zenith angle and the distance from meridian for each observation
+- (perhaps other field descriptors)
+- seeing and the depth for each image (say 5 sigma for point sources)
+                                                                                
+I am sure I am forgetting something, but we'll discover this later (in a
+painful way).
+                                                                                
+

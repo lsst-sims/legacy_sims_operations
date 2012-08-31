@@ -1,0 +1,12 @@
+Dec. 20, 2007
+-------------
+To build latest field tessellation, drop existing field table in DB and
+rebuild the table using "tessellationFields."
+
+mysql> drop table Field;
+mysql> source ../sql/field.sql;
+
+unix> ../ingestTargetsByFov.py --fov=3.5 --fields=tessellationFields
+
+Previous sky tiling dated 9/1/2006 is found in the raw data file
+"radecgalecl.new."
