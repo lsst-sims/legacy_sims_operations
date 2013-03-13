@@ -123,7 +123,7 @@ class Weather (LSSTObject):
         #print "n = %d, adjustedEnd = %s" % (n, res)
        
         #  Acquire the seeing data
-        sql = 'SELECT * FROM %s WHERE s_date >= %d AND s_date <= %d' \
+        sql = 'SELECT s_date, seeing FROM %s WHERE s_date >= %d AND s_date <= %d' \
                   % (self.dbTableDict['seeing'], adjustedStart, adjustedEnd)
         (n, res) = self.lsstDB.executeSQL (sql)
         #print "n = %d, res = %s" % (n, res)
@@ -200,11 +200,11 @@ class Weather (LSSTObject):
         #print "n = %d, adjustedEnd = %s" % (n, res)
        
         #  Acquire the cloud data
-        sql = 'SELECT * FROM %s WHERE c_date >= %d AND c_date <= %d' \
+        sql = 'SELECT c_date, cloud FROM %s WHERE c_date >= %d AND c_date <= %d' \
                   % (self.dbTableDict['cloud'], adjustedStart, adjustedEnd)
         (n, res) = self.lsstDB.executeSQL (sql)
         #print "n = %d, res = %s" % (n, res)
-
+    
         i = 1
         self.currentIdx = i
         for (c_date, cloud) in res:

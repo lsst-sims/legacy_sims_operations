@@ -393,13 +393,11 @@ class Simulator(object):
                     daysDown -= 1
         
                 # record entire downtime in one DB entry
-                sql = 'INSERT INTO %s VALUES (NULL, %d, "%s", %d, %d, %d,  \
-                          %d, %d, %f, "%s")' % (self.dbTableDict['downHist'], 
-                          self.sessionID, activityDown, duration,  
-                          startDownTime, t, startDownNight, self.nightCnt,
-			  cloudiness, schedDown)
-                (n, dummy) = self.lsstDB.executeSQL (sql)
-
+                        #sql = 'INSERT INTO %s VALUES (NULL, %d, "%s", %d, %d, %d, %d, %d, %f, "%s")' % (self.dbTableDict['downHist'], 
+                #  self.sessionID, activityDown, duration, startDownTime, t, startDownNight, self.nightCnt, cloudiness, schedDown)
+            #(n, dummy) = self.lsstDB.executeSQL (sql)
+            # This has been commented out for discussion with Francisco 
+            
                 if schedDown:
                     # get next scheduled downtime starttime
                     if len (self.schedDownStart) != 0:
@@ -470,14 +468,14 @@ class Simulator(object):
                         t = t + self.idleDelay
 
                         eventTime = self.idleDelay
-                        sql = 'INSERT INTO %s VALUES (NULL, %d, "%s", %d, %d, \
-                              %d, %d, %d, %f, "%s")' %  \
-                              (self.dbTableDict['downHist'], 
-                              self.sessionID, 'cloudy', eventTime, 
-#                              t, now(), self.nightCnt, self.nightCnt,
-                              t-self.idleDelay, t, self.nightCnt, self.nightCnt,
-                              cloudiness, 'False')
-                        (n, dummy) = self.lsstDB.executeSQL (sql)
+#                        sql = 'INSERT INTO %s VALUES (NULL, %d, "%s", %d, %d, \
+#                              %d, %d, %d, %f, "%s")' %  \
+#                              (self.dbTableDict['downHist'], 
+#                              self.sessionID, 'cloudy', eventTime, 
+##                              t, now(), self.nightCnt, self.nightCnt,
+#                              t-self.idleDelay, t, self.nightCnt, self.nightCnt,
+#                              cloudiness, 'False')
+#                        (n, dummy) = self.lsstDB.executeSQL (sql)
 
                     # Observe next field
                     else:

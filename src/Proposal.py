@@ -385,19 +385,19 @@ class Proposal (object):
 
         # Create short-term overlappingField table
         overlappingField = "OlapField_%d_%d" %(self.sessionID,self.propID)
-        sql = 'drop table if exists %s; ' %(overlappingField)
-        print sql
-        # Send the SQL commmand to the DB
-        (n, res) = self.lsstDB.executeSQL (sql)
+#        sql = 'drop table if exists %s; ' %(overlappingField)
+#        print sql
+#        # Send the SQL commmand to the DB
+#        (n, res) = self.lsstDB.executeSQL (sql)
 
-        sql = 'create table %s (fieldID int unsigned not null primary key,' % (overlappingField)
-        sql += 'fieldFov float NOT NULL,fieldRA float NOT NULL,fieldDec float NOT NULL,fieldGL float NOT NULL,fieldGB float NOT NULL,fieldEL float NOT NULL,fieldEB float NOT NULL);'
-        # Send the SQL commmand to the DB
-        (n, res) = self.lsstDB.executeSQL (sql)
+#        sql = 'create table %s (fieldID int unsigned not null primary key,' % (overlappingField)
+#        sql += 'fieldFov float NOT NULL,fieldRA float NOT NULL,fieldDec float NOT NULL,fieldGL float NOT NULL,fieldGB float NOT NULL,fieldEL float NOT NULL,fieldEB float NOT NULL);'
+#        # Send the SQL commmand to the DB
+#        (n, res) = self.lsstDB.executeSQL (sql)
+        olapTable = self.lsstDB.createOlapTable(overlappingField)
 
         # Load entire FieldDB in-core
         sql = 'select fieldID,fieldFov,fieldRA,fieldDec,fieldGL,fieldGB,fieldEL,fieldEB from %s;' %(fieldTable)
-
         # Send the SQL commmand to the DB
         (n, res) = self.lsstDB.executeSQL (sql)
 
@@ -426,14 +426,14 @@ class Proposal (object):
                 # is dist(regionCenter,fieldCenter) < fieldFov/2
                 if (dist(ra_rad[k],dec_rad[k],ofRa,ofDec) < (ofFov_div2 + diameter_div2_rad[k])) :
                       # ingest field into overlappingField
-                      sql = 'insert into %s values (%d,%f,%f,%f,%f,%f,%f,%f)'\
-                            %(overlappingField,id,fov,ra,dec,gl,gb,el,eb)
-                      (n, dummy) = self.lsstDB.executeSQL (sql)
+                      # sql = 'insert into %s values (%d,%f,%f,%f,%f,%f,%f,%f)' %(overlappingField,id,fov,ra,dec,gl,gb,el,eb)
+                      #(n, dummy) = self.lsstDB.executeSQL (sql)
+                      self.lsstDB.addOlap(olapTable, id,fov,ra,dec,gl,gb,el,eb)
                       # if field loaded, skip rest of regions wrt this field
                       break
 
-        return(overlappingField)
-
+        #return(overlappingField)
+        return (olapTable)
 
     def getPropID (self):
         """
@@ -462,24 +462,27 @@ class Proposal (object):
         #(n,res) = self.lsstDB.executeSQL (sql)
 
         # Create a new entry
-        sql = 'INSERT INTO %s VALUES (NULL, ' % (self.dbTableDict["proposal"])
-        sql += '"%s", ' % (self.propConf)
-        sql += '"%s", ' % (self.propName)
-        sql += '%d,  ' % (self.sessionID)
-        sql += '%d,  ' % (self.objID)
-        sql += '"%s" )' % (self.host)
-        (n,res) = self.lsstDB.executeSQL (sql)
+#        sql = 'INSERT INTO %s VALUES (NULL, ' % (self.dbTableDict["proposal"])
+#        sql += '"%s", ' % (self.propConf)
+#        sql += '"%s", ' % (self.propName)
+#        sql += '%d,  ' % (self.sessionID)
+#        sql += '%d,  ' % (self.objID)
+#        sql += '"%s" )' % (self.host)
+#        (n,res) = self.lsstDB.executeSQL (sql)
+#
+#        # Now fetch the propID we got assigned
+#        sql = 'SELECT propID FROM %s WHERE '  % (self.dbTableDict["proposal"])
+#        sql += 'propConf="%s" AND ' % (self.propConf)
+#        sql += 'propName="%s" AND ' % (self.propName)
+#        sql += 'sessionID=%d AND ' % (self.sessionID)
+#        sql += 'objectHost="%s" AND ' % (self.host)
+#        sql += 'objectID=%d' % (self.objID)
+#        (n,res) = self.lsstDB.executeSQL (sql)
+#        self.propID = res[0][0]
+               
+        oProposal = self.lsstDB.addProposal(self.propConf, self.propName, self.sessionID, self.host, self.objID)
+        self.propID = oProposal.propID
 
-        # Now fetch the propID we got assigned
-        sql = 'SELECT propID FROM %s WHERE '  % (self.dbTableDict["proposal"])
-        sql += 'propConf="%s" AND ' % (self.propConf)
-        sql += 'propName="%s" AND ' % (self.propName)
-        sql += 'sessionID=%d AND ' % (self.sessionID)
-        sql += 'objectHost="%s" AND ' % (self.host)
-        sql += 'objectID=%d' % (self.objID)
-        (n,res) = self.lsstDB.executeSQL (sql)
-
-        self.propID = res[0][0]
         return
     
     

@@ -1139,63 +1139,53 @@ class Instrument (object):
             self.log.info("Instrument: Observe(): PERFORMING AN OBSERVATION")
 
         self.slewCount += 1
-
+        
         (date,mjd,lst_RAD) = dateProfile
 
-	self.current_state.UpdateState(date)
-	self.DBrecordState(self.current_state, 'SlewInitState')
+        self.current_state.UpdateState(date)
+        #self.DBrecordState(self.current_state, 'SlewInitState')
 
         ha_RAD = lst_RAD - ra_RAD
-        (az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (ha_RAD,
-                                           dec_RAD,
-                                           self.params.latitude_RAD)
+        (az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (ha_RAD, dec_RAD, self.params.latitude_RAD)
 
-	if self.slew_params.Rotator_FollowSky:
-	    angle_RAD = 0.0
-	else:
-	    angle_RAD = pa_RAD - self.current_state.Rotator_Pos_RAD
-        self.targetposition.Set(ra_RAD,
-				dec_RAD,
-				angle_RAD,
-				filter,
-				exposureTime,
-				date,
-				alt_RAD,
-                                az_RAD,
-                                pa_RAD)
+        if self.slew_params.Rotator_FollowSky:
+            angle_RAD = 0.0
+        else:
+            angle_RAD = pa_RAD - self.current_state.Rotator_Pos_RAD
+            self.targetposition.Set(ra_RAD,	dec_RAD, angle_RAD, filter, exposureTime, date, alt_RAD, az_RAD, pa_RAD)
 
         delay = self.Slew(self.targetposition)
-        self.DBrecordState(self.current_state, 'SlewFinalState')
-        self.DBrecordMaximumSpeeds()
+        #self.DBrecordState(self.current_state, 'SlewFinalState')
+        #self.DBrecordMaximumSpeeds()
 
-	rotator_skypos = self.current_state.GetRotatorSkyPos()
-	rotator_telpos = self.current_state.GetRotatorTelPos()
+        rotator_skypos = self.current_state.GetRotatorSkyPos()
+        rotator_telpos = self.current_state.GetRotatorTelPos()
         altitude = self.current_state.ALT_RAD
         azimuth = self.current_state.AZ_RAD
 
-	sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewHistory')
-	sql += '%d, ' % (self.sessionID)
-	sql += '%d, ' % (self.slewCount)
-	sql += '%f, ' % (date)
-	sql += '%f, ' % (date+delay)
-	sql += '%f )' % (delay)
-	(n, dummy) = self.lsstDB.executeSQL(sql)
+        sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewHistory')
+        sql += '%d, ' % (self.sessionID)
+        sql += '%d, ' % (self.slewCount)
+        sql += '%f, ' % (date)
+        sql += '%f, ' % (date+delay)
+        sql += '%f )' % (delay)
+        #(n, dummy) = self.lsstDB.executeSQL(sql)
 
-	for activity in self.lastslew_delays.keys():
-	    if activity in self.lastslew_criticalpath:
-		cp = 'True'
-	    else:
-		cp = 'False'
-	    sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewActivities')
-	    sql += '%d, ' % (self.sessionID)
-	    sql += '%d, ' % (self.slewCount)
-	    sql += '"%s", ' % (activity)
-	    sql += '%f, ' % (self.lastslew_delays[activity])
-	    sql += '"%s" )' % (cp)
-	    (n, dummy) = self.lsstDB.executeSQL(sql)
+        for activity in self.lastslew_delays.keys():
+            if activity in self.lastslew_criticalpath:
+                cp = 'True'
+            else:
+                cp = 'False'
+            sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewActivities')
+            sql += '%d, ' % (self.sessionID)
+            sql += '%d, ' % (self.slewCount)
+            sql += '"%s", ' % (activity)
+            sql += '%f, ' % (self.lastslew_delays[activity])
+            sql += '"%s" )' % (cp)
+            #(n, dummy) = self.lsstDB.executeSQL(sql)
 
-	self.next_state = copy.deepcopy(self.current_state)
-	self.next_state.UpdateState(date+delay+exposureTime)
+        self.next_state = copy.deepcopy(self.current_state)
+        self.next_state.UpdateState(date+delay+exposureTime)
 
         return (delay, rotator_skypos, rotator_telpos, altitude, azimuth)
 

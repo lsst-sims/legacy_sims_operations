@@ -89,7 +89,7 @@ class MissedHistory (LSSTObject):
                obs.date, obs.mjd, \
                obs.ra * DEG2RAD, obs.dec * DEG2RAD)
 
-        (n, dummy) = self.lsstDB.executeSQL (sql)
+        #(n, dummy) = self.lsstDB.executeSQL (sql)
         return
     
     

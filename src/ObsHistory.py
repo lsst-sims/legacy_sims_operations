@@ -135,7 +135,7 @@ class ObsHistory (LSSTObject):
                obs.mieScatter, obs.moonIllum, obs.moonBright, \
                obs.darkBright, obs.solarElong)
 
-        (n, dummy) = self.lsstDB.executeSQL (sql)
+        #(n, dummy) = self.lsstDB.executeSQL (sql)
         return
     
     def getNVisitsPerFilter (self, 
@@ -377,11 +377,11 @@ class ObsHistory (LSSTObject):
         if ( self.log and self.verbose > 1):
             self.log.info('ObsHistory: cleanupProposal()')
 
-        sql = 'DELETE FROM %s WHERE ' % (self.dbTableDict['obsHist'])
-        sql += 'propID=%d AND ' % (propID)
-        sql += ' sessionID=%d' % (sessionID)
-
-        (n, res) = self.lsstDB.executeSQL (sql)
+#        sql = 'DELETE FROM %s WHERE ' % (self.dbTableDict['obsHist'])
+#        sql += 'propID=%d AND ' % (propID)
+#        sql += ' sessionID=%d' % (sessionID)
+#
+#        (n, res) = self.lsstDB.executeSQL (sql)
         return
     
     

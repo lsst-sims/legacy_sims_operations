@@ -5,11 +5,12 @@
 #except:
 #    pass
 
-OPSIM_VERSION = '2.6'
+OPSIM_VERSION = '3.0alpha'
 
 from utilities import *
 from Simulator import *
-from LSSTDatabase import * 
+#from LSSTDatabase import *
+from Database import *
 import binascii
 
 import urllib
@@ -40,28 +41,33 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     # Remove data from the previous run where user, host and date are
     # the same. This would only happen is the same user restarts the 
     # simulatiomn on the same machine within a second...
-    sql = 'DELETE FROM %s WHERE ' % (sessionTbl)
-    sql += 'sessionUser="%s" AND ' % (user)
-    sql += 'sessionHost="%s" AND ' % (host)
-    sql += 'sessionDate="%s"' % (date)
-    (n, dummy) = lsstDB.executeSQL (sql)
+
+#    sql = 'DELETE FROM %s WHERE ' % (sessionTbl)
+#    sql += 'sessionUser="%s" AND ' % (user)
+#    sql += 'sessionHost="%s" AND ' % (host)
+#    sql += 'sessionDate="%s"' % (date)
+#    (n, dummy) = lsstDB.executeSQL (sql)
+#    
+#    # Create a new entry
+#    sql = 'INSERT INTO %s VALUES (NULL, '  % (sessionTbl)
+#    sql += '"%s", ' % (user)
+#    sql += '"%s", ' % (host)
+#    sql += '"%s",' % (date)
+#    sql += '"%s",' % (OPSIM_VERSION)
+#    sql += '"%s")' % (startup_comment)
+#    (n, dummy) = lsstDB.executeSQL (sql)
+#    
+#    # Now fetch the assigned sessionID 
+#    sql = 'SELECT sessionID FROM %s WHERE '  % (sessionTbl)
+#    sql += 'sessionUser="%s" AND ' % (user)
+#    sql += 'sessionHost="%s" AND ' % (host)
+#    sql += 'sessionDate="%s"' % (date)
+#    (n, res) = lsstDB.executeSQL (sql)
+#    sessionID = res[0][0]
     
-    # Create a new entry
-    sql = 'INSERT INTO %s VALUES (NULL, '  % (sessionTbl)
-    sql += '"%s", ' % (user)
-    sql += '"%s", ' % (host)
-    sql += '"%s",' % (date)
-    sql += '"%s",' % (OPSIM_VERSION)
-    sql += '"%s")' % (startup_comment)
-    (n, dummy) = lsstDB.executeSQL (sql)
+    oSession = lsstDB.newSession(user, host, date, OPSIM_VERSION, startup_comment)
+    sessionID = oSession.sessionID
     
-    # Now fetch the assigned sessionID 
-    sql = 'SELECT sessionID FROM %s WHERE '  % (sessionTbl)
-    sql += 'sessionUser="%s" AND ' % (user)
-    sql += 'sessionHost="%s" AND ' % (host)
-    sql += 'sessionDate="%s"' % (date)
-    (n, res) = lsstDB.executeSQL (sql)
-    sessionID = res[0][0]
     # the last argument = 1 is the status_id 
     try:
     	track(sessionID, host, user, startup_comment, code_test, 1.0)
@@ -74,12 +80,12 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
 def track(sessionID, hostname, user, startup_comment, code_test, status_id):
 	url = "http://opsimcvs.tuc.noao.edu/tracking/tracking.php";
 	params = urllib.urlencode({'sessionID': sessionID,
-                                   'hostname': hostname,
-                                   'user': user, 
-                                   'startup_comment': startup_comment, 
-                                   'code_test': code_test, 
-                                   'status_id': status_id, 
-                                   'run_version': OPSIM_VERSION})
+                               'hostname': hostname,
+                               'user': user,
+                               'startup_comment': startup_comment,
+                               'code_test': code_test,
+                               'status_id': status_id,
+                               'run_version': OPSIM_VERSION})
 	url = "%s?%s" % (url, params);
 	result = urllib.urlopen(url).read();
 	print("    Tracking:%s" % (result))
@@ -105,7 +111,8 @@ def startLsst( args ):
         exit if there are errors 
     """
     # Instantiate DB Object
-    lsstDB = LSSTDatabase() 
+    # lsstDB = LSSTDatabase()
+    lsstDB = Database()
 
     # Startup comment
     if (args.has_key ('startup_comment')):
@@ -578,7 +585,7 @@ def startLsst( args ):
         dt = time.time () - t0
         print ('      simulation took %.02fs' % (dt))
 
-    lsstDB.closeConnection()
+    #lsstDB.closeConnection()
 
     return
     

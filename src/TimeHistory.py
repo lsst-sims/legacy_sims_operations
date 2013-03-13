@@ -94,11 +94,11 @@ class TimeHistory (LSSTObject):
         if ( self.log and self.verbose > 0):
             self.log.info('TimeHistory: add(): date:%d mjd:%f event:%d ' % (date,mjd,event))
         
-        sql = 'INSERT INTO %s VALUES (NULL, %d, %d, %f, %d, %d )' \
-            % (self.dbTableDict['timeHist'], \
-               sessionID, date, mjd, nightCnt, event)
-
-        (n, dummy) = self.lsstDB.executeSQL (sql)
+#        sql = 'INSERT INTO %s VALUES (NULL, %d, %d, %f, %d, %d )' \
+#            % (self.dbTableDict['timeHist'], \
+#               sessionID, date, mjd, nightCnt, event)
+#        (n, dummy) = self.lsstDB.executeSQL (sql)
+        self.lsstDB.addTimeHistory(sessionID, date, mjd, nightCnt, event)
         return
     
     

@@ -132,11 +132,11 @@ class SeqHistory (LSSTObject):
         if ( self.log and self.verbose > 1):
             self.log.info('SeqHistory: cleanupProposal()')
 
-        sql = 'DELETE FROM %s WHERE ' % (self.dbTableDict['seqHistory'])
-        sql += 'propID=%d AND ' % (propID)
-        sql += ' sessionID=%d' % (sessionID)
-
-        (n, res) = self.lsstDB.executeSQL (sql)
+#        sql = 'DELETE FROM %s WHERE ' % (self.dbTableDict['seqHistory'])
+#        sql += 'propID=%d AND ' % (propID)
+#        sql += ' sessionID=%d' % (sessionID)
+#
+#        (n, res) = self.lsstDB.executeSQL (sql)
         return
     
     

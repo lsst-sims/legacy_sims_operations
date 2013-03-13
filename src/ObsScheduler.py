@@ -757,11 +757,10 @@ class ObsScheduler (LSSTObject):
         return
 
     def closeProposals(self, time):
-
-#	for proposal in self.interProposalRank.keys ():
-	for proposal in self.proposals_list:
-	    proposal.closeProposal(time)
-
-	return
+        
+        #	for proposal in self.interProposalRank.keys ():
+        #for proposal in self.proposals_list:
+            #proposal.closeProposal(time)
+        return
 
 

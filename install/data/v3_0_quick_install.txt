@@ -1,0 +1,10 @@
+mysql> drop schema OpsimDB;
+
+mysql> source v3_0.sql;
+
+mysql> insert into Seeing (s_date, seeing) select s_date, seeing from LSST.SeeingPachon;
+
+mysql> insert into Cloud (c_date, cloud) select c_date, cloud from LSST.CloudTololo;
+
+mysql> insert into Field select * from LSST.Field;
+

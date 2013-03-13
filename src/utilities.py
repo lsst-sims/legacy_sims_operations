@@ -11,7 +11,7 @@ import sys
 import tempfile
 import time
 import logging
-import MySQLdb
+#import MySQLdb
 
 # SimPy includes
 #from SimPy import Simulation
@@ -325,16 +325,17 @@ def readConfFile (fileName):
 def storeParam (lsstDB, sessionID, propID, moduleName, paramIndex, paramName,
                     paramValue, comment=""):
 
-    sql = 'insert into Config values (NULL, '
-    sql += '"%d", ' % (sessionID)
-    sql += '"%d", ' % (propID)
-    sql += '"%s", ' % (moduleName)
-    sql += '"%d", ' % (paramIndex)
-    sql += '"%s", ' % (paramName)
-    sql += '"%s", ' % (MySQLdb.escape_string(paramValue))
-    sql += '"%s") ' % (comment)
-
-    (n, dummy) = lsstDB.executeSQL(sql)
+#    sql = 'insert into Config values (NULL, '
+#    sql += '"%d", ' % (sessionID)
+#    sql += '"%d", ' % (propID)
+#    sql += '"%s", ' % (moduleName)
+#    sql += '"%d", ' % (paramIndex)
+#    sql += '"%s", ' % (paramName)
+#    sql += '"%s", ' % (MySQLdb.escape_string(paramValue))
+#    sql += '"%s") ' % (comment)
+#
+#    (n, dummy) = lsstDB.executeSQL(sql)
+    lsstDB.addConfig(sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment)
 
 def computeDateProfile (obsProfile, date):
     """
