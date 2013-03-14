@@ -145,11 +145,10 @@ class Database :
             self.dbSession.rollback()
         return oSession
 
-    def addConfig(self, sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment) :
+    def addConfig(self, sessionID, moduleName, paramIndex, paramName, paramValue, comment) :
         try:
             oConfig = Opsim_Config()
             oConfig.session_sessionID = sessionID
-            oConfig.propID = propID
             oConfig.moduleName = moduleName
             oConfig.paramIndex = paramIndex
             oConfig.paramName = paramName
