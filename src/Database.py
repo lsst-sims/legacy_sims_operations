@@ -209,7 +209,7 @@ class Database :
             self.dbSession.add(oConfigFile)
             self.dbSession.commit()
         except:
-            self.dbSEssion.rollback()
+            self.dbSession.rollback()
 
     def addLog(self, log_name, log_value, sessionID):
         try:
