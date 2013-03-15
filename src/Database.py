@@ -232,7 +232,8 @@ class Database :
         except:
             self.dbSession.rollback()
 
-    def addSeqHistory(self, startDate, expDate, seqnNum, completion, reqEvents, actualEvents, endStatus, parent_sequenceID, fieldID, sessionID, propID):
+    def addSeqHistory(self, startDate, expDate, seqnNum, completion, reqEvents, actualEvents,
+                      endStatus, parent_sequenceID, fieldID, sessionID, propID):
         try:
             oSeqHistory = Opsim_SeqHistory()
             oSeqHistory.startDate = startDate
@@ -248,8 +249,10 @@ class Database :
             oSeqHistory.Proposal_propID = propID
             self.dbSession.add(oSeqHistory)
             self.dbSession.commit()
+            self.dbSession.refresh(oSeqHistory)
         except:
             self.dbSession.rollback()
+	return oSeqHistory
 
     def addSeqHistoryObsHistory(self, sequenceID, obsHistID):
         try:
@@ -261,7 +264,7 @@ class Database :
         except:
             self.dbSession.rollback()
 
-    def addObsHistory_Propsal(self, propID, obsHistID, propRank):
+    def addObsHistoryProposal(self, propID, obsHistID, propRank):
         try:
             oObsHistoryProposal = Opsim_ObsHistory_Proposal
             oObsHistoryProposal.Proposal_propID = propID
