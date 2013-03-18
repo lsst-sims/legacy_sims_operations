@@ -21,7 +21,7 @@ Activate a TAC instance
 from utilities import *
 from LSSTObject import *
 from Proposal import *
-from WeakLensingProp import *
+from newWeakLensingProp import *
 from NearEarthProp import *
 from SuperNovaProp import *
 from SuperNovaSubSeqProp import *
@@ -34,6 +34,7 @@ class TAC(object):
     def __init__(self,
 		 lsstDB, 
                  nRun,
+		 schedulingData,
                  sky, 
                  weather, 
                  obsScheduler, 
@@ -83,7 +84,8 @@ class TAC(object):
 
         """
 #        Simulation.Process.__init__(self)
-	self.lsstDB = lsstDB        
+	self.lsstDB = lsstDB    
+	self.schedulingData = schedulingData    
 	self.sky = sky
         self.weather = weather
         self.obsScheduler = obsScheduler
@@ -144,6 +146,7 @@ class TAC(object):
         if ( self.weakLensConf[0] != None):
             for k in range(len(self.weakLensConf)):
                 wlp = WeakLensingProp (lsstDB=self.lsstDB,
+			       schedulingData=self.schedulingData,
 			       sky=self.sky, 
                                weather=self.weather,
                                sessionID=self.sessionID,
