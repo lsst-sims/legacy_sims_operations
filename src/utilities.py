@@ -335,7 +335,7 @@ def storeParam (lsstDB, sessionID, propID, moduleName, paramIndex, paramName,
 #    sql += '"%s") ' % (comment)
 #
 #    (n, dummy) = lsstDB.executeSQL(sql)
-    lsstDB.addConfig(sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment)
+    lsstDB.addConfig(sessionID, moduleName, paramIndex, paramName, paramValue, comment)
 
 def computeDateProfile (obsProfile, date):
     """
