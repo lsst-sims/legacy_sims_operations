@@ -103,6 +103,7 @@ class AstronomicalSky (LSSTObject):
 
         """
 	self.lsstDB = lsstDB        
+	self.obsProfile = obsProfile
 	(self.longitude_RAD,self.latitude_RAD,self.height,self.epoch,\
             self.pressure,self.temp,self.relhum) = obsProfile
         self.simEpoch = self.epoch
@@ -618,7 +619,8 @@ class AstronomicalSky (LSSTObject):
         brightProfile = alpha, k, rs, ms, i, moonBr, skyBr
 
         return (totBr,distance2moon_RAD,moonAlt_RAD, brightProfile)
-    
+   
+ 
     def airmass (self, dateProfile, ra, dec):
         """
         Compute the airmass of (ra, dec) at date with respect of the
@@ -697,6 +699,13 @@ class AstronomicalSky (LSSTObject):
         # Update the cache
         self.airmassCache[key] = (am,alt_RAD,az_RAD)
         return (am,alt_RAD,az_RAD)
+
+    def airmasst (self, date, ra, dec):
+
+        dateProfile = computeDateProfile(self.obsProfile, date)
+
+        return self.airmass(dateProfile, ra, dec)
+
     
     def getHAforAirmass(self, airmass):
 	"""
