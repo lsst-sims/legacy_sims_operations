@@ -243,6 +243,13 @@ def startLsst( args ):
         schedulerConf = DefaultSchedulerConfigFile
         print("    schedulerConf:%s default" % (schedulerConf))
 
+    if ( configDict.has_key ('schedulingDataConf')) :
+        schedulingDataConf =  configDict["schedulingDataConf"]
+        print("    schedulindDataConf:%s" % (schedulingDataConf))
+    else :
+        schedulingDataConf = DefaultSchedulingDataConfigFile
+        print("    schedulingDataConf:%s default" % (schedulingDataConf))
+
     if ( configDict.has_key ('schedDownConf')) :
         schedDownConf =  configDict["schedDownConf"]
         print("    schedDownConf:%s" % (schedDownConf ))
@@ -562,6 +569,7 @@ def startLsst( args ):
 		     WLpropConf=WLpropConf,
                      instrumentConf=instrumentConf,
                      schedulerConf=schedulerConf, 
+		     schedulingDataConf=schedulingDataConf,
                      dbTableDict=dbTableDict,
                      log=log, 
                      logfile=logfile, 
