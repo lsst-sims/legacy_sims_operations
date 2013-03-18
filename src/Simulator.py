@@ -43,6 +43,7 @@ from TAC import *
 from Weather import *
 from Instrument import *
 from Filters import *
+from SchedulingData import *
 
 #class Simulator (Simulation.Process):
 class Simulator(object):
@@ -72,6 +73,7 @@ class Simulator(object):
 		  WLpropConf,
                   instrumentConf,
                   schedulerConf,
+		  schedulingDataConf,
                   dbTableDict,
                   log=False,
                   logfile='./Simulator.log',
@@ -138,6 +140,7 @@ class Simulator(object):
 	self.WLpropConf = WLpropConf
         self.instrumentConf = instrumentConf   # Instrument config file
         self.schedulerConf = schedulerConf
+	self.schedulingDataConf = schedulingDataConf
         self.dbTableDict = dbTableDict  # dictionary of SQL table names
 
         # Setup logging
@@ -729,6 +732,11 @@ class Simulator(object):
                                     logfile=self.logfile,
                                     verbose=self.verbose)
         
+        self.schedulingData = SchedulingData(self.schedulingDataConf,
+                                                0,
+                                                self.nRun*YEAR,
+						self.sky)
+
         # Init the Weather Simulator
         self.weather = Weather (lsstDB=self.lsstDB,
 				date=0., 
@@ -760,6 +768,7 @@ class Simulator(object):
         # Create a TAC object and activate it.
         self.tac = TAC (lsstDB=self.lsstDB,
 			nRun=self.nRun,
+			schedulingData=self.schedulingData,
                         sky=self.sky, 
                         weather=self.weather, 
                         obsScheduler=self.obsScheduler,
