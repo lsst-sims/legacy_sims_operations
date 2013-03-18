@@ -6,7 +6,12 @@ from utilities import *
 class SchedulingData (LSSTObject):
 
     def __init__ (self,
-                  configFile):
+                  configFile,
+		  surveyStartTime,
+		  surveyEndTime,
+		  astroSky):
+
+	self.astroSky = astroSky
 
         config, pairs = readConfFile(configFile)
 
@@ -15,9 +20,7 @@ class SchedulingData (LSSTObject):
 
 	self.cycleSamples = self.cycleDuration/self.dt
 
-	self.startTime = 0
-	self.endTime = 0
-	self.currentTime = 0
+	self.initSurvey(surveyStartTime, surveyEndTime)
 
 	return
 
@@ -28,6 +31,12 @@ class SchedulingData (LSSTObject):
 	self.endTime = endTime
 	self.currentTime = startTime
 	self.extendedCycleTimes = [self.currentTime]
+
+	self.listOfActiveFields = []
+	self.airmass = {}
+	self.brightness = {}
+	self.visible = {}
+	self.filters = {}
 
 	self.initNewCycle()
 
@@ -44,6 +53,10 @@ class SchedulingData (LSSTObject):
 	    extensionStart = self.extendedCycleTimes[-1] + self.dt
 	    extensionEnd = min(extensionStart + samplesToAdd*self.dt, self.endTime)
 	extensionTimes = range(extensionStart, extensionEnd+1, self.dt)
+	for t in extensionTimes:
+	    for field in self.listOfActiveFields:
+	        self.airmass[field][t] = self.astroSky.airmass(t, field)
+#        	self.brightness[field][t] = self.astroSky.brightness(t, field)
 
 	self.extendedCycleTimes += extensionTimes
 
@@ -72,6 +85,25 @@ class SchedulingData (LSSTObject):
 	cycleTimes = self.extendedCycleTimes[self.indexTime:self.indexTime+self.windowSamples+1]
 
 	return cycleTimes
+
+    def updateTargets (self, dictOfNewFields, propID, dateProfile):
+
+	listOfNewFields = sorted(dictOfNewFields.iterkeys())
+	for field in listOfNewFields:
+	    if field not in self.listOfActiveFields:
+		self.listOfActiveFields.append(field)
+		self.airmass[field] = {}
+		self.brightness[field] = {}
+		self.visible[field] = {}
+		self.filters[field] = {}
+                for t in self.extendedCycleTimes[self.indexTime:]:
+		    print t
+		    (ra, dec) = dictOfNewFields[field]
+		    self.airmass[field][t] = self.astroSky.airmasst(t, ra, dec)
+#		    self.brightness[field][t] = self.astroSky.brightness(t, ra, dec)
+	self.listOfActiveFields.sort()
+
+	return
 
 if (__name__ == '__main__'):
 
