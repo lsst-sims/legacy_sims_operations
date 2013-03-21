@@ -161,8 +161,8 @@ class AstronomicalSky (LSSTObject):
         self.fluxTwilight = 10.**((-self.twilightBrightness)/2.5)
         
         # store config to DB
-        for line in pairs:
-            storeParam (self.lsstDB, sessionID, 0, 'astroSky', line['index'], line['key'], line['val'])
+#        for line in pairs:
+#            storeParam (self.lsstDB, sessionID, 0, 'astroSky', line['index'], line['key'], line['val'])
 
         # Setup logging
         if (verbose < 0):
@@ -188,7 +188,61 @@ class AstronomicalSky (LSSTObject):
 
         return
 
-    
+    def computeDateProfile(self, date):
+        """
+        Convert Simulator seconds to an MJD and LST for observatory location
+        and epoch.
+        Input
+            obsProfile  longitude, latitude, elevation, epoch of observatory
+            date        elapsed simulation time in seconds
+
+        Output
+            dateProfile     an array containing
+                date
+                mjd
+                lst_RAD
+        """
+        (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = self.obsProfile
+        mjd = (float (date) / float (DAY)) + float(epoch_MJD)
+        lst_RAD = slalib.sla_gmst(mjd)  + lon_RAD
+        if lst_RAD < 0:
+            lst_RAD += TWOPI
+        return (date, mjd, lst_RAD)
+
+    def mjd(self, date):
+
+        mjd = (float (date) / float (DAY)) + float(self.simEpoch)
+
+	return mjd
+
+    def computeMoonProfile(self, date):
+        """
+        Precompute quantities relating to the moon used by subsequent routines
+
+        Input
+            dateProfile:    an array containing
+                date
+                mjd
+                lst_RAD
+        Output
+            moonProfile:    an array containing
+                moonRA_RAD
+                moonDec_RAD
+                moonPhase_PERCENT
+        """
+        (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = self.obsProfile
+        mjd = (float (date) / float (DAY)) + epoch_MJD
+
+        # Get the Moon RA/Dec  in radians
+        (moonRA_RAD,moonDec_RAD,moonDiam) =  slalib.sla_rdplan(mjd,
+                                                    3,
+                                                    lon_RAD,
+                                                    lat_RAD)
+        moonPhase_PERCENT = self.getMoonPhase(mjd)
+
+        return(moonRA_RAD,moonDec_RAD,moonPhase_PERCENT)
+
+
     def isVisible (self, ra, dec, dateProfile, maxAirmass=2.):
         """
         Compute the visibility of a given point in the sky ()ra, dec 
@@ -279,7 +333,18 @@ class AstronomicalSky (LSSTObject):
 
         return ((sunriseDate,sunsetDate,sunRiseMJD,sunSetMJD, sunriseTwilDate,sunsetTwilDate))
         
-    
+    def getIntTwilightSunriseSunset (self, date):
+
+	(sunriseDate,sunsetDate,sunRiseMJD,sunSetMJD, sunriseTwilDate,sunsetTwilDate) = self.getTwilightSunriseSunset(date)
+	return (int(sunriseDate),int(sunsetDate),sunRiseMJD,sunSetMJD,int(sunriseTwilDate),int(sunsetTwilDate))
+
+    def computeTwilightProfile(self, date):
+
+	(sunRise,sunSet,sunRiseMJD,sunSetMJD, sunRiseTwil,sunSetTwil) = self.getTwilightSunriseSunset(date)
+
+	return (sunRiseTwil, sunSetTwil)
+
+
     def getNightMidpoint(self, date):
 
         """
@@ -620,7 +685,7 @@ class AstronomicalSky (LSSTObject):
 
         return (totBr,distance2moon_RAD,moonAlt_RAD, brightProfile)
    
- 
+
     def airmass (self, dateProfile, ra, dec):
         """
         Compute the airmass of (ra, dec) at date with respect of the
