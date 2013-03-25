@@ -515,16 +515,20 @@ class Simulator(object):
                     if (t >tonightSunsetTwil) and (lastEvent <tonightSunsetTwil):
                         self.dateProfile = computeDateProfile (self.obsProfile, 
                                                       tonightSunsetTwil)
-                        self.timeHist.add (self.sessionID, self.nightCnt,
-                                   self.dateProfile, END_DUSK)
+			(date, MJD, lst_RAD) = self.dateProfile
+			self.lsstDB.addTimeHistory(date, MJD, self.nightCnt, END_DUSK, self.sessionID)
+#                        self.timeHist.add (self.sessionID, self.nightCnt,
+#                                   self.dateProfile, END_DUSK)
                         self.obsScheduler.flushSkyCache()
 
                     # Check for dawn - MM
                     elif (t > sunRiseTwil) and (lastEvent < sunRiseTwil):
                         self.dateProfile = computeDateProfile (self.obsProfile, 
                                                       sunRiseTwil)
-                        self.timeHist.add (self.sessionID, self.nightCnt,
-                                   self.dateProfile, START_DAWN)
+                        (date, MJD, lst_RAD) = self.dateProfile
+                        self.lsstDB.addTimeHistory(date, MJD, self.nightCnt, START_DAWN, self.sessionID)
+#                        self.timeHist.add (self.sessionID, self.nightCnt,
+#                                   self.dateProfile, START_DAWN)
                         self.obsScheduler.flushSkyCache()
 
                     # end if
@@ -642,13 +646,17 @@ class Simulator(object):
             if self.lastNightPhase > moonPhase_PERCENT :
                 startNewLunation = True
                 # record Moon event
-                self.timeHist.add (self.sessionID, self.nightCnt,
-                                   self.dateProfile, MOON_WANING)
+                (date, MJD, lst_RAD) = self.dateProfile
+                self.lsstDB.addTimeHistory(date, MJD, self.nightCnt, MOON_WANING, self.sessionID)
+#                self.timeHist.add (self.sessionID, self.nightCnt,
+#                                   self.dateProfile, MOON_WANING)
                 if self.lunationCount > 0 and self.lunationCount % 12 == 0:
                     startNewYear = True
                     # record new year event
-                    self.timeHist.add (self.sessionID, self.nightCnt, 
-		                       self.dateProfile, NEW_YEAR)
+                    (date, MJD, lst_RAD) = self.dateProfile
+                    self.lsstDB.addTimeHistory(date, MJD, self.nightCnt, NEW_YEAR, self.sessionID)
+#                    self.timeHist.add (self.sessionID, self.nightCnt, 
+#		                       self.dateProfile, NEW_YEAR)
                 self.lunationCount += 1
                 self.moonTrendToFull = False
                 self.log.info( "New Lunation: Moon phase switching to waning: date:%d lastphase:%f newphase:%f startNewLunation:%d" %(date,self.lastNightPhase,moonPhase_PERCENT,startNewLunation))
@@ -656,14 +664,18 @@ class Simulator(object):
             if moonPhase_PERCENT > self.lastNightPhase :
                 self.moonTrendToFull = True
                 # record moon event
-                self.timeHist.add (self.sessionID, self.nightCnt, 
-                                   self.dateProfile, MOON_WAXING)
+                (date, MJD, lst_RAD) = self.dateProfile
+                self.lsstDB.addTimeHistory(date, MJD, self.nightCnt, MOON_WAXING, self.sessionID)
+#                self.timeHist.add (self.sessionID, self.nightCnt, 
+#                                   self.dateProfile, MOON_WAXING)
                 self.log.info("Moon phase switching to waxing: date:%d lastphase:%f newphase:%f startNewLunation:%d" %(date,self.lastNightPhase,moonPhase_PERCENT,startNewLunation))
         self.lastNightPhase = moonPhase_PERCENT
 
         # record PassingOfTime events
-        self.timeHist.add (self.sessionID, self.nightCnt, self.dateProfile,
-			   START_NIGHT)
+        (date, MJD, lst_RAD) = self.dateProfile
+        self.lsstDB.addTimeHistory(date, MJD, self.nightCnt, START_NIGHT, self.sessionID)
+#        self.timeHist.add (self.sessionID, self.nightCnt, self.dateProfile,
+#			   START_NIGHT)
 
         # Finally:  let ObsScheduler know about the startNight
         self.obsScheduler.startNight(self.dateProfile,self.moonProfile, 
@@ -683,8 +695,10 @@ class Simulator(object):
 	triggering filters swap for now.
 	"""
         self.dateProfile = computeDateProfile (self.obsProfile, date)
-        self.timeHist.add (self.sessionID, self.nightCnt, self.dateProfile,
-                           END_NIGHT)
+        (date, MJD, lst_RAD) = self.dateProfile
+        self.lsstDB.addTimeHistory(date, MJD, self.nightCnt, END_NIGHT, self.sessionID)
+#        self.timeHist.add (self.sessionID, self.nightCnt, self.dateProfile,
+#                           END_NIGHT)
         
         self.moonProfile = self.computeMoonProfile(date)
 	self.obsScheduler.startDay(self.moonProfile)
