@@ -64,7 +64,7 @@ class Opsim_TimeHistory(object):
 
 class Database :
     def __init__(self):
-        self.engine = create_engine('mysql://www:zxcvbnm@localhost/OpsimDB', echo=False)
+        self.engine = create_engine('mysql://www:zxcvbnm@localhost/OpsimDB', echo=True)
         self.metadata = MetaData(self.engine)
 
         self.opsim_cloud = Table('Cloud', self.metadata, autoload=True)
@@ -83,7 +83,7 @@ class Database :
         mapper(Opsim_Log, self.opsim_log)
         
         self.opsim_obshistory = Table('ObsHistory', self.metadata, autoload=True)
-        mapper(Opsim_ObsHistory, self.opsim_obshistory)
+        mapper(Opsim_ObsHistory, self.opsim_obshistory)				
         
         self.opsim_astronomicalsky = Table('AstronomicalSky', self.metadata, autoload=True)
         mapper(Opsim_AstronomicalSky, self.opsim_astronomicalsky)
@@ -143,6 +143,7 @@ class Database :
             self.dbSession.refresh(oSession)
         except:
             self.dbSession.rollback()
+            raise
         return oSession
 
     def addConfig(self, sessionID, moduleName, paramIndex, paramName, paramValue, comment) :
@@ -158,6 +159,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
     
     def addTimeHistory(self, sessionID, date, mjd, nightCnt, event) :
         try:
@@ -171,6 +173,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addProposal(self, propConf, propName, sessionID, objectID, objectHost) :
         try:
@@ -185,6 +188,7 @@ class Database :
             self.dbSession.refresh(oProposal)
         except:
             self.dbSession.rollback()
+            raise
         return oProposal
 
     def createOlapTable(self, overlappingField) :
@@ -210,6 +214,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addLog(self, log_name, log_value, sessionID):
         try:
@@ -220,6 +225,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addProposalField(self, sessionID, propID, fieldID):
         try:
@@ -231,6 +237,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addSeqHistory(self, startDate, expDate, seqnNum, completion, reqEvents, actualEvents,
                       endStatus, parent_sequenceID, fieldID, sessionID, propID):
@@ -252,7 +259,8 @@ class Database :
             self.dbSession.refresh(oSeqHistory)
         except:
             self.dbSession.rollback()
-	return oSeqHistory
+            raise
+        return oSeqHistory
 
     def addSeqHistoryObsHistory(self, sequenceID, obsHistID):
         try:
@@ -263,6 +271,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addObsHistoryProposal(self, propID, obsHistID, propRank):
         try:
@@ -274,6 +283,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addObservation(self, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank,
                        finSeeing, transparency, airmass, vSkyBright, filtSkyBright, rotSkyPos,
@@ -283,7 +293,7 @@ class Database :
             oObs.filter = filter
             oObs.expDate = expDate
             oObs.expMJD = expMJD
-	    oObs.night = night
+            oObs.night = night
             oObs.visitTime = visitTime
             oObs.visitExpTime = visitExpTime
             oObs.finRank = finRank
@@ -294,7 +304,7 @@ class Database :
             oObs.filtSkyBright = filtSkyBright
             oObs.rotSkyPos = rotSkyPos
             oObs.lst = lst
-	    oObs.alt = alt
+            oObs.alt = alt
             oObs.az = az
             oObs.dist2Moon = dist2Moon
             oObs.solarElong = solarElong
@@ -306,6 +316,7 @@ class Database :
             self.dbSession.refresh(oObs)
         except:
             self.dbSession.rollback()
+            raise
         return oObs
 
     def addAstronomicalSky(self, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAZ, phaseAngle,
@@ -329,6 +340,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addAtmosphere(self, rawSeeing, wind, humidity, obsHistID):
         try:
@@ -340,6 +352,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addSlewHistory(self, slewCount, startDate, endDate, slewTime, slewDist, obsHistID):
         try:
@@ -355,6 +368,7 @@ class Database :
             self.dbSession.refresh(oSlewHist)
         except:
             self.dbSession.rollback()
+            raise
         return oSlewHist
 
     def addSlewActivities(self, activity, actDelay, inCriticalPath, slewID):
@@ -368,6 +382,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addSlewMaxSpeeds(self, DomAltSpd, DomAzSpd, TelAltSpd, TelAzSpd, RotSpd, slewID):
         try:
@@ -382,6 +397,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addSlewState(self, slewStateDate, tra, tdec, tracking, alt, az, pa, DomAlt,
                      DomAz, TelAlt, TelAz, RotTelPos, Filter, state, slewID):
@@ -406,6 +422,7 @@ class Database :
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
+            raise
 
     def addOlap(self, olapTable, id, fov, ra, dec, gl, gb, el, eb) :
         ins = olapTable.insert().values(fieldID=id, fieldFov=fov, fieldRA=ra, fieldDec=dec, fieldGL=gl, fieldGB=gb, fieldEL=el, fieldEB=eb)
