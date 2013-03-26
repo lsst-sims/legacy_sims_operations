@@ -101,6 +101,7 @@ class Observation (LSSTObject):
         logfile:    name (and path) of the desired log file (defaults to None)
         verbose:    Log verbosity:-1=none, 0=minimal, 1=wordy, >1=verbose
         """
+	self.obsType = 0
         self.proposal = proposal
         if (self.proposal):
             self.propID = self.proposal.propID
@@ -114,6 +115,7 @@ class Observation (LSSTObject):
         (self.date,self.mjd,self.lst) = dateProfile
         self.night = -1
         self.exposureTime = exposureTime
+	self.visitTime = 0.0
         self.slewTime = slewTime
         self.slewDistance = slewDistance
         self.fieldFilterInterval = fieldFilterInterval
