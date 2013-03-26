@@ -566,8 +566,8 @@ class ObsScheduler (LSSTObject):
 
 #        self.log.info("reuseRanking=%d" % self.reuseRanking)
 
-        return (maxrank, t, s)
-    
+#        return (maxrank, t, s)
+	return self.winner    
 
     def computeTargetProfiles (self, fieldID):
         """
@@ -614,7 +614,7 @@ class ObsScheduler (LSSTObject):
                  moonAlt_RAD,azimuth_RAD)
 
     
-    def closeObservation (self):
+    def closeObservation (self, winner):
         """
         Notify the various proposals that suggested the winner 
         observation that that observation took place.
@@ -623,45 +623,55 @@ class ObsScheduler (LSSTObject):
         """
         # Move the telescope
         (delay,rotatorSkyPos_RAD,rotatorTelPos_RAD,alt_RAD,az_RAD)=self.telescope.Observe(\
-                                                    self.winner.ra*DEG2RAD,
-                                                    self.winner.dec*DEG2RAD,
+                                                    winner.ra*DEG2RAD,
+                                                    winner.dec*DEG2RAD,
                                                     self.dateProfile,
-                                                    self.winner.exposureTime,
-                                                    self.winner.filter,
-                                                    self.winner.slewTime)
+                                                    winner.exposureTime,
+                                                    winner.filter,
+                                                    winner.slewTime)
         #print "SUCCESS: delay:%f rotSkyPos:%f rotTelPos:%f" % (delay,rotator_skypos_RAD,rotator_telpos_RAD)
 
         # MM - debug error check
-        if delay != self.winner.slewTime:
-             print "ERROR: ObsScheduler.closeObservation delay:%f != winner.slewTime:%f" % (delay,self.winner.slewTime)
+        if delay != winner.slewTime:
+             print "ERROR: ObsScheduler.closeObservation delay:%f != winner.slewTime:%f" % (delay,winner.slewTime)
 
         # install final parameters in the winning observation
-        self.winner.rotatorSkyPos = rotatorSkyPos_RAD
-        self.winner.rotatorTelPos = rotatorTelPos_RAD
-        self.winner.altitude = alt_RAD
-        self.winner.azimuth  = az_RAD
+        winner.rotatorSkyPos = rotatorSkyPos_RAD
+        winner.rotatorTelPos = rotatorTelPos_RAD
+        winner.altitude = alt_RAD
+        winner.azimuth  = az_RAD
 
         (sunAlt,sunAz) = self.sky.getSunAltAz(self.dateProfile)
-        self.winner.sunAlt = sunAlt
-        self.winner.sunAz  = sunAz
+        winner.sunAlt = sunAlt
+        winner.sunAz  = sunAz
 
-        self.winner.night = self.nightCnt
+        winner.night = self.nightCnt
        
         # Adjust date to start of exposure by accounting for slew time - MM
         # Is self.dateProfile == self.winner.dateProfile here?
         (date,mjd,lst_RAD) = self.dateProfile
-        if date != self.winner.date:
-            print "ERROR: ObsScheduler.closeObservation date:%d != winner.date:%d" % (date,self.winner.date)
+        if date != winner.date:
+            print "ERROR: ObsScheduler.closeObservation date:%d != winner.date:%d" % (date,winner.date)
 
         t = date + delay
-        (self.winner.date,self.winner.mjd,self.winner.lst) = computeDateProfile (self.obsProfile, t)
+        (winner.date,winner.mjd,winner.lst) = computeDateProfile (self.obsProfile, t)
+
+	self.lsstDB.addObservation(winner.filter, winner.date, winner.mjd,
+				winner.night, winner.visitTime, winner.exposureTime,
+				winner.finRank, winner.seeing,
+				winner.transparency, winner.airmass,
+				winner.skyBrightness, winner.filterSkyBright,
+				winner.rotatorSkyPos, winner.lst,
+				winner.altitude, winner.azimuth,
+				winner.distance2moon, winner.solarElong,
+				winner.obsType, self.sessionID, winner.fieldID)
 
         # Take observation. Delete winning Field/Filters from masterTargets.
         # Could reset rank to 0.0 as done previously.  Let's see if this works.
 #        for proposal in self.interProposalRank.keys ():
 	for proposal in self.proposals_list:
 	    if proposal.IsActive(date, self.nightCnt):
-                obs = proposal.closeObservation (self.winner,
+                obs = proposal.closeObservation (winner,
                                                  self.twilightProfile)
                 #print "ObsScheduler.closeObs(): In proposal?: fieldID: %d date: %d propID: %d" % (self.winner.fieldID, t, proposal.propID)
 
@@ -673,7 +683,7 @@ class ObsScheduler (LSSTObject):
 #                    if fieldFilter in self.masterTargets[obs.propID]:
 #                        del self.masterTargets[obs.propID][fieldFilter]
 
-	self.targetRank[self.winner.fieldID][self.winner.filter] = 0.0
+	self.targetRank[winner.fieldID][winner.filter] = 0.0
 
         return
    
