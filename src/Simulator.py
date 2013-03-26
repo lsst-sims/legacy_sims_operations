@@ -483,12 +483,17 @@ class Simulator(object):
                     # Observe next field
                     else:
                         self.dateProfile = computeDateProfile (self.obsProfile, t)
-                        (oRank, oExp, oSlew) = \
-                         self.obsScheduler.suggestObservation (self.dateProfile,
+#                        (oRank, oExp, oSlew) = \
+                        winner_obs = self.obsScheduler.suggestObservation (self.dateProfile,
                                         self.moonProfile, self.twilightProfile,
                                         cloudiness)
-                        oTime= oExp + oSlew
-            
+			if (winner_obs != None):
+			    oRank = winner_obs.finRank
+			    oExp  = winner_obs.exposureTime
+			    oSlew = winner_obs.slewTime
+                            oTime = oExp + oSlew
+            		else:
+			    oRank = 0
                         # Request telescope resource (semaphore)
 #                        yield request, self, self.telResource
            
@@ -498,7 +503,7 @@ class Simulator(object):
 #                            idle = now() - lastEvent - oTime
                             idle = t - lastEvent - oTime
                             eventTime = oTime
-                            self.obsScheduler.closeObservation ()
+                            self.obsScheduler.closeObservation(winner_obs)
                             if ( self.log ) :
                                 self.log.info ('Simulator: observing: last event: %d; idle %d sec; slew %d sec; expose %d sec' % (t, idle, oSlew,oExp))
                         else:
