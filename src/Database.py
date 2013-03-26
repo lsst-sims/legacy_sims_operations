@@ -283,6 +283,7 @@ class Database :
             oObs.filter = filter
             oObs.expDate = expDate
             oObs.expMJD = expMJD
+	    oObs.night = night
             oObs.visitTime = visitTime
             oObs.visitExpTime = visitExpTime
             oObs.finRank = finRank
@@ -293,6 +294,7 @@ class Database :
             oObs.filtSkyBright = filtSkyBright
             oObs.rotSkyPos = rotSkyPos
             oObs.lst = lst
+	    oObs.alt = alt
             oObs.az = az
             oObs.dist2Moon = dist2Moon
             oObs.solarElong = solarElong
