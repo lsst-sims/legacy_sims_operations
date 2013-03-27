@@ -640,7 +640,9 @@ class Simulator(object):
         self.nightCnt += 1
 
         # compute the moonProfile and dateProfile for the current simdate
-        self.dateProfile = computeDateProfile (self.obsProfile,date)
+        self.dateProfile = self.sky.computeDateProfile(date)
+        (date, MJD, lst_RAD) = self.dateProfile
+
         self.moonProfile = self.computeMoonProfile(midnight)
         (moonRA_RAD, moonDec_RAD, moonPhase_PERCENT) = self.moonProfile
 
@@ -651,14 +653,12 @@ class Simulator(object):
             if self.lastNightPhase > moonPhase_PERCENT :
                 startNewLunation = True
                 # record Moon event
-                (date, MJD, lst_RAD) = self.dateProfile
                 self.lsstDB.addTimeHistory(self.sessionID, date, MJD, self.nightCnt, MOON_WANING)
 #                self.timeHist.add (self.sessionID, self.nightCnt,
 #                                   self.dateProfile, MOON_WANING)
                 if self.lunationCount > 0 and self.lunationCount % 12 == 0:
                     startNewYear = True
                     # record new year event
-                    (date, MJD, lst_RAD) = self.dateProfile
                     self.lsstDB.addTimeHistory(self.sessionID, date, MJD, self.nightCnt, NEW_YEAR)
 #                    self.timeHist.add (self.sessionID, self.nightCnt, 
 #		                       self.dateProfile, NEW_YEAR)
@@ -669,7 +669,6 @@ class Simulator(object):
             if moonPhase_PERCENT > self.lastNightPhase :
                 self.moonTrendToFull = True
                 # record moon event
-                (date, MJD, lst_RAD) = self.dateProfile
                 self.lsstDB.addTimeHistory(self.sessionID, date, MJD, self.nightCnt, MOON_WAXING)
 #                self.timeHist.add (self.sessionID, self.nightCnt, 
 #                                   self.dateProfile, MOON_WAXING)
@@ -677,7 +676,6 @@ class Simulator(object):
         self.lastNightPhase = moonPhase_PERCENT
 
         # record PassingOfTime events
-        (date, MJD, lst_RAD) = self.dateProfile
         self.lsstDB.addTimeHistory(self.sessionID, date, MJD, self.nightCnt, START_NIGHT)
 #        self.timeHist.add (self.sessionID, self.nightCnt, self.dateProfile,
 #			   START_NIGHT)
