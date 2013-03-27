@@ -10,9 +10,13 @@ class SchedulingData (LSSTObject):
                   configFile,
 		  surveyStartTime,
 		  surveyEndTime,
-		  astroSky):
+		  astroSky,
+		  lsstDB,
+		  sessionID):
 
 	self.sky = astroSky
+	self.lsstDB = lsstDB
+	self.sessionID = sessionID
 
         config, pairs = readConfFile(configFile)
 
@@ -239,6 +243,8 @@ class SchedulingData (LSSTObject):
 						twilightProfile)
                     self.brightness[field][t] = br
                     print ("field=%5i t=%8i airmass=%5.3f brightness=%5.3f" % (field, t, am, br[2]))
+
+		self.lsstDB.addProposalField(self.sessionID, propID, field)
 
 	self.listOfActiveFields.sort()
 
