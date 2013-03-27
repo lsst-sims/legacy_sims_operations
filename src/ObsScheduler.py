@@ -548,6 +548,7 @@ class ObsScheduler (LSSTObject):
                                 dateProfile = self.dateProfile,
                                 moonProfile = self.moonProfile)
             self.winner.finRank = maxrank
+	    self.winner.seeing = self.seeing
 #            self.log.info("WINNER date = %d fieldID = %d filter=%s maxrank=%f propID=%s" % (date,win_fieldID,win_filter,maxrank,win_propXblk))
 
 	    if self.winner.exclusiveBlockRequired == True:
@@ -633,7 +634,7 @@ class ObsScheduler (LSSTObject):
 
         # MM - debug error check
         if delay != winner.slewTime:
-             print "ERROR: ObsScheduler.closeObservation delay:%f != winner.slewTime:%f" % (delay,winner.slewTime)
+             print "WARNING: ObsScheduler.closeObservation delay:%f != winner.slewTime:%f" % (delay,winner.slewTime)
 
         # install final parameters in the winning observation
         winner.rotatorSkyPos = rotatorSkyPos_RAD
@@ -642,19 +643,32 @@ class ObsScheduler (LSSTObject):
         winner.azimuth  = az_RAD
 
         (sunAlt,sunAz) = self.sky.getSunAltAz(self.dateProfile)
+	winner.airmass = 1/math.cos(1.5708 - alt_RAD)
+
         winner.sunAlt = sunAlt
         winner.sunAz  = sunAz
 
         winner.night = self.nightCnt
-       
+
         # Adjust date to start of exposure by accounting for slew time - MM
         # Is self.dateProfile == self.winner.dateProfile here?
         (date,mjd,lst_RAD) = self.dateProfile
         if date != winner.date:
-            print "ERROR: ObsScheduler.closeObservation date:%d != winner.date:%d" % (date,winner.date)
+            print "WARNING: ObsScheduler.closeObservation date:%d != winner.date:%d" % (date,winner.date)
 
         t = date + delay
-        (winner.date,winner.mjd,winner.lst) = computeDateProfile (self.obsProfile, t)
+        (winner.date, winner.mjd, winner.lst) = self.sky.computeDateProfile(t)
+
+        moonProfile = (winner.moonRA_RAD, winner.moonDec_RAD,
+                       winner.moonPhase)
+        (skyBright,distance2moon,moonAlt_RAD,brightProfile) = \
+                    self.sky.getSkyBrightness(winner.fieldID,
+                                      winner.ra, winner.dec,
+                                      winner.altitude,
+                                      self.dateProfile,
+                                      moonProfile,
+                                      self.twilightProfile)
+	winner.skyBrightness = skyBright
 
 	self.lsstDB.addObservation(winner.filter, winner.date, winner.mjd,
 				winner.night, winner.visitTime, winner.exposureTime,
