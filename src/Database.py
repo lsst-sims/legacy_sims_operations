@@ -64,7 +64,7 @@ class Opsim_TimeHistory(object):
 
 class Database :
     def __init__(self):
-        self.engine = create_engine('mysql://www:zxcvbnm@localhost/OpsimDB', echo=True)
+        self.engine = create_engine('mysql://www:zxcvbnm@localhost/OpsimDB', echo=False)
         self.metadata = MetaData(self.engine)
 
         self.opsim_cloud = Table('Cloud', self.metadata, autoload=True)
@@ -165,10 +165,10 @@ class Database :
         try:
             oTimeHistory = Opsim_TimeHistory()
             oTimeHistory.date = date
-            oTimeHistory.mjd = mjd
+            oTimeHistory.MJD = mjd
             oTimeHistory.night = nightCnt
             oTimeHistory.event = event
-            oTimeHistory.session_sessionID = sessionID
+            oTimeHistory.Session_sessionID = sessionID
             self.dbSession.add(oTimeHistory)
             self.dbSession.commit()
         except:
