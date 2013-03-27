@@ -233,7 +233,6 @@ class SchedulingData (LSSTObject):
 		    self.alt[field][t] = alt
 		    self.az[field][t] = az
 		    self.airmass[field][t] = am
-		    print ("field=%5i t=%8i airmass=%5.3f" % (field, t, am)) 
 		    br = self.sky.getSkyBrightness(0, ra, dec, alt,
 						self.dateProfile[t],
 						self.moonProfile[t],
