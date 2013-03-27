@@ -752,7 +752,9 @@ class Simulator(object):
         self.schedulingData = SchedulingData(self.schedulingDataConf,
                                                 0,
                                                 self.nRun*YEAR,
-						self.sky)
+						self.sky,
+						self.lsstDB,
+						self.sessionID)
 
         # Init the Weather Simulator
         self.weather = Weather (lsstDB=self.lsstDB,
