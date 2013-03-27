@@ -311,7 +311,7 @@ class Database :
             oObs.obsType = obsType
             oObs.Session_sessionID = sessionID
             oObs.Field_fieldID = fieldID
-            self.dbSession(oObs)
+            self.dbSession.add(oObs)
             self.dbSession.commit()
             self.dbSession.refresh(oObs)
         except:
@@ -336,7 +336,7 @@ class Database :
             oAstroSky.moonBright = moonBright
             oAstroSky.darkBright = darkBright
             oAstroSky.ObsHistory_obsHistID = obsHistID
-            self.dbSession(oAstroSky)
+            self.dbSession.add(oAstroSky)
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
