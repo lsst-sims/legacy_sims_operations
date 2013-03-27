@@ -900,7 +900,7 @@ class Proposal (object):
             self.lastTarget = (obsfound.ra*DEG2RAD,obsfound.dec*DEG2RAD)
 
             # update the ObsHistory DB with the new observation
-            self.obsHistory.addObservation (obsfound, self.sessionID)
+#            self.obsHistory.addObservation (obsfound, self.sessionID)
         
         return obsfound
 
