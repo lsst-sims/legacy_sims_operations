@@ -154,6 +154,22 @@ class InstrumentPosition (object):
                 	newpos.PA_RAD)
 
 ######################################################################
+class dataSlew(object):
+    def __init__(self,
+		slewCount = 0,
+		startDate = 0,
+		endDate   = 0,
+		slewTime  = 0.0,
+		slewDist  = 0.0):
+
+	self.slewCount = slewCount
+	self.startDate = startDate
+	self.endDate   = endDate
+	self.slewTime  = slewTime
+	self.slewDist  = slewDist
+
+
+######################################################################
 class InstrumentState (InstrumentPosition):
     # This class describes a state of all the moving systems in Instrument.
     # The default values correspond to a Park position.
@@ -1162,13 +1178,16 @@ class Instrument (object):
         rotator_telpos = self.current_state.GetRotatorTelPos()
         altitude = self.current_state.ALT_RAD
         azimuth = self.current_state.AZ_RAD
+	slewDistance = slalib.sla_dsep(ra_RAD, dec_RAD, self.current_state.RA_RAD, self.current_state.DEC_RAD)
 
-        sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewHistory')
-        sql += '%d, ' % (self.sessionID)
-        sql += '%d, ' % (self.slewCount)
-        sql += '%f, ' % (date)
-        sql += '%f, ' % (date+delay)
-        sql += '%f )' % (delay)
+	slewdata = dataSlew(self.slewCount, date, date+delay, delay, slewDistance)
+
+#        sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewHistory')
+#        sql += '%d, ' % (self.sessionID)
+#        sql += '%d, ' % (self.slewCount)
+#        sql += '%f, ' % (date)
+#        sql += '%f, ' % (date+delay)
+#        sql += '%f )' % (delay)
         #(n, dummy) = self.lsstDB.executeSQL(sql)
 
         for activity in self.lastslew_delays.keys():
@@ -1187,7 +1206,7 @@ class Instrument (object):
         self.next_state = copy.deepcopy(self.current_state)
         self.next_state.UpdateState(date+delay+exposureTime)
 
-        return (delay, rotator_skypos, rotator_telpos, altitude, azimuth)
+        return (delay, rotator_skypos, rotator_telpos, altitude, azimuth, slewdata)
 
     def DBrecordState(self, state, dbTable):
 
