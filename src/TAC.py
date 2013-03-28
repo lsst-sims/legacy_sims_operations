@@ -21,7 +21,7 @@ Activate a TAC instance
 from utilities import *
 from LSSTObject import *
 from Proposal import *
-from newWeakLensingProp import *
+from WeakLensingProp import *
 from NearEarthProp import *
 from SuperNovaProp import *
 from SuperNovaSubSeqProp import *
@@ -202,6 +202,7 @@ class TAC(object):
         if ( self.superNovaSubSeqConf[0] != None):
             for k in range(len(self.superNovaSubSeqConf)):
                 snss = SuperNovaSubSeqProp (lsstDB=self.lsstDB,
+			       schedulingData=self.schedulingData,
 			       sky=self.sky, 
                                weather=self.weather,
                                sessionID=self.sessionID,
@@ -280,6 +281,7 @@ class TAC(object):
         if ( self.WLpropConf[0] != None):
             for k in range(len(self.WLpropConf)):
                 wl = WLprop (lsstDB=self.lsstDB,
+			     schedulingData=self.schedulingData,
 			     sky=self.sky,
                              weather=self.weather,
                              sessionID=self.sessionID,
