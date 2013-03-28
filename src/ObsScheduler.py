@@ -623,7 +623,7 @@ class ObsScheduler (LSSTObject):
         Needs to pass along the required slew time since not embeded in Obs
         """
         # Move the telescope
-        (delay,rotatorSkyPos_RAD,rotatorTelPos_RAD,alt_RAD,az_RAD)=self.telescope.Observe(\
+        (delay,rotatorSkyPos_RAD,rotatorTelPos_RAD,alt_RAD,az_RAD, slewdata)=self.telescope.Observe(\
                                                     winner.ra*DEG2RAD,
                                                     winner.dec*DEG2RAD,
                                                     self.dateProfile,
@@ -669,6 +669,8 @@ class ObsScheduler (LSSTObject):
                                       moonProfile,
                                       self.twilightProfile)
 	winner.skyBrightness = skyBright
+	winner.distance2moon = distance2moon
+	winner.moonAlt       = moonAlt_RAD
 
 	obsHist = self.lsstDB.addObservation(winner.filter, winner.date, winner.mjd,
 				winner.night, winner.visitTime, winner.exposureTime,
@@ -679,6 +681,24 @@ class ObsScheduler (LSSTObject):
 				winner.altitude, winner.azimuth,
 				winner.distance2moon, winner.solarElong,
 				winner.obsType, self.sessionID, winner.fieldID)
+
+
+	self.lsstDB.addAstronomicalSky(winner.moonRA_RAD, winner.moonDec_RAD,
+					winner.moonAlt, winner.moonAz, winner.moonPhase,
+					winner.sunAlt, winner.sunAz,
+					winner.phaseAngle, winner.rScatter,
+					winner.mieScatter, winner.moonIllum,
+					winner.moonBright, winner.darkBright,
+					obsHist.obsHistID)
+
+	self.lsstDB.addAtmosphere(winner.rawSeeing, 0.0, 0.0, obsHist.obsHistID)
+
+	self.lsstDB.addSlewHistory(slewdata.slewCount,
+				slewdata.startDate,
+				slewdata.endDate,
+				slewdata.slewTime,
+				slewdata.slewDist,
+				obsHist.obsHistID)
 
         # Take observation. Delete winning Field/Filters from masterTargets.
         # Could reset rank to 0.0 as done previously.  Let's see if this works.
