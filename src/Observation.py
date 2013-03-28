@@ -144,6 +144,8 @@ class Observation (LSSTObject):
         self.extinction = 0.0
         self.rScatter = 0.0
         self.mieScatter = 0.0
+	self.moonAlt = 0.0
+	self.moonAz  = 0.0
         self.moonIllum = 0.0
         self.moonBright = 0.0
         self.darkBright = 0.0
