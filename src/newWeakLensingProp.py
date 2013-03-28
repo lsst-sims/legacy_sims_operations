@@ -531,12 +531,12 @@ class WeakLensingProp (Proposal):
         return self.getSuggestList(numberOfObsToPropose)
     
     
-    def closeObservation (self, observation, twilightProfile):
+    def closeObservation (self, observation, obsHistID, twilightProfile):
 
         if (self.log and self.verbose > 1):
            self.log.info('WeakLensingProp: closeObservation() propID=%d' %(self.propID))
 
-        obs = super (WeakLensingProp, self).closeObservation(observation, twilightProfile)
+        obs = super (WeakLensingProp, self).closeObservation(observation, obsHistID, twilightProfile)
 
         if obs != None:
             try:
