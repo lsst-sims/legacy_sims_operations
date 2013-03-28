@@ -8,6 +8,7 @@ class WLprop (TransSubSeqProp):
     """
     def __init__ (self, 
                   lsstDB,
+		  schedulingData,
 		  sky, 
                   weather,
                   sessionID,
@@ -58,6 +59,7 @@ class WLprop (TransSubSeqProp):
         config_dict, pairs = readConfFile(WLpropConf)
 
 	self.lsstDB = lsstDB        
+	self.schedulingData = schedulingData
 	self.nextNight = 0
         self.maxAirmass = eval(str(config_dict['MaxAirmass']))
         self.ha_maxairmass = sky.getHAforAirmass(self.maxAirmass)
@@ -279,7 +281,7 @@ class WLprop (TransSubSeqProp):
         return rankForFilters
 
     
-    def closeObservation (self, observation, twilightProfile):
+    def closeObservation (self, observation, obsHistID, twilightProfile):
         """
         Registers the fact that the indicated observation took place.
         This is, the corresponding event in the sequence of the indicated
@@ -299,7 +301,7 @@ class WLprop (TransSubSeqProp):
         if ( self.log and self.verbose > 1 ):
            self.log.info('%sProp: closeObservation() for propID=%d' %(self.propFullName, self.propID))
 
-        obs = super (WLprop, self).closeObservation(observation, twilightProfile)
+        obs = super (WLprop, self).closeObservation(observation, obsHistID, twilightProfile)
 
         return obs
 
@@ -448,6 +450,7 @@ class WLprop (TransSubSeqProp):
         ##self.log.info("WL: updateTargetList:(entry:exit) mem: %d:%d resMem: %d:%d stack: %d:%d" % (m0,m1, r0,r1, s0,s1))
         #print("WL: updateTargetList:(entry:exit) mem: %d:%d resMem: %d:%d stack: %d:%d" % (m0,m1, r0,r1, s0,s1))
                                                                                                                             
+	self.schedulingData.updateTargets(self.targets, self.propID, dateProfile)
 
         return (self.targets)
 

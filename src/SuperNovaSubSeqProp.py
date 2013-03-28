@@ -8,6 +8,7 @@ class SuperNovaSubSeqProp (TransSubSeqProp):
     """
     def __init__ (self, 
                   lsstDB,
+		  schedulingData,
 		  sky, 
                   weather,
                   sessionID,
@@ -57,6 +58,7 @@ class SuperNovaSubSeqProp (TransSubSeqProp):
         config_dict, pairs = readConfFile(superNovaSubSeqConf)
 
 	self.lsstDB = lsstDB        
+	self.schedulingData = schedulingData
 	self.nextNight = 0
         self.maxSeeing = {}
         try:
@@ -325,7 +327,7 @@ class SuperNovaSubSeqProp (TransSubSeqProp):
         return rankForFilters
 
     
-    def closeObservation (self, observation, twilightProfile):
+    def closeObservation (self, observation, obsHistID, twilightProfile):
         """
         Registers the fact that the indicated observation took place.
         This is, the corresponding event in the sequence of the indicated
@@ -345,7 +347,7 @@ class SuperNovaSubSeqProp (TransSubSeqProp):
         if ( self.log and self.verbose > 1 ):
            self.log.info('SuperNovaSubSeq: closeObservation() for propID=%d' %(self.propID))
 
-        obs = super (SuperNovaSubSeqProp, self).closeObservation(observation,
+        obs = super (SuperNovaSubSeqProp, self).closeObservation(observation, obsHistID,
                                                      twilightProfile)
 
         return obs
@@ -508,6 +510,8 @@ class SuperNovaSubSeqProp (TransSubSeqProp):
        #s1 = stacksize()
        ##self.log.info("WL: updateTargetList:(entry:exit) mem: %d:%d resMem: %d:%d stack: %d:%d" % (m0,m1, r0,r1, s0,s1))
        #print("SN: updateTargetList:(entry:exit) mem: %d:%d resMem: %d:%d stack: %d:%d" % (m0,m1, r0,r1, s0,s1))
+
+       self.schedulingData.updateTargets(self.targets, self.propID, dateProfile)
 
        return (self.targets)
 

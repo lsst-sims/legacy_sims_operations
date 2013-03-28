@@ -722,7 +722,7 @@ class TransSubSeqProp (Proposal):
         return
     
     
-    def closeObservation (self, observation, twilightProfile):
+    def closeObservation (self, observation, obsHistID, twilightProfile):
         """
         Registers the fact that the indicated observation took place.
         This is, the corresponding event in the sequence of the indicated
@@ -746,7 +746,7 @@ class TransSubSeqProp (Proposal):
         if ( self.log and self.verbose > 1 ):
            self.log.info('%sProp: closeObservation()' % (self.propFullName))
 
-        obs = super (TransSubSeqProp, self).closeObservation(observation, twilightProfile)
+        obs = super (TransSubSeqProp, self).closeObservation(observation, obsHistID, twilightProfile)
 
         if obs != None:
             self.sequences[obs.fieldID].ObserveEvent(obs.date, obs.subsequence)

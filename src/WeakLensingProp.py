@@ -18,6 +18,7 @@ class WeakLensingProp (Proposal):
     """
     def __init__ (self, 
                   lsstDB,
+		  schedulingData,
 		  sky, 
                   weather,
                   sessionID,
@@ -72,6 +73,7 @@ class WeakLensingProp (Proposal):
 	if (self.log and self.verbose > 1):
            self.log.info('WeakLensingProp: init() propID=%d' %(self.propID))
         
+	self.schedulingData = schedulingData
         self.weakLensConf = weakLensConf
         self.GoalVisitsFieldFilter = {}
         self.sky = sky
@@ -529,12 +531,12 @@ class WeakLensingProp (Proposal):
         return self.getSuggestList(numberOfObsToPropose)
     
     
-    def closeObservation (self, observation, twilightProfile):
+    def closeObservation (self, observation, obsHistID, twilightProfile):
 
         if (self.log and self.verbose > 1):
            self.log.info('WeakLensingProp: closeObservation() propID=%d' %(self.propID))
 
-        obs = super (WeakLensingProp, self).closeObservation(observation, twilightProfile)
+        obs = super (WeakLensingProp, self).closeObservation(observation, obsHistID, twilightProfile)
 
         if obs != None:
             try:
@@ -697,6 +699,8 @@ class WeakLensingProp (Proposal):
         #s1 = stacksize()
         ##self.log.info("WL: updateTargetList:(entry:exit) mem: %d:%d resMem: %d:%d stack: %d:%d" % (m0,m1, r0,r1, s0,s1))
         #print("WL: updateTargetList:(entry:exit) mem: %d:%d resMem: %d:%d stack: %d:%d" % (m0,m1, r0,r1, s0,s1))
+
+	self.schedulingData.updateTargets(fields, self.propID, dateProfile)
 
         return (fields)
 
