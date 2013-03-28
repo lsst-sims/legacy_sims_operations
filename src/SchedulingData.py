@@ -155,6 +155,7 @@ class SchedulingData (LSSTObject):
 	self.brightness = {}
 	self.visible = {}
 	self.filters = {}
+	self.proposals = {}
 
         self.dateProfile[self.currentTime] = self.sky.computeDateProfile(self.currentTime)
         self.moonProfile[self.currentTime] = self.sky.computeMoonProfile(self.currentTime)
@@ -217,12 +218,15 @@ class SchedulingData (LSSTObject):
 	for field in listOfNewFields:
 	    if field not in self.listOfActiveFields:
 		self.listOfActiveFields.append(field)
+
 		self.alt[field] = {}
 		self.az[field] = {}
 		self.airmass[field] = {}
 		self.brightness[field] = {}
 		self.visible[field] = {}
 		self.filters[field] = {}
+		self.proposals[field] = []
+
 		(ra, dec) = dictOfNewFields[field]
 
 		night = 0
@@ -242,9 +246,18 @@ class SchedulingData (LSSTObject):
 						self.moonProfile[t],
 						twilightProfile)
                     self.brightness[field][t] = br
-                    print ("field=%5i t=%8i airmass=%5.3f brightness=%5.3f" % (field, t, am, br[2]))
+                    #print ("field=%5i t=%8i airmass=%5.3f brightness=%5.3f" % (field, t, am, br[2]))
 
+		self.proposals[field].append(propID)
+		print ("new field=%4i new propID=%i" % (field, propID))
 		self.lsstDB.addProposalField(self.sessionID, propID, field)
+
+	    else:
+		if propID not in self.proposals[field]:
+		    self.proposals[field].append(propID)
+		    print ("    field=%4i new propID=%i" % (field, propID))
+		    self.lsstDB.addProposalField(self.sessionID, propID, field)
+
 
 	self.listOfActiveFields.sort()
 
