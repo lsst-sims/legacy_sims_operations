@@ -670,7 +670,7 @@ class ObsScheduler (LSSTObject):
                                       self.twilightProfile)
 	winner.skyBrightness = skyBright
 
-	self.lsstDB.addObservation(winner.filter, winner.date, winner.mjd,
+	obsHist = self.lsstDB.addObservation(winner.filter, winner.date, winner.mjd,
 				winner.night, winner.visitTime, winner.exposureTime,
 				winner.finRank, winner.seeing,
 				winner.transparency, winner.airmass,
@@ -685,7 +685,7 @@ class ObsScheduler (LSSTObject):
 #        for proposal in self.interProposalRank.keys ():
 	for proposal in self.proposals_list:
 	    if proposal.IsActive(date, self.nightCnt):
-                obs = proposal.closeObservation (winner,
+                obs = proposal.closeObservation (winner, obsHist.obsHistID,
                                                  self.twilightProfile)
                 #print "ObsScheduler.closeObs(): In proposal?: fieldID: %d date: %d propID: %d" % (self.winner.fieldID, t, proposal.propID)
 
