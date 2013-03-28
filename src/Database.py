@@ -275,7 +275,7 @@ class Database :
 
     def addObsHistoryProposal(self, propID, obsHistID, propRank):
         try:
-            oObsHistoryProposal = Opsim_ObsHistory_Proposal
+            oObsHistoryProposal = Opsim_ObsHistory_Proposal()
             oObsHistoryProposal.Proposal_propID = propID
             oObsHistoryProposal.Obshistory_obsHistID = obsHistID
             oObsHistoryProposal.propRank = propRank
