@@ -737,7 +737,7 @@ class Proposal (object):
         return
     
     
-    def closeObservation (self, obs, twilightProfile):
+    def closeObservation (self, obs, obsHistID, twilightProfile):
         """
         Remove the corresponding field from self.targets
         
@@ -787,6 +787,8 @@ class Proposal (object):
 
         if obsfound != None:
 	    self.last_observed_wasForThisProposal = True
+
+	    self.lsstDB.addObsHistoryProposal(self.propID, obsHistID, obsfound.propRank)
 
             # Update suggested Observation with actual observing conditions 
             obsfound.date = obs.date
