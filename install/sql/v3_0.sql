@@ -34,11 +34,11 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Config` (
   `paramName` VARCHAR(32) NOT NULL COMMENT 'parameter name' ,
   `paramValue` VARCHAR(32) NOT NULL COMMENT 'string of parameter value' ,
   `comment` VARCHAR(512) NULL DEFAULT NULL COMMENT 'comment' ,
-  `session_sessionID` INT(10) UNSIGNED NOT NULL ,
+  `Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   PRIMARY KEY (`configID`) ,
-  INDEX `fk_config_session_idx` (`session_sessionID` ASC) ,
+  INDEX `fk_config_session_idx` (`Session_sessionID` ASC) ,
   CONSTRAINT `fk_config_session`
-    FOREIGN KEY (`session_sessionID` )
+    FOREIGN KEY (`Session_sessionID` )
     REFERENCES `OpsimDB`.`Session` (`sessionID` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
