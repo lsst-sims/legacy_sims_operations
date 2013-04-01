@@ -149,7 +149,7 @@ class Database :
     def addConfig(self, sessionID, moduleName, paramIndex, paramName, paramValue, comment) :
         try:
             oConfig = Opsim_Config()
-            oConfig.session_sessionID = sessionID
+            oConfig.Session_sessionID = sessionID
             oConfig.moduleName = moduleName
             oConfig.paramIndex = paramIndex
             oConfig.paramName = paramName
@@ -180,7 +180,7 @@ class Database :
             oProposal = Opsim_Proposal()
             oProposal.propConf = propConf
             oProposal.propName = propName
-            oProposal.sessionID = sessionID
+            oProposal.Session_sessionID = sessionID
             oProposal.objectID = objectID
             oProposal.objectHost = objectHost
             self.dbSession.add(oProposal)
@@ -209,7 +209,7 @@ class Database :
             oConfigFile = Opsim_Config_File()
             oConfigFile.filename = filename
             oConfigFile.data = data
-            oConfigFile.session_sessionID = sessionID
+            oConfigFile.Session_sessionID = sessionID
             self.dbSession.add(oConfigFile)
             self.dbSession.commit()
         except:
@@ -221,6 +221,7 @@ class Database :
             oLog = Opsim_Log()
             oLog.log_name = log_name
             oLog.log_value = log_value
+            oLog.Session_sessionID = sessionID;
             self.dbSession.add(oLog)
             self.dbSession.commit()
         except:
