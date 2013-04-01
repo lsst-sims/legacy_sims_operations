@@ -108,7 +108,7 @@ class SeqHistory (LSSTObject):
                 numActualEvents,
                 status)
         
-        (n, dummy) = self.lsstDB.executeSQL (sql)
+#        (n, dummy) = self.lsstDB.executeSQL (sql)
         return
     
     

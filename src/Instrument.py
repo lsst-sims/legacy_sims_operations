@@ -1224,9 +1224,10 @@ class Instrument (object):
         sql += '%f, %f, ' % (state.TelAlt_Pos_RAD, state.TelAz_Pos_RAD)
         sql += '%f, ' % (state.Rotator_Pos_RAD)
         sql += '"%s" )' % (state.Filter_Pos)
-        (n, dummy) = self.lsstDB.executeSQL(sql)
+#        (n, dummy) = self.lsstDB.executeSQL(sql)
 
-	return n
+#	return n
+	return 0
 
     def DBrecordMaximumSpeeds(self):
                                                                                                                          
@@ -1236,9 +1237,10 @@ class Instrument (object):
         sql += '%f, %f, ' % (self.current_state.DomAlt_Spd_RDS, self.current_state.DomAz_Spd_RDS)
         sql += '%f, %f, ' % (self.current_state.TelAlt_Spd_RDS, self.current_state.TelAz_Spd_RDS)
         sql += '%f )    ' % (self.current_state.Rotator_Spd_RDS)
-        (n, dummy) = self.lsstDB.executeSQL(sql)
+#        (n, dummy) = self.lsstDB.executeSQL(sql)
         
-        return n
+#        return n
+	return 0
 
     def GetFilter(self):
         """

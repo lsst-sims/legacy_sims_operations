@@ -444,7 +444,7 @@ class KuiperBeltProp (TransSubSeqProp):
        #print (sql)
        print ('*** Found %d KBO fields for propID=%d***' % (len (res),self.propID))
 
-       (n, res) = self.lsstDB.executeSQL (sqlNewSeq)
+#       (n, res) = self.lsstDB.executeSQL (sqlNewSeq)
        fields = {}
        for (ra, dec, fieldID) in res:
            fields[fieldID] = (ra, dec)
