@@ -121,12 +121,16 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Proposal` (
   `propID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `propConf` VARCHAR(255) NOT NULL COMMENT 'proposal configuration filename name' ,
   `propName` VARCHAR(80) NOT NULL COMMENT 'proposal name' ,
-  `sessionID` INT(10) UNSIGNED NOT NULL COMMENT 'session identifier' ,
   `objectID` BIGINT(20) NULL DEFAULT NULL COMMENT 'python obj identifier for Proposal instance' ,
   `objectHost` VARCHAR(80) NULL DEFAULT NULL COMMENT 'hostname for proposal object instance' ,
+  `Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   PRIMARY KEY (`propID`) ,
-  INDEX `p_sessID_idx` (`sessionID` ASC) ,
-  INDEX `p_sessID_propID_idx` (`sessionID` ASC, `propID` ASC) )
+  INDEX `fk_Proposal_Session1_idx` (`Session_sessionID` ASC) ,
+  CONSTRAINT `fk_Proposal_Session1`
+    FOREIGN KEY (`Session_sessionID` )
+    REFERENCES `OpsimDB`.`Session` (`sessionID` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
