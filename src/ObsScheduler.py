@@ -623,7 +623,7 @@ class ObsScheduler (LSSTObject):
         Needs to pass along the required slew time since not embeded in Obs
         """
         # Move the telescope
-        (delay,rotatorSkyPos_RAD,rotatorTelPos_RAD,alt_RAD,az_RAD, slewdata)=self.telescope.Observe(\
+        (delay,rotatorSkyPos_RAD,rotatorTelPos_RAD,alt_RAD,az_RAD, slewdata, slewinitstate, slewfinalstate, slewmaxspeeds, listslewactivities)=self.telescope.Observe(\
                                                     winner.ra*DEG2RAD,
                                                     winner.dec*DEG2RAD,
                                                     self.dateProfile,
@@ -693,12 +693,57 @@ class ObsScheduler (LSSTObject):
 
 	self.lsstDB.addAtmosphere(winner.rawSeeing, 0.0, 0.0, obsHist.obsHistID)
 
-	self.lsstDB.addSlewHistory(slewdata.slewCount,
+	slewHist = self.lsstDB.addSlewHistory(slewdata.slewCount,
 				slewdata.startDate,
 				slewdata.endDate,
 				slewdata.slewTime,
 				slewdata.slewDist,
 				obsHist.obsHistID)
+
+	self.lsstDB.addSlewState(slewinitstate.slewStateDate,
+        			slewinitstate.tra,
+        			slewinitstate.tdec,
+        			slewinitstate.tracking,
+        			slewinitstate.alt,
+        			slewinitstate.az,
+        			slewinitstate.pa,
+        			slewinitstate.DomAlt,
+        			slewinitstate.DomAz,
+        			slewinitstate.TelAlt,
+        			slewinitstate.TelAz,
+        			slewinitstate.RotTelPos,
+        			slewinitstate.Filter,
+        			slewinitstate.state,
+				slewHist.slewID)
+
+        self.lsstDB.addSlewState(slewfinalstate.slewStateDate,
+                                slewfinalstate.tra,
+                                slewfinalstate.tdec,
+                                slewfinalstate.tracking,
+                                slewfinalstate.alt,
+                                slewfinalstate.az,
+                                slewfinalstate.pa,
+                                slewfinalstate.DomAlt,
+                                slewfinalstate.DomAz,
+                                slewfinalstate.TelAlt,
+                                slewfinalstate.TelAz,
+                                slewfinalstate.RotTelPos,
+                                slewfinalstate.Filter,
+                                slewfinalstate.state,
+                                slewHist.slewID)
+
+	self.lsstDB.addSlewMaxSpeeds(slewmaxspeeds.DomAltSpd,
+				slewmaxspeeds.DomAzSpd,
+				slewmaxspeeds.TelAltSpd,
+				slewmaxspeeds.TelAzSpd,
+				slewmaxspeeds.RotSpd,
+				slewHist.slewID)		
+
+	for act in listslewactivities:
+	    self.lsstDB.addSlewActivities(act.activity,
+					act.actDelay,
+					act.inCriticalPath,
+					slewHist.slewID)
 
         # Take observation. Delete winning Field/Filters from masterTargets.
         # Could reset rank to 0.0 as done previously.  Let's see if this works.
