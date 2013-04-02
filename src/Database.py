@@ -379,7 +379,7 @@ class Database :
             oSlewAct.actDelay = actDelay
             oSlewAct.inCriticalPath = inCriticalPath
             oSlewAct.SlewHistory_slewID = slewID
-            seld.dbSession.add(oSlewAct)
+            self.dbSession.add(oSlewAct)
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
