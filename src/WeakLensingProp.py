@@ -107,7 +107,7 @@ class WeakLensingProp (Proposal):
 
         for ix in range(len(self.FilterNames)):
             self.GoalVisitsFieldFilter[self.FilterNames[ix]] = filterVisits[ix]
-        print 'GoalVisitsFieldFilter for propID=%d %s = %s' % (self.propID, self.propFullName, str(self.GoalVisitsFieldFilter))
+#        print 'GoalVisitsFieldFilter for propID=%d %s = %s' % (self.propID, self.propFullName, str(self.GoalVisitsFieldFilter))
         
         try:
             self.maxNeedAfterOverflow = config['MaxNeedAfterOverflow']
@@ -208,7 +208,7 @@ class WeakLensingProp (Proposal):
 	    if filter in self.GoalVisitsFieldFilter.keys():
                 self.visits[filter]={}
                 self.GoalVisitsField += self.GoalVisitsFieldFilter[filter]
-        print('GoalVisitsField = %i' % (self.GoalVisitsField))
+#        print('GoalVisitsField = %i' % (self.GoalVisitsField))
 
         # DataBase specifics
         self.dbTableDict = dbTableDict
