@@ -82,7 +82,7 @@ class TransSubSeqProp (Proposal):
         self.loosers = []
         
         self.obsHistory = None
-        self.seqHistory = None
+#        self.seqHistory = None
         self.sessionID = sessionID
 
         # self.targets is a convenience dictionary. Its keys are 
@@ -102,13 +102,13 @@ class TransSubSeqProp (Proposal):
         self.obsHistory.cleanupProposal (self.propID, self.sessionID)
         
         # Create the SeqHistory instance and cleanup any leftover
-        self.seqHistory = SeqHistory (lsstDB=self.lsstDB,
-				      dbTableDict=self.dbTableDict,
-                                      log=self.log,
-                                      logfile=self.logfile,
-                                      verbose=self.verbose)
+#        self.seqHistory = SeqHistory (lsstDB=self.lsstDB,
+#				      dbTableDict=self.dbTableDict,
+#                                      log=self.log,
+#                                      logfile=self.logfile,
+#                                      verbose=self.verbose)
         
-        self.seqHistory.cleanupProposal (self.propID, self.sessionID)
+#        self.seqHistory.cleanupProposal (self.propID, self.sessionID)
 
 	self.exclusiveBlockNeeded = False
 	self.exclusiveObs = None
@@ -635,11 +635,24 @@ class TransSubSeqProp (Proposal):
                 	        self.log.info('%sProp: suggestObs() sequence LOST for propID=%d field=%i t=%.0f event missed' % (self.propFullName, self.propID,fieldID, date))
                                                                                                                                     
 	                    # Update the SeqHistory database
-        	            self.seqHistory.addSequence (seq=self.sequences[fieldID],
-                	                                 fieldID=fieldID,
-                        	                         sessionID=self.sessionID,
-                                	                 obsdate=date,
-                                        	         status=MAX_MISSED_EVENTS)
+			    seq = self.sequences[fieldID]
+			    self.lsstDB.addSeqHistory(seq.date,
+							date,
+							seq.seqNum,
+							seq.GetProgress(),
+							seq.GetNumTargetEvents(),
+							seq.GetNumActualEvents(),
+							MAX_MISSED_EVENTS,
+							0,
+							fieldID,
+							self.sessionID,
+							self.propID)
+
+#        	            self.seqHistory.addSequence (seq=self.sequences[fieldID],
+#                	                                 fieldID=fieldID,
+#                        	                         sessionID=self.sessionID,
+#                                	                 obsdate=date,
+#                                        	         status=MAX_MISSED_EVENTS)
 	                    seq_lost+=1
                             # ZZZZ - mm debug 2nd delete of tonightTargets
                             print "Prop[%d].suggestObs() seq lost: delete self.tonightTargets[%d] date = %d" % (self.propID, fieldID, date)
@@ -782,11 +795,24 @@ class TransSubSeqProp (Proposal):
     def CompleteSequence(self, fieldID, date):
 
         # Update sequence history DB
-        self.seqHistory.addSequence (seq=self.sequences[fieldID],
-                   	                 fieldID=fieldID,
-                        	         sessionID=self.sessionID,
-                                	 obsdate=date,
-	                                 status=SUCCESS)
+        seq = self.sequences[fieldID]
+        self.lsstDB.addSeqHistory(seq.date,
+				date,
+                                seq.seqNum,
+                                seq.GetProgress(),
+                                seq.GetNumTargetEvents(),
+                                seq.GetNumActualEvents(),
+                                SUCCESS,
+                                0,
+                                fieldID,
+                                self.sessionID,
+                                self.propID)
+
+#        self.seqHistory.addSequence (seq=self.sequences[fieldID],
+#                   	                 fieldID=fieldID,
+#                        	         sessionID=self.sessionID,
+#                                	 obsdate=date,
+#	                                 status=SUCCESS)
 
         if not self.overflow:
             # ZZZZ - mm debug 2nd delete of tonightTargets
@@ -813,11 +839,24 @@ class TransSubSeqProp (Proposal):
                 self.sequences[fieldID].Abort()
 
                 # Update sequence history DB
-                self.seqHistory.addSequence (seq=self.sequences[fieldID],
-                                             fieldID=fieldID,
-                                             sessionID=self.sessionID,
-                                             obsdate=obsdate,
-                                             status=CYCLE_END)
+                seq = self.sequences[fieldID]
+                self.lsstDB.addSeqHistory(seq.date,
+					obsdate,
+                                        seq.seqNum,
+                                        seq.GetProgress(),
+                                        seq.GetNumTargetEvents(),
+                                        seq.GetNumActualEvents(),
+                                        CYCLE_END,
+                                        0,
+                                        fieldID,
+                                        self.sessionID,
+                                        self.propID)
+
+#                self.seqHistory.addSequence (seq=self.sequences[fieldID],
+#                                             fieldID=fieldID,
+#                                             sessionID=self.sessionID,
+#                                             obsdate=obsdate,
+#                                             status=CYCLE_END)
 
         return
 
@@ -835,11 +874,24 @@ class TransSubSeqProp (Proposal):
                 #self.sequences[fieldID].Abort()
 
                 # Update sequence history DB
-                self.seqHistory.addSequence (seq=self.sequences[fieldID],
-                                             fieldID=fieldID,
-                                             sessionID=self.sessionID,
-                                             obsdate=time,
-                                             status=SIMULATION_END)
+                seq = self.sequences[fieldID]
+                self.lsstDB.addSeqHistory(seq.date,
+                                        time,
+                                        seq.seqNum,
+                                        seq.GetProgress(),
+                                        seq.GetNumTargetEvents(),
+                                        seq.GetNumActualEvents(),
+                                        SIMULATION_END,
+                                        0,
+                                        fieldID,
+                                        self.sessionID,
+                                        self.propID)
+
+#		self.seqHistory.addSequence (seq=self.sequences[fieldID],
+#                                             fieldID=fieldID,
+#                                             sessionID=self.sessionID,
+#                                             obsdate=time,
+#                                             status=SIMULATION_END)
 
         # delete OlapField user-defined region table
         if not (self.userRegion[0] == None): 
