@@ -476,11 +476,23 @@ class NearEarthProp (TransientProp):
 ,fieldID, date))
 
                         # Update the SeqHistory database
-                        self.seqHistory.addSequence (seq=self.sequences[fieldID],
-                                                     fieldID=fieldID,
-                                                     sessionID=self.sessionID,
-                                                     obsdate=date,
-                                                     status=MAX_MISSED_EVENTS)
+	                seq = self.sequences[fieldID]
+        	        self.lsstDB.addSeqHistory(seq.date,
+                	                        date,
+                                        	seq.seqNum,
+                                        	seq.GetProgress(),
+                                        	seq.GetNumTargetEvents(),
+                                        	seq.GetNumActualEvents(),
+                                        	MAX_MISSED_EVENTS,
+                                        	0,
+                                        	fieldID,
+                                        	self.sessionID,
+                                        	self.propID)
+#                        self.seqHistory.addSequence (seq=self.sequences[fieldID],
+#                                                     fieldID=fieldID,
+#                                                     sessionID=self.sessionID,
+#                                                     obsdate=date,
+#                                                     status=MAX_MISSED_EVENTS)
                         fields_lost+=1
                         del self.tonightTargets[fieldID]
                     # it is also possible that the missed event was the last needed for completing the sequence
