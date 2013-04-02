@@ -168,6 +168,65 @@ class dataSlew(object):
 	self.slewTime  = slewTime
 	self.slewDist  = slewDist
 
+SLEWINITSTATE = 0
+SLEWFINALSTATE = 1
+class stateSlew(object):
+    def __init__(self,
+		slewStateDate = 0,
+		tra = 0.0,
+		tdec = 0.0,
+		tracking = "False",
+		alt = 0.0,
+		az = 0.0,
+		pa = 0.0,
+		DomAlt = 0.0,
+		DomAz = 0.0,
+		TelAlt = 0.0,
+		TelAz = 0.0,
+		RotTelPos = 0.0,
+		Filter = "r",
+		state = SLEWINITSTATE):
+
+
+        self.slewStateDate = slewStateDate
+        self.tra = tra
+        self.tdec = tdec
+        self.tracking = tracking
+        self.alt = alt
+        self.az = az
+        self.pa = pa
+        self.DomAlt = DomAlt
+        self.DomAz = DomAz
+        self.TelAlt = TelAlt
+        self.TelAz = TelAz
+        self.RotTelPos = RotTelPos
+        self.Filter = Filter
+        self.state = state
+
+class speedsSlew(object):
+    def __init__(self,
+		DomAltSpd = 0.0,
+		DomAzSpd = 0.0,
+		TelAltSpd = 0.0,
+		TelAzSpd = 0.0,
+		RotSpd = 0.0):
+
+	self.DomAltSpd = DomAltSpd
+	self.DomAzSpd = DomAzSpd
+	self.TelAltSpd = TelAltSpd
+	self.TelAzSpd = TelAzSpd
+	self.RotSpd = RotSpd
+
+class activitySlew(object):
+    def __init__(self,
+		activity = "",
+		actDelay = 0.0,
+		inCriticalPath = "False"):
+
+	self.activity = activity
+	self.actDelay = actDelay
+	self.inCriticalPath = inCriticalPath
+
 
 ######################################################################
 class InstrumentState (InstrumentPosition):
@@ -1159,7 +1218,7 @@ class Instrument (object):
         (date,mjd,lst_RAD) = dateProfile
 
         self.current_state.UpdateState(date)
-        #self.DBrecordState(self.current_state, 'SlewInitState')
+        slewInitState = self.DBrecordState(self.current_state, SLEWINITSTATE)
 
         ha_RAD = lst_RAD - ra_RAD
         (az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (ha_RAD, dec_RAD, self.params.latitude_RAD)
@@ -1171,8 +1230,9 @@ class Instrument (object):
             self.targetposition.Set(ra_RAD,	dec_RAD, angle_RAD, filter, exposureTime, date, alt_RAD, az_RAD, pa_RAD)
 
         delay = self.Slew(self.targetposition)
-        #self.DBrecordState(self.current_state, 'SlewFinalState')
-        #self.DBrecordMaximumSpeeds()
+
+        slewFinalState = self.DBrecordState(self.current_state, SLEWFINALSTATE)
+        slewMaxSpeeds = self.DBrecordMaximumSpeeds()
 
         rotator_skypos = self.current_state.GetRotatorSkyPos()
         rotator_telpos = self.current_state.GetRotatorTelPos()
@@ -1190,57 +1250,84 @@ class Instrument (object):
 #        sql += '%f )' % (delay)
         #(n, dummy) = self.lsstDB.executeSQL(sql)
 
+	listSlewActivities = []
         for activity in self.lastslew_delays.keys():
             if activity in self.lastslew_criticalpath:
                 cp = 'True'
             else:
                 cp = 'False'
-            sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewActivities')
-            sql += '%d, ' % (self.sessionID)
-            sql += '%d, ' % (self.slewCount)
-            sql += '"%s", ' % (activity)
-            sql += '%f, ' % (self.lastslew_delays[activity])
-            sql += '"%s" )' % (cp)
+	    slewactivity = activitySlew(activity,
+					self.lastslew_delays[activity],
+					cp)
+	    listSlewActivities.append(slewactivity)
+
+#            sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewActivities')
+#            sql += '%d, ' % (self.sessionID)
+#            sql += '%d, ' % (self.slewCount)
+#            sql += '"%s", ' % (activity)
+#            sql += '%f, ' % (self.lastslew_delays[activity])
+#            sql += '"%s" )' % (cp)
             #(n, dummy) = self.lsstDB.executeSQL(sql)
 
         self.next_state = copy.deepcopy(self.current_state)
         self.next_state.UpdateState(date+delay+exposureTime)
 
-        return (delay, rotator_skypos, rotator_telpos, altitude, azimuth, slewdata)
+        return (delay, rotator_skypos, rotator_telpos, altitude, azimuth, slewdata, slewInitState, slewFinalState, slewMaxSpeeds, listSlewActivities)
 
-    def DBrecordState(self, state, dbTable):
+    def DBrecordState(self, state, initfinal):
 
         if state.Tracking:
             tracking = 'True'
         else:
             tracking = 'False'
-        sql = 'INSERT INTO %s VALUES (NULL, ' % (dbTable)
-        sql += '%d, ' % (self.sessionID)
-        sql += '%d, ' % (self.slewCount)
-        sql += '%f, %f, %f, ' % (state.TIME, state.RA_RAD, state.DEC_RAD)
-        sql += '"%s", ' % (tracking)
-        sql += '%f, %f, %f, ' % (state.ALT_RAD, state.AZ_RAD, state.PA_RAD)
-        sql += '%f, %f, ' % (state.DomAlt_Pos_RAD, state.DomAz_Pos_RAD)
-        sql += '%f, %f, ' % (state.TelAlt_Pos_RAD, state.TelAz_Pos_RAD)
-        sql += '%f, ' % (state.Rotator_Pos_RAD)
-        sql += '"%s" )' % (state.Filter_Pos)
+
+	slewState = stateSlew(state.TIME,
+				state.RA_RAD,
+				state.DEC_RAD,
+				tracking,
+				state.ALT_RAD,
+				state.AZ_RAD,
+				state.PA_RAD,
+				state.DomAlt_Pos_RAD,
+				state.DomAz_Pos_RAD,
+				state.TelAlt_Pos_RAD,
+				state.TelAz_Pos_RAD,
+				state.Rotator_Pos_RAD,
+				state.Filter_Pos,
+				initfinal)
+
+#        sql = 'INSERT INTO %s VALUES (NULL, ' % (dbTable)
+#        sql += '%d, ' % (self.sessionID)
+#        sql += '%d, ' % (self.slewCount)
+#        sql += '%f, %f, %f, ' % (state.TIME, state.RA_RAD, state.DEC_RAD)
+#        sql += '"%s", ' % (tracking)
+#        sql += '%f, %f, %f, ' % (state.ALT_RAD, state.AZ_RAD, state.PA_RAD)
+#        sql += '%f, %f, ' % (state.DomAlt_Pos_RAD, state.DomAz_Pos_RAD)
+#        sql += '%f, %f, ' % (state.TelAlt_Pos_RAD, state.TelAz_Pos_RAD)
+#        sql += '%f, ' % (state.Rotator_Pos_RAD)
+#        sql += '"%s" )' % (state.Filter_Pos)
 #        (n, dummy) = self.lsstDB.executeSQL(sql)
 
 #	return n
-	return 0
+	return slewState
 
     def DBrecordMaximumSpeeds(self):
-                                                                                                                         
-        sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewMaxSpeeds')
-        sql += '%d, ' % (self.sessionID)
-        sql += '%d, ' % (self.slewCount)
-        sql += '%f, %f, ' % (self.current_state.DomAlt_Spd_RDS, self.current_state.DomAz_Spd_RDS)
-        sql += '%f, %f, ' % (self.current_state.TelAlt_Spd_RDS, self.current_state.TelAz_Spd_RDS)
-        sql += '%f )    ' % (self.current_state.Rotator_Spd_RDS)
+        
+	slewSpeeds = speedsSlew(self.current_state.DomAlt_Spd_RDS,
+				self.current_state.DomAz_Spd_RDS,
+				self.current_state.TelAlt_Spd_RDS,
+				self.current_state.TelAz_Spd_RDS,
+				self.current_state.Rotator_Spd_RDS)                                                                                                                 
+#        sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewMaxSpeeds')
+#        sql += '%d, ' % (self.sessionID)
+#        sql += '%d, ' % (self.slewCount)
+#        sql += '%f, %f, ' % (self.current_state.DomAlt_Spd_RDS, self.current_state.DomAz_Spd_RDS)
+#        sql += '%f, %f, ' % (self.current_state.TelAlt_Spd_RDS, self.current_state.TelAz_Spd_RDS)
+#        sql += '%f )    ' % (self.current_state.Rotator_Spd_RDS)
 #        (n, dummy) = self.lsstDB.executeSQL(sql)
         
 #        return n
-	return 0
+	return slewSpeeds
 
     def GetFilter(self):
         """
