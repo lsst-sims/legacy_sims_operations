@@ -323,9 +323,9 @@ class TransSubSeqProp (Proposal):
 
 	return progressFilter
 
-    def MissEvent(self, date, mjd, fieldID, subseq):
+    def MissEvent(self, date, mjd, fieldID, subseq, obsHistID):
     
-        self.sequences[fieldID].MissEvent(date, subseq)
+        self.sequences[fieldID].MissEvent(date, subseq, obsHistID)
         if self.log and self.verbose>0 and not self.sequences[fieldID].IsLost():
             t_secs = date%60
             t_mins = (date%3600)/60
@@ -473,7 +473,7 @@ class TransSubSeqProp (Proposal):
 
 		    self.exclusiveBlockNeeded = False
 
-                    self.MissEvent(date, mjd, fieldID, subseq)
+                    self.MissEvent(date, mjd, fieldID, subseq, 0)
 
             fields_received=len(listOfFieldsToEvaluate)
             fields_invisible=0
@@ -636,7 +636,7 @@ class TransSubSeqProp (Proposal):
                                                                                                                                     
 	                    # Update the SeqHistory database
 			    seq = self.sequences[fieldID]
-			    self.lsstDB.addSeqHistory(seq.date,
+			    seqHist = self.lsstDB.addSeqHistory(seq.date,
 							date,
 							seq.seqNum,
 							seq.GetProgress(),
@@ -647,6 +647,8 @@ class TransSubSeqProp (Proposal):
 							fieldID,
 							self.sessionID,
 							self.propID)
+			    for obsID in seq.GetListObsID():
+				self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
 
 #        	            self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                	                                 fieldID=fieldID,
@@ -762,7 +764,7 @@ class TransSubSeqProp (Proposal):
         obs = super (TransSubSeqProp, self).closeObservation(observation, obsHistID, twilightProfile)
 
         if obs != None:
-            self.sequences[obs.fieldID].ObserveEvent(obs.date, obs.subsequence)
+            self.sequences[obs.fieldID].ObserveEvent(obs.date, obs.subsequence, obsHistID)
             progress = self.sequences[obs.fieldID].GetProgress()
 
             if self.log and self.verbose>0:
@@ -796,7 +798,7 @@ class TransSubSeqProp (Proposal):
 
         # Update sequence history DB
         seq = self.sequences[fieldID]
-        self.lsstDB.addSeqHistory(seq.date,
+        seqHist = self.lsstDB.addSeqHistory(seq.date,
 				date,
                                 seq.seqNum,
                                 seq.GetProgress(),
@@ -807,6 +809,8 @@ class TransSubSeqProp (Proposal):
                                 fieldID,
                                 self.sessionID,
                                 self.propID)
+	for obsID in seq.GetListObsID():
+	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
 
 #        self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                   	                 fieldID=fieldID,
@@ -840,7 +844,7 @@ class TransSubSeqProp (Proposal):
 
                 # Update sequence history DB
                 seq = self.sequences[fieldID]
-                self.lsstDB.addSeqHistory(seq.date,
+                seqHist = self.lsstDB.addSeqHistory(seq.date,
 					obsdate,
                                         seq.seqNum,
                                         seq.GetProgress(),
@@ -851,6 +855,8 @@ class TransSubSeqProp (Proposal):
                                         fieldID,
                                         self.sessionID,
                                         self.propID)
+        	for obsID in seq.GetListObsID():
+	            self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
 
 #                self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                                             fieldID=fieldID,
@@ -875,7 +881,7 @@ class TransSubSeqProp (Proposal):
 
                 # Update sequence history DB
                 seq = self.sequences[fieldID]
-                self.lsstDB.addSeqHistory(seq.date,
+                seqHist = self.lsstDB.addSeqHistory(seq.date,
                                         time,
                                         seq.seqNum,
                                         seq.GetProgress(),
@@ -886,6 +892,8 @@ class TransSubSeqProp (Proposal):
                                         fieldID,
                                         self.sessionID,
                                         self.propID)
+	        for obsID in seq.GetListObsID():
+        	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
 
 #		self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                                             fieldID=fieldID,

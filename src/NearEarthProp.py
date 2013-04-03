@@ -458,7 +458,7 @@ class NearEarthProp (TransientProp):
 
                     fields_missed+=1
 
-                    self.sequences[fieldID].missEvent(date)
+                    self.sequences[fieldID].missEvent(date, 0)
 
                     if self.log and self.verbose>0 and not self.sequences[fieldID].IsLost():
                         t_secs = date%60
@@ -477,7 +477,7 @@ class NearEarthProp (TransientProp):
 
                         # Update the SeqHistory database
 	                seq = self.sequences[fieldID]
-        	        self.lsstDB.addSeqHistory(seq.date,
+        	        seqHist = self.lsstDB.addSeqHistory(seq.date,
                 	                        date,
                                         	seq.seqNum,
                                         	seq.GetProgress(),
@@ -488,6 +488,8 @@ class NearEarthProp (TransientProp):
                                         	fieldID,
                                         	self.sessionID,
                                         	self.propID)
+	        	for obsID in seq.GetListObsID():
+        	    	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
 #                        self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                                                     fieldID=fieldID,
 #                                                     sessionID=self.sessionID,

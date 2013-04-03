@@ -479,7 +479,7 @@ class TransientProp (Proposal):
 
                     fields_missed+=1
 
-                    self.sequences[fieldID].missEvent(date)
+                    self.sequences[fieldID].missEvent(date, 0)
 
                     if self.log and self.verbose>0 and not self.sequences[fieldID].IsLost():
                         t_secs = date%60
@@ -498,7 +498,7 @@ class TransientProp (Proposal):
 
                         # Update the SeqHistory database
                         seq = self.sequences[fieldID]
-                        self.lsstDB.addSeqHistory(seq.date,
+                        seqHist = self.lsstDB.addSeqHistory(seq.date,
                                                     date,
                                                     seq.seqNum,
                                                     seq.GetProgress(),
@@ -509,6 +509,8 @@ class TransientProp (Proposal):
                                                     fieldID,
                                                     self.sessionID,
                                                     self.propID)
+		        for obsID in seq.GetListObsID():
+		            self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
 
 #                        self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                                                     fieldID=fieldID,
@@ -581,7 +583,7 @@ class TransientProp (Proposal):
         return
     
     
-    def closeObservation (self, observation, twilightProfile):
+    def closeObservation (self, observation, twilightProfile, obsHistID):
         """
         Registers the fact that the indicated observation took place.
         This is, the corresponding event in the sequence of the indicated
@@ -603,9 +605,9 @@ class TransientProp (Proposal):
 	    return None
 
         if ( self.log and self.verbose > 1 ):
-           self.log.info('TransientProp: closeObservation()')
+            self.log.info('TransientProp: closeObservation()')
 
-        obs = super (TransientProp, self).closeObservation(observation, twilightProfile)
+        obs = super (TransientProp, self).closeObservation(observation, twilightProfile, obsHistID)
 
         if obs != None:
             self.sequences[obs.fieldID].closeEvent(obs.date, obs.filter)
@@ -629,7 +631,7 @@ class TransientProp (Proposal):
 
 	# Update sequence history DB
         seq = self.sequences[fieldID]
-        self.lsstDB.addSeqHistory(seq.date,
+        seqHist = self.lsstDB.addSeqHistory(seq.date,
                                 date,
                                 seq.seqNum,
                                 seq.GetProgress(),
@@ -640,6 +642,8 @@ class TransientProp (Proposal):
                                 fieldID,
                                 self.sessionID,
                                 self.propID)
+        for obsID in seq.GetListObsID():
+            self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
 
 #        self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                                     fieldID=fieldID,
@@ -669,7 +673,7 @@ class TransientProp (Proposal):
 
                 # Update sequence history DB
                 seq = self.sequences[fieldID]
-                self.lsstDB.addSeqHistory(seq.date,
+                seqHist = self.lsstDB.addSeqHistory(seq.date,
                                         obsdate,
                                         seq.seqNum,
                                         seq.GetProgress(),
@@ -680,6 +684,8 @@ class TransientProp (Proposal):
                                         fieldID,
                                         self.sessionID,
                                         self.propID)
+	        for obsID in seq.GetListObsID():
+        	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
 
 #		self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                                             fieldID=fieldID,
@@ -704,7 +710,7 @@ class TransientProp (Proposal):
 
                 # Update sequence history DB
                 seq = self.sequences[fieldID]
-                self.lsstDB.addSeqHistory(seq.date,
+                seqHist = self.lsstDB.addSeqHistory(seq.date,
                                         time,
                                         seq.seqNum,
                                         seq.GetProgress(),
@@ -715,6 +721,8 @@ class TransientProp (Proposal):
                                         fieldID,
                                         self.sessionID,
                                         self.propID)
+	        for obsID in seq.GetListObsID():
+        	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
 
 #                self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                                             fieldID=fieldID,
