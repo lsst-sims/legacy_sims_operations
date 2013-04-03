@@ -628,7 +628,7 @@ class TransSubSeqProp (Proposal):
 
                         events_missed+=1
 
-                        self.MissEvent(date, mjd, fieldID, subseq)
+                        self.MissEvent(date, mjd, fieldID, subseq, 0)
 
 	                if self.sequences[fieldID].IsLost():
         	            if self.log and self.verbose>0:
