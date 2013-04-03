@@ -122,6 +122,7 @@ class SubSequence (LSSTObject):
         self.allHistory = []
         self.obsHistory = []
         self.misHistory = []
+	self.allHistID  = []
 
 	self.subeventIndex = 0
 
@@ -240,6 +241,10 @@ class SubSequence (LSSTObject):
 
         return (interval)
 
+    def GetListObsID(self):
+
+	return self.allHistID
+
     def HasTimeWindow(self):
 
 	if not self.WLtype:
@@ -297,10 +302,10 @@ class SubSequence (LSSTObject):
             
         return rank
 
-    def ObserveEvent(self, date):
+    def ObserveEvent(self, date, obsHistID):
 
 	if self.nestedSubSequence != None:
-	    self.nestedSubSequence.ObserveEvent(date)
+	    self.nestedSubSequence.ObserveEvent(date, obsHistID)
 	    if self.nestedSubSequence.IsComplete() == False:
 		return False
 	    else:
@@ -326,6 +331,7 @@ class SubSequence (LSSTObject):
 	self.exposuresLeft = self.subExposures[0]
 
         self.allHistory.append(date)
+	self.allHistID.append(obsHistID)
 	#print ("subseq=%s history=%s" % (self.subName, str(self.allHistory)))
         self.obsHistory.append(date)
 
@@ -337,7 +343,7 @@ class SubSequence (LSSTObject):
 	#print self.state
         return True
 
-    def MissEvent(self, date):
+    def MissEvent(self, date, obsHistID):
 
 	if self.nestedSubSequence != None:
 	    self.nestedSubSequence.MissEvent(date)
@@ -348,6 +354,7 @@ class SubSequence (LSSTObject):
 
 	if ((self.nMisEvents < self.subMaxMissed) or self.WLtype):
 	    self.allHistory.append(d)
+	    self.allHistID.append(obsHistID)
         self.misHistory.append(d)
 
         self.subeventIndex = 0
@@ -661,7 +668,14 @@ class SuperSequence (LSSTObject):
         """
 
         return self.subSequence[name].GetNextDate()
-    
+   
+    def GetListObsID(self):
+
+	listObsID = []
+	for subseq in self.subSeqName:
+	    listObsID = listObsID + self.subSequence[subseq].GetListObsID()
+	return listObsID
+ 
     def HasEventsTonight(self, date):
 
 	if self.state == SEQ_IDLE:
@@ -676,13 +690,13 @@ class SuperSequence (LSSTObject):
 			has = True
 	    return has
 
-    def ObserveEvent (self, date, name):
+    def ObserveEvent (self, date, name, obsHistID):
         """
         Simply register the fact that one of our observations has been
         carried out and uodate self.obsHistory
         """
 
-        if self.subSequence[name].ObserveEvent(date) == True:
+        if self.subSequence[name].ObserveEvent(date, obsHistID) == True:
 
 	    self.allHistory.append((date, name))
             self.obsHistory.append((date, name))
@@ -698,13 +712,13 @@ class SuperSequence (LSSTObject):
         
         return
 
-    def MissEvent (self, date, name):
+    def MissEvent (self, date, name, obsHistID):
 	"""
 	Event missed. allHistory will store the event as if it were observed,
 	and misHistory will register the miss.
 	"""
 
-        self.subSequence[name].MissEvent(date)
+        self.subSequence[name].MissEvent(date, obsHistID)
 
         self.allHistory.append((date, name))
         self.misHistory.append((date, name))
