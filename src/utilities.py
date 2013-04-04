@@ -84,6 +84,10 @@ DefaultASConfigFile = '../conf/system/AstronomicalSky.conf'
 DefaultFiltersConfigFile = '../conf/survey/Filters.conf'
 DefaultSchedulerConfigFile = '../conf/scheduler/Scheduler.conf'
 
+# Observation Types for events in sequences
+OBSTYPE_VISIT = 0
+OBSTYPE_MISSED = 1
+
 # SeqHistory Sequence completion status
 SUCCESS = 0
 MAX_MISSED_EVENTS = 1
