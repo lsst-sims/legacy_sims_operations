@@ -680,7 +680,7 @@ class ObsScheduler (LSSTObject):
 				winner.rotatorSkyPos, winner.lst,
 				winner.altitude, winner.azimuth,
 				winner.distance2moon, winner.solarElong,
-				winner.obsType, self.sessionID, winner.fieldID)
+				OBSTYPE_VISIT, self.sessionID, winner.fieldID)
 
 
 	self.lsstDB.addAstronomicalSky(winner.moonRA_RAD, winner.moonDec_RAD,
