@@ -479,7 +479,10 @@ class TransientProp (Proposal):
 
                     fields_missed+=1
 
-                    self.sequences[fieldID].missEvent(date, 0)
+                    obsHist = self.lsstDB.addObservation(self.sequences[fieldID].GetNextFilter(),
+                                                        date, mjd, 0, 0,0,0,0,0,0,0,0,0,
+                                                        lst_RAD,0,0,0,0,OBSTYPE_MISSED, self.sessionID, fieldID)
+                    self.sequences[fieldID].missEvent(date, obsHist.obsHistID)
 
                     if self.log and self.verbose>0 and not self.sequences[fieldID].IsLost():
                         t_secs = date%60

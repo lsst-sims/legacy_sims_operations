@@ -473,7 +473,10 @@ class TransSubSeqProp (Proposal):
 
 		    self.exclusiveBlockNeeded = False
 
-                    self.MissEvent(date, mjd, fieldID, subseq, 0)
+		    obsHist = self.lsstDB.addObservation(self.sequences[fieldID].GetNextFilter(subseq),
+							date, mjd, 0, 0,0,0,0,0,0,0,0,0,
+							lst_RAD,0,0,0,0,OBSTYPE_MISSED, self.sessionID, fieldID)
+                    self.MissEvent(date, mjd, fieldID, subseq, obsHist.obsHistID)
 
             fields_received=len(listOfFieldsToEvaluate)
             fields_invisible=0
@@ -628,7 +631,10 @@ class TransSubSeqProp (Proposal):
 
                         events_missed+=1
 
-                        self.MissEvent(date, mjd, fieldID, subseq, 0)
+	                obsHist = self.lsstDB.addObservation(self.sequences[fieldID].GetNextFilter(subseq),
+                                                        date, mjd, 0, 0,0,0,0,0,0,0,0,0,
+                                                        lst_RAD,0,0,0,0,OBSTYPE_MISSED, self.sessionID, fieldID)
+                        self.MissEvent(date, mjd, fieldID, subseq, obsHist.obsHistID)
 
 	                if self.sequences[fieldID].IsLost():
         	            if self.log and self.verbose>0:
