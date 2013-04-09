@@ -204,6 +204,13 @@ class Database :
         self.metadata.create_all()
         return olapTable
 
+    def dropTable(self, tableName) :
+	conn = self.engine.connect()
+	sql = 'drop table if exists %s; ' %(tableName)
+	sText = text(sql)
+	result = conn.execute(sText)
+	return result
+	
     def addConfigFile(self, filename, data, sessionID):
         try:
             oConfigFile = Opsim_Config_File()

@@ -736,10 +736,7 @@ class TransientProp (Proposal):
         # delete OlapField user-defined region table
         if not (self.userRegion[0] == None):
             overlappingField = "OlapField_%d_%d" %(self.sessionID,self.propID)
-            sql = 'drop table if exists %s; ' %(overlappingField)
-            print sql
-            # Send the SQL commmand to the DB
-            (n, res) = self.lsstDB.executeSQL(sql)
+            result = self.lsstDB.dropTable(overlappingField)
 
         return
 
