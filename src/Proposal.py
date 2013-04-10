@@ -788,7 +788,7 @@ class Proposal (object):
         if obsfound != None:
 	    self.last_observed_wasForThisProposal = True
 
-	    self.lsstDB.addObsHistoryProposal(self.propID, obsHistID, obsfound.propRank)
+	    self.lsstDB.addObsHistoryProposal(self.propID, obsHistID, self.sessionID, obsfound.propRank)
 
             # Update suggested Observation with actual observing conditions 
             obsfound.date = obs.date

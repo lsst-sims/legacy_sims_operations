@@ -19,11 +19,8 @@ class Opsim_Log(object):
 
 class Opsim_ObsHistory(object):
     pass
-
-class Opsim_AstronomicalSky(object):
-    pass
-
-class Opsim_Atmosphere(object):
+    
+class Opsim_MissedHistory(object):
     pass
 
 class Opsim_ObsHistory_Proposal(object):
@@ -42,6 +39,9 @@ class Opsim_SeqHistory(object):
     pass
 
 class Opsim_SeqHistory_ObsHistory(object):
+    pass
+
+class Opsim_SeqHistory_MissedHistory(object):
     pass
 
 class Opsim_Session(object):
@@ -84,13 +84,10 @@ class Database :
         
         self.opsim_obshistory = Table('ObsHistory', self.metadata, autoload=True)
         mapper(Opsim_ObsHistory, self.opsim_obshistory)				
-        
-        self.opsim_astronomicalsky = Table('AstronomicalSky', self.metadata, autoload=True)
-        mapper(Opsim_AstronomicalSky, self.opsim_astronomicalsky)
-        
-        self.opsim_atmosphere = Table('Atmosphere', self.metadata, autoload=True)
-        mapper(Opsim_Atmosphere, self.opsim_atmosphere)
-        
+
+        self.opsim_missedhistory = Table('MissedHistory', self.metadata, autoload=True)
+        mapper(Opsim_MissedHistory, self.opsim_missedhistory)				
+       
         self.opsim_obshistory_proposal = Table('ObsHistory_Proposal', self.metadata, autoload=True)
         mapper(Opsim_ObsHistory_Proposal, self.opsim_obshistory_proposal)
         
@@ -108,6 +105,9 @@ class Database :
 
         self.opsim_seqhistory_obshistory = Table('SeqHistory_ObsHistory', self.metadata, autoload=True)
         mapper(Opsim_SeqHistory_ObsHistory, self.opsim_seqhistory_obshistory)
+
+        self.opsim_seqhistory_missedhistory = Table('SeqHistory_MissedHistory', self.metadata, autoload=True)
+        mapper(Opsim_SeqHistory_MissedHistory, self.opsim_seqhistory_missedhistory)
 
         self.opsim_session = Table('Session', self.metadata, autoload=True)
         mapper(Opsim_Session, self.opsim_session)
@@ -165,7 +165,7 @@ class Database :
         try:
             oTimeHistory = Opsim_TimeHistory()
             oTimeHistory.date = date
-            oTimeHistory.MJD = mjd
+            oTimeHistory.mjd = mjd
             oTimeHistory.night = nightCnt
             oTimeHistory.event = event
             oTimeHistory.Session_sessionID = sessionID
@@ -205,11 +205,11 @@ class Database :
         return olapTable
 
     def dropTable(self, tableName) :
-	conn = self.engine.connect()
-	sql = 'drop table if exists %s; ' %(tableName)
-	sText = text(sql)
-	result = conn.execute(sText)
-	return result
+        conn = self.engine.connect()
+        sql = 'drop table if exists %s; ' %(tableName)
+        sText = text(sql)
+        result = conn.execute(sText)
+        return result
 	
     def addConfigFile(self, filename, data, sessionID):
         try:
@@ -270,22 +270,36 @@ class Database :
             raise
         return oSeqHistory
 
-    def addSeqHistoryObsHistory(self, sequenceID, obsHistID):
+    def addSeqHistoryObsHistory(self, sequenceID, obsHistID, sessionID):
         try:
             oSeqHistoryObsHistory = Opsim_SeqHistory_ObsHistory()
             oSeqHistoryObsHistory.SeqHistory_sequenceID = sequenceID
             oSeqHistoryObsHistory.ObsHistory_obsHistID = obsHistID
+            oSeqHistoryObsHistory.ObsHistory_Session_sessionID = sessionID
             self.dbSession.add(oSeqHistoryObsHistory)
             self.dbSession.commit()
         except:
             self.dbSession.rollback()
             raise
 
-    def addObsHistoryProposal(self, propID, obsHistID, propRank):
+    def addSeqHistoryMissedHistory(self, sequenceID, missedHistID, sessionID):
+        try:
+            oSeqHistoryMissedHistory = Opsim_SeqHistory_MissedHistory()
+            oSeqHistoryMissedHistory.SeqHistory_sequenceID = sequenceID
+            oSeqHistoryMissedHistory.MissedHistory_missedHistID = missedHistID
+            oSeqHistoryMissedHistory.MissedHistory_Session_sessionID = sessionID
+            self.dbSession.add(oSeqHistoryMissedHistory)
+            self.dbSession.commit()
+        except:
+            self.dbSession.rollback()
+            raise
+
+    def addObsHistoryProposal(self, propID, obsHistID, sessionID, propRank):
         try:
             oObsHistoryProposal = Opsim_ObsHistory_Proposal()
             oObsHistoryProposal.Proposal_propID = propID
-            oObsHistoryProposal.Obshistory_obsHistID = obsHistID
+            oObsHistoryProposal.ObsHistory_obsHistID = obsHistID
+            oObsHistoryProposal.ObsHistory_Session_sessionID = sessionID
             oObsHistoryProposal.propRank = propRank
             self.dbSession.add(oObsHistoryProposal)
             self.dbSession.commit()
@@ -293,11 +307,32 @@ class Database :
             self.dbSession.rollback()
             raise
 
-    def addObservation(self, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank,
+    def addMissedObservation(self, filter, expDate, expMJD, night, lst, sessionID, fieldID):
+        try:
+            oMissed = Opsim_MissedHistory()
+            oMissed.filter = filter
+            oMissed.expDate = expDate
+            oMissed.expMJD = expMJD
+            oMissed.night = night
+            oMissed.lst = lst
+            oMissed.Session_sessionID = sessionID
+            oMissed.Field_fieldID = fieldID
+            self.dbSession.add(oMissed)
+            self.dbSession.commit()
+            self.dbSession.refresh(oMissed)
+        except:
+            self.dbSEssion.rollback()
+            raise
+        return oMissed
+
+    def addObservation(self, obsHistID, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank,
                        finSeeing, transparency, airmass, vSkyBright, filtSkyBright, rotSkyPos,
-                       lst, alt, az, dist2Moon, solarElong, obsType, sessionID, fieldID):
+                       lst, alt, az, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ,
+                       moonPhase, sunAlt, sunAZ, phaseAngle, rScatter, mieScatter, moonIllum,
+                       moonBright, darkBright, rawSeeing, wind, humidity, sessionID, fieldID):
         try:
             oObs = Opsim_ObsHistory()
+            oObs.obsHistID = obsHistID
             oObs.filter = filter
             oObs.expDate = expDate
             oObs.expMJD = expMJD
@@ -316,53 +351,32 @@ class Database :
             oObs.az = az
             oObs.dist2Moon = dist2Moon
             oObs.solarElong = solarElong
-            oObs.obsType = obsType
+            oObs.moonRA = moonRA
+            oObs.moonDec = moonDec
+            oObs.moonAlt = moonAlt
+            oObs.moonAZ = moonAZ
+            oObs.moonPhase = moonPhase
+            oObs.sunAlt = sunAlt
+            oObs.sunAZ = sunAZ
+            oObs.phaseAngle = phaseAngle
+            oObs.rScatter = rScatter
+            oObs.mieScatter = mieScatter
+            oObs.moonIllum = moonIllum
+            oObs.moonBright = moonBright
+            oObs.darkBright = darkBright
+            oObs.rawSeeing = rawSeeing
+            oObs.wind = wind
+            oObs.humidity = humidity            
             oObs.Session_sessionID = sessionID
             oObs.Field_fieldID = fieldID
             self.dbSession.add(oObs)
             self.dbSession.commit()
-            self.dbSession.refresh(oObs)
         except:
             self.dbSession.rollback()
             raise
         return oObs
 
-    def addAstronomicalSky(self, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAZ, phaseAngle,
-                           rScatter, mieScatter, moonIllum, moonBright, darkBright, obsHistID):
-        try:
-            oAstroSky = Opsim_AstronomicalSky()
-            oAstroSky.moonRA = moonRA
-            oAstroSky.moonDec = moonDec
-            oAstroSky.moonAlt = moonAlt
-            oAstroSky.moonPhase = moonPhase
-            oAstroSky.sunAlt = sunAlt
-            oAstroSky.sunAZ = sunAZ
-            oAstroSky.phaseAngle = phaseAngle
-            oAstroSky.rScatter = rScatter
-            oAstroSky.mieScatter = mieScatter
-            oAstroSky.moonIllum = moonIllum
-            oAstroSky.moonBright = moonBright
-            oAstroSky.darkBright = darkBright
-            oAstroSky.ObsHistory_obsHistID = obsHistID
-            self.dbSession.add(oAstroSky)
-            self.dbSession.commit()
-        except:
-            self.dbSession.rollback()
-            raise
-
-    def addAtmosphere(self, rawSeeing, wind, humidity, obsHistID):
-        try:
-            oAtm = Opsim_Atmosphere()
-            oAtm.rawSeeing = rawSeeing
-            oAtm.wind = wind
-            oAtm.ObsHistory_obsHistID = obsHistID
-            self.dbSession.add(oAtm)
-            self.dbSession.commit()
-        except:
-            self.dbSession.rollback()
-            raise
-
-    def addSlewHistory(self, slewCount, startDate, endDate, slewTime, slewDist, obsHistID):
+    def addSlewHistory(self, slewCount, startDate, endDate, slewTime, slewDist, obsHistID, sessionID):
         try:
             oSlewHist = Opsim_SlewHistory()
             oSlewHist.slewCount = slewCount
@@ -371,6 +385,7 @@ class Database :
             oSlewHist.slewTime = slewTime
             oSlewHist.slewDist = slewDist
             oSlewHist.ObsHistory_obsHistID = obsHistID
+            oSlewHist.ObsHistory_Session_sessionID = sessionID
             self.dbSession.add(oSlewHist)
             self.dbSession.commit()
             self.dbSession.refresh(oSlewHist)
@@ -392,14 +407,14 @@ class Database :
             self.dbSession.rollback()
             raise
 
-    def addSlewMaxSpeeds(self, DomAltSpd, DomAzSpd, TelAltSpd, TelAzSpd, RotSpd, slewID):
+    def addSlewMaxSpeeds(self, domAltSpd, domAzSpd, telAltSpd, telAzSpd, rotSpd, slewID):
         try:
             oSlewMaxSpeed = Opsim_SlewMaxSpeeds()
-            oSlewMaxSpeed.DomAltSpd = DomAltSpd
-            oSlewMaxSpeed.DomAzSpd = DomAzSpd
-            oSlewMaxSpeed.TelAltSpd = TelAltSpd
-            oSlewMaxSpeed.TelAzSpd = TelAzSpd
-            oSlewMaxSpeed.RotSpd = RotSpd
+            oSlewMaxSpeed.domAltSpd = domAltSpd
+            oSlewMaxSpeed.domAzSpd = domAzSpd
+            oSlewMaxSpeed.telAltSpd = telAltSpd
+            oSlewMaxSpeed.telAzSpd = telAzSpd
+            oSlewMaxSpeed.rotSpd = rotSpd
             oSlewMaxSpeed.SlewHistory_slewID = slewID
             self.dbSession.add(oSlewMaxSpeed)
             self.dbSession.commit()
@@ -407,8 +422,8 @@ class Database :
             self.dbSession.rollback()
             raise
 
-    def addSlewState(self, slewStateDate, tra, tdec, tracking, alt, az, pa, DomAlt,
-                     DomAz, TelAlt, TelAz, RotTelPos, Filter, state, slewID):
+    def addSlewState(self, slewStateDate, tra, tdec, tracking, alt, az, pa, domAlt,
+                     domAz, telAlt, telAz, rotTelPos, filter, state, slewID):
         try:
             oSlewState = Opsim_SlewState()
             oSlewState.slewStateDate = slewStateDate
@@ -418,12 +433,12 @@ class Database :
             oSlewState.alt = alt
             oSlewState.az = az
             oSlewState.pa = pa
-            oSlewState.DomAlt = DomAlt
-            oSlewState.DomAz = DomAz
-            oSlewState.TelAlt = TelAlt
-            oSlewState.TelAz = TelAz
-            oSlewState.RotTelPos = RotTelPos
-            oSlewState.Filter = Filter
+            oSlewState.domAlt = domAlt
+            oSlewState.domAz = domAz
+            oSlewState.telAlt = telAlt
+            oSlewState.telAz = telAz
+            oSlewState.rotTelPos = rotTelPos
+            oSlewState.filter = filter
             oSlewState.state = state
             oSlewState.SlewHistory_slewID = slewID
             self.dbSession.add(oSlewState)

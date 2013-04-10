@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
 import imp
+from datetime import datetime
 
 if __name__ == "__main__":
     imp.load_source('Module', '../src/Database.py')
     from Module import *
     db = Database()
+    d = datetime.now()
     
     # Adding Session
-    session = db.newSession('schandra', 'hewelhog', '99-01-01 12:12:12', '3.0alpha', 'database tests')
+    session = db.newSession('schandra', 'hewelhog', d.isoformat(), '3.0alpha', 'database tests')
 
     # Adding Proposal
     prop1 = db.addProposal('TestPropConf', 'TestPropName', session.sessionID, 1, 'objectHost')
@@ -35,41 +37,40 @@ if __name__ == "__main__":
     seq1 = db.addSeqHistory(1, 1, 1, 0.4, 1, 1, 1, 1, 1, session.sessionID, prop1.propID)
     
     # Adding ObsHistory
-    obs1 = db.addObservation('u', 1, 1.0, 1, 34.0, 32.0, .9,
-                             .9, .2, .2, .2, .1, .1,
-                             .1, .1, .1, .1, .1, 1, session.sessionID, 1)
-    obs2 = db.addObservation('g', 1, 1.0, 1, 34.0, 32.0, .9,
-                             .9, .2, .2, .2, .1, .1,
-                             .1, .1, .1, .1, .1, 1, session.sessionID, 1)
-    obs3 = db.addObservation('r', 1, 1.0, 1, 34.0, 32.0, .9,
-                             .9, .2, .2, .2, .1, .1,
-                             .1, .1, .1, .1, .1, 1, session.sessionID, 1)
-    
-    # Adding AstronomicalSky
-    db.addAstronomicalSky(.1, .1, .1, .1, .1, .1, .1, .1,
-                          .1, .1, .1, .1, .1, obs1.obsHistID)
-    db.addAstronomicalSky(.1, .1, .1, .1, .1, .1, .1, .1,
-                          .1, .1, .1, .1, .1, obs2.obsHistID)
-    db.addAstronomicalSky(.1, .1, .1, .1, .1, .1, .1, .1,
-                          .1, .1, .1, .1, .1, obs3.obsHistID)
-    
-    # Adding Atmosphere
-    db.addAtmosphere(.1, .1, .1, obs1.obsHistID)
-    db.addAtmosphere(.1, .1, .1, obs2.obsHistID)
-    db.addAtmosphere(.1, .1, .1, obs3.obsHistID)
+    obs1 = db.addObservation(1, 'u', 1, 1.0, 1, 34.0, 32.0, .9, .9, .2, .2, .2, .1, .1,
+                             .1, .1, .1, .1, .1, 1, .1, .1, .1, .1, .1, .1, .1, .1,
+                             .1, .1, .1, .1, .1, .1, .1, session.sessionID, 1)
+    obs2 = db.addObservation(2, 'g', 1, 1.0, 1, 34.0, 32.0, .9, .9, .2, .2, .2, .1, .1,
+                             .1, .1, .1, .1, .1, 1, .1, .1, .1, .1, .1, .1, .1, .1,
+                             .1, .1, .1, .1, .1, .1, .1, session.sessionID, 1)
+    obs3 = db.addObservation(3, 'r', 1, 1.0, 1, 34.0, 32.0, .9, .9, .2, .2, .2, .1, .1,
+                             .1, .1, .1, .1, .1, 1, .1, .1, .1, .1, .1, .1, .1, .1,
+                             .1, .1, .1, .1, .1, .1, .1, session.sessionID, 1)
     
     # Adding SeqHistory_ObsHistory
-    db.addSeqHistoryObsHistory(seq1.sequenceID, obs1.obsHistID)
+    db.addSeqHistoryObsHistory(seq1.sequenceID, obs1.obsHistID, obs1.Session_sessionID)
+    db.addSeqHistoryObsHistory(seq1.sequenceID, obs2.obsHistID, obs2.Session_sessionID)
+    db.addSeqHistoryObsHistory(seq1.sequenceID, obs3.obsHistID, obs3.Session_sessionID)
+    
+    # Adding Missed History
+    missed1 = db.addMissedObservation('u', 1, 1.0, 1, .9, session.sessionID, 1)
+    missed2 = db.addMissedObservation('u', 1, 1.0, 1, .9, session.sessionID, 1)
+    missed3 = db.addMissedObservation('u', 1, 1.0, 1, .9, session.sessionID, 1)
+    
+    # Adding SeqHistory_MissedHistory
+    db.addSeqHistoryMissedHistory(seq1.sequenceID, missed1.missedHistID, missed1.Session_sessionID)
+    db.addSeqHistoryMissedHistory(seq1.sequenceID, missed2.missedHistID, missed2.Session_sessionID)
+    db.addSeqHistoryMissedHistory(seq1.sequenceID, missed3.missedHistID, missed3.Session_sessionID)
     
     # Adding ObsHistory_Proposal
-    db.addObsHistoryProposal(prop1.propID, obs1.obsHistID, .9)
-    db.addObsHistoryProposal(prop1.propID, obs2.obsHistID, .89)
-    db.addObsHistoryProposal(prop1.propID, obs3.obsHistID, .88)
+    db.addObsHistoryProposal(prop1.propID, obs1.obsHistID, obs1.Session_sessionID, .9)
+    db.addObsHistoryProposal(prop1.propID, obs2.obsHistID, obs2.Session_sessionID, .89)
+    db.addObsHistoryProposal(prop1.propID, obs3.obsHistID, obs3.Session_sessionID, .88)
 
     # Adding SlewHistory
-    slew1 = db.addSlewHistory(1, .1, .2, 6.0, 10.0, obs1.obsHistID)
-    slew2 = db.addSlewHistory(1, .1, .2, 5.0, 8.0, obs2.obsHistID)
-    slew3 = db.addSlewHistory(1, .1, .2, 4.0, 9.0, obs3.obsHistID)
+    slew1 = db.addSlewHistory(1, .1, .2, 6.0, 10.0, obs1.obsHistID, obs1.Session_sessionID)
+    slew2 = db.addSlewHistory(1, .1, .2, 5.0, 8.0, obs2.obsHistID, obs2.Session_sessionID)
+    slew3 = db.addSlewHistory(1, .1, .2, 4.0, 9.0, obs3.obsHistID, obs3.Session_sessionID)
     
     # Adding SlewState
     db.addSlewState(.1, .1, .1, 'tracking', .1, .1, .1, .1,
