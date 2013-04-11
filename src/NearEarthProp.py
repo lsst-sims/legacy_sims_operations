@@ -490,7 +490,7 @@ class NearEarthProp (TransientProp):
                                         	self.sessionID,
                                         	self.propID)
 	        	for obsID in seq.GetListObsID():
-        	    	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
+        	    	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 #                        self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                                                     fieldID=fieldID,
 #                                                     sessionID=self.sessionID,

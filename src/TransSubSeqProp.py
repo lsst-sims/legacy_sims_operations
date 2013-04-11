@@ -474,7 +474,7 @@ class TransSubSeqProp (Proposal):
 		    self.exclusiveBlockNeeded = False
 
 		    obsHist = self.lsstDB.addMissedObservation(self.sequences[fieldID].GetNextFilter(subseq), date, mjd, 0, lst_RAD, self.sessionID, fieldID)
-                    self.MissEvent(date, mjd, fieldID, subseq, obsHist.obsHistID)
+                    self.MissEvent(date, mjd, fieldID, subseq, obsHist.missedHistID)
 
             fields_received=len(listOfFieldsToEvaluate)
             fields_invisible=0
@@ -630,7 +630,7 @@ class TransSubSeqProp (Proposal):
                         events_missed+=1
 
 	                obsHist = self.lsstDB.addMissedObservation(self.sequences[fieldID].GetNextFilter(subseq), date, mjd, 0, lst_RAD, self.sessionID, fieldID)
-                        self.MissEvent(date, mjd, fieldID, subseq, obsHist.obsHistID)
+                        self.MissEvent(date, mjd, fieldID, subseq, obsHist.missedHistID)
 
 	                if self.sequences[fieldID].IsLost():
         	            if self.log and self.verbose>0:
@@ -650,7 +650,7 @@ class TransSubSeqProp (Proposal):
 							self.sessionID,
 							self.propID)
 			    for obsID in seq.GetListObsID():
-				self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
+				self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
 #        	            self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                	                                 fieldID=fieldID,
@@ -812,7 +812,7 @@ class TransSubSeqProp (Proposal):
                                 self.sessionID,
                                 self.propID)
 	for obsID in seq.GetListObsID():
-	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
+	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
 #        self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                   	                 fieldID=fieldID,
@@ -858,7 +858,7 @@ class TransSubSeqProp (Proposal):
                                         self.sessionID,
                                         self.propID)
         	for obsID in seq.GetListObsID():
-	            self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
+	            self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
 #                self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                                             fieldID=fieldID,
@@ -895,7 +895,7 @@ class TransSubSeqProp (Proposal):
                                         self.sessionID,
                                         self.propID)
 	        for obsID in seq.GetListObsID():
-        	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID)
+        	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
 #		self.seqHistory.addSequence (seq=self.sequences[fieldID],
 #                                             fieldID=fieldID,
