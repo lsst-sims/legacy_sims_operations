@@ -161,17 +161,22 @@ class SchedulingData (LSSTObject):
 
     def updateLookAheadWindow(self):
 
-        nightsToAdd = 2*self.lookAheadNights - (self.lookAhead_nights[-1] - self.currentNight)
+	lastnight = self.lookAhead_nights[-1]
+        nightsToAdd = 2*self.lookAheadNights - (lastnight - self.currentNight)
 
-	self.lookAheadLastNight = self.currentNight + nightsToAdd
+	self.lookAheadLastNight = lastnight + nightsToAdd
 
-	night = self.currentNight
-	last_sunSetMJD  = self.sunSetMJD[night]
-	last_sunSet     = self.sunSet[night]
-	last_sunSetTwil = self.sunSetTwil[night]
-	t = last_sunSet
+        night = lastnight
+        t = self.midnight[night]
+        x = self.sky.getIntTwilightSunriseSunset(t)
+        print x
+        (sunRise,sunSet,sunRiseMJD,sunSetMJD,sunRiseTwil,sunSetTwil) = x
+	last_sunSetMJD  = sunSetMJD
+	last_sunSet     = sunSet
+	last_sunSetTwil = sunSetTwil
 	while ( (t < self.endTime) and (night < self.lookAheadLastNight) ):
 	    night += 1
+            t += DAY
 	    x = self.sky.getIntTwilightSunriseSunset(t)
 	    (sunRise,sunSet,sunRiseMJD,sunSetMJD,sunRiseTwil,sunSetTwil) = x
 	    midnight = int((last_sunSetTwil+sunRiseTwil)/2)
@@ -194,15 +199,28 @@ class SchedulingData (LSSTObject):
 	    last_sunSet     = sunSet
 	    last_sunSetTwil = sunSetTwil
 
-            t += DAY
-
         self.computeTargetData(self.currentNight, {}, 0)
+
+	for n in range(self.lookAhead_nights[0], self.currentNight):
+	    del self.sunSetMJD[n]
+            del self.sunSet[n]
+            del self.sunSetTwil[n]
+            del self.midnight[n]
+            del self.sunRiseTwil[n]
+            del self.sunRise[n]
+            del self.moonProfile[n]
+            del self.twilightProfile[n]
+
+	    for t in self.lookAhead_times[n]:
+	        del self.dateProfile[t]
+	    del self.lookAhead_times[n]
+	    self.lookAhead_nights.remove(n)
 
 	return
 
 
     def findNightAndTime(self, time):
-	n = 0
+	n = self.lookAhead_nights[0]
 	found = False
 	while (n<= self.lookAheadLastNight and not found):
 	    if (time < self.sunSet[n]):
@@ -226,29 +244,12 @@ class SchedulingData (LSSTObject):
 	    return None
 
 
-    def getCycleTimes (self, newCurrentTime):
-
-	if (newCurrentTime > self.endTime):
-	    return []
-
-	while (self.currentTime < newCurrentTime):
-	    self.indexTime += 1
-	    if (self.indexTime > self.maxIndexTime):
-		return []
-	    self.currentTime = self.extendedCycleTimes[self.indexTime]
-
-        if (self.indexTime > self.cycleSamples):
-            self.initNewCycle()
-
-	cycleTimes = self.extendedCycleTimes[self.indexTime:self.indexTime+self.windowSamples+1]
-
-	return cycleTimes
-
     def updateTargets (self, dictOfNewFields, propID, dateProfile):
 
 	(date,mjd,lst_RAD) = dateProfile
 
 	(nextNight, nextTime) = self.findNightAndTime(date)
+	print ("nextNight=%i nextTime=%i" % (nextNight, nextTime))
         self.currentNight = nextNight
         self.currentTime  = nextTime
 	if ( (self.lookAhead_nights[-1] - self.currentNight) < self.lookAheadNights):
@@ -262,6 +263,8 @@ class SchedulingData (LSSTObject):
 
 	listOfNewFields = sorted(dictOfNewFields.iterkeys())
 	listOfActiveFields = sorted(self.dictOfActiveFields.iterkeys())
+	newfields = 0
+	newprops  = 0
 	for field in listOfNewFields:
 	    if field not in listOfActiveFields:
 		self.dictOfActiveFields[field] = dictOfNewFields[field]
@@ -275,33 +278,58 @@ class SchedulingData (LSSTObject):
 		self.filters[field] = {}
 
                 self.proposals[field] = [propID]
-                print ("new field=%4i new propID=%i" % (field, propID))
+                #print ("new field=%4i new propID=%i" % (field, propID))
                 self.lsstDB.addProposalField(self.sessionID, propID, field)
-
+		newfields += 1
             else:
                 if propID not in self.proposals[field]:
                     self.proposals[field].append(propID)
-                    print ("    field=%4i new propID=%i" % (field, propID))
+                    #print ("    field=%4i new propID=%i" % (field, propID))
                     self.lsstDB.addProposalField(self.sessionID, propID, field)
+		    newprops += 1
 
-        idxInitNight = self.lookAhead_nights.index(initNight)
+	print ("SchedulingData:: %4i new fields from propID=%4i" % (newfields, propID))
+	print ("SchedulingData:: %4i existing fields registered for propID=%4i" % (newprops, propID))
+
+        print initNight
         listOfActiveFields = sorted(self.dictOfActiveFields.iterkeys())
-	for field in listOfActiveFields:
-	    for n in self.lookAhead_nights[idxInitNight:]:
-		if n not in self.computedNights[field]:
-		    (ra, dec) = dictOfNewFields[field]
-		    for t in self.lookAhead_times[n]:
-			(am, alt, az) = self.sky.airmasst(t, ra, dec)
-			self.alt[field][t] = alt
-			self.az[field][t] = az
-			self.airmass[field][t] = am
-			br = self.sky.getSkyBrightness(0, ra, dec, alt,
-						self.dateProfile[t],
-						self.moonProfile[n],
-						self.twilightProfile[n])
-                	self.brightness[field][t] = br
-	                #print ("field=%5i t=%8i airmass=%5.3f brightness=%5.3f" % (field, t, am, br[2]))
-		    self.computedNights[field].append(n)
+	print self.lookAhead_nights
+        for n in self.lookAhead_nights:
+	    #print n
+	    #print self.lookAhead_times[n][0:3]
+	    computed = 0
+	    removed  = 0
+	    for field in listOfActiveFields:
+		#print self.computedNights[field]
+		if (n >= initNight):
+		    if n not in self.computedNights[field]:
+			(ra, dec) = self.dictOfActiveFields[field]
+                    	for t in self.lookAhead_times[n]:
+                            (am, alt, az) = self.sky.airmasst(t, ra, dec)
+                            self.alt[field][t] = alt
+                            self.az[field][t] = az
+                            self.airmass[field][t] = am
+                            br = self.sky.getSkyBrightness(0, ra, dec, alt,
+                                                self.dateProfile[t],
+                                                self.moonProfile[n],
+                                                self.twilightProfile[n])
+                            self.brightness[field][t] = br
+                        self.computedNights[field].append(n)
+                        computed += 1
+		else:
+                    if n in self.computedNights[field]:
+                        for t in self.lookAhead_times[n]:
+                            del self.alt[field][t]
+                            del self.az[field][t]
+                            del self.airmass[field][t]
+                            del self.brightness[field][t]
+                        self.computedNights[field].remove(n)
+                        removed += 1
+
+	    if (computed > 0):
+		print ("SchedulingData:: night %i computed %4i fields" % (n, computed))
+	    if (removed > 0):
+		print ("SchedulingData:: night %i removed %4i fields" % (n, removed))
 
 	return
 
@@ -320,14 +348,6 @@ if (__name__ == '__main__'):
     sky = AstronomicalSky(None, obsProfile, 0, 0, None, "../conf/system/AstronomicalSky.conf", False, './AstronomicalSky.log', 0)
 
     data = SchedulingData('../test/SchedulingData.conf', 0, 432000, sky)
-
-#    data.initSurvey(0,36000)
-
-#    for time in range(0,36000,2500):
-#	print time
-#	print data.getCycleTimes(time)
-#	print data.extendedCycleTimes
-
 
     sys.exit(0)
 
