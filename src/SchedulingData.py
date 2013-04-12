@@ -305,14 +305,16 @@ class SchedulingData (LSSTObject):
 		    if n not in self.computedNights[field]:
 			(ra, dec) = self.dictOfActiveFields[field]
                     	for t in self.lookAhead_times[n]:
-                            (am, alt, az) = self.sky.airmasst(t, ra, dec)
+#                            (am, alt, az) = self.sky.airmasst(t, ra, dec)
+                            (am, alt, az) = (0,0,0)
                             self.alt[field][t] = alt
                             self.az[field][t] = az
                             self.airmass[field][t] = am
-                            br = self.sky.getSkyBrightness(0, ra, dec, alt,
-                                                self.dateProfile[t],
-                                                self.moonProfile[n],
-                                                self.twilightProfile[n])
+#                            br = self.sky.getSkyBrightness(0, ra, dec, alt,
+#                                                self.dateProfile[t],
+#                                                self.moonProfile[n],
+#                                                self.twilightProfile[n])
+			    br = 0
                             self.brightness[field][t] = br
                         self.computedNights[field].append(n)
                         computed += 1
