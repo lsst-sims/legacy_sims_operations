@@ -122,7 +122,8 @@ class SubSequence (LSSTObject):
         self.allHistory = []
         self.obsHistory = []
         self.misHistory = []
-	self.allHistID  = []
+	self.obsHistID  = []
+	self.misHistID  = []
 
 	self.subeventIndex = 0
 
@@ -243,7 +244,11 @@ class SubSequence (LSSTObject):
 
     def GetListObsID(self):
 
-	return self.allHistID
+	return self.obsHistID
+
+    def GetListMisID(self):
+
+	return self.misHistID
 
     def HasTimeWindow(self):
 
@@ -331,7 +336,7 @@ class SubSequence (LSSTObject):
 	self.exposuresLeft = self.subExposures[0]
 
         self.allHistory.append(date)
-	self.allHistID.append(obsHistID)
+	self.obsHistID.append(obsHistID)
 	#print ("subseq=%s history=%s" % (self.subName, str(self.allHistory)))
         self.obsHistory.append(date)
 
@@ -343,7 +348,7 @@ class SubSequence (LSSTObject):
 	#print self.state
         return True
 
-    def MissEvent(self, date, obsHistID):
+    def MissEvent(self, date, misHistID):
 
 	if self.nestedSubSequence != None:
 	    self.nestedSubSequence.MissEvent(date)
@@ -354,7 +359,7 @@ class SubSequence (LSSTObject):
 
 	if ((self.nMisEvents < self.subMaxMissed) or self.WLtype):
 	    self.allHistory.append(d)
-	    self.allHistID.append(obsHistID)
+	    self.misHistID.append(misHistID)
         self.misHistory.append(d)
 
         self.subeventIndex = 0
@@ -676,6 +681,13 @@ class SuperSequence (LSSTObject):
 	    listObsID = listObsID + self.subSequence[subseq].GetListObsID()
 	return listObsID
  
+    def GetListMisID(self):
+
+        listMisID = []
+        for subseq in self.subSeqName:
+            listMisID = listMisID + self.subSequence[subseq].GetListMisID()
+        return listMisID
+
     def HasEventsTonight(self, date):
 
 	if self.state == SEQ_IDLE:
