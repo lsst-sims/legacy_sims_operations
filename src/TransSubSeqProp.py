@@ -652,11 +652,10 @@ class TransSubSeqProp (Proposal):
 			    for obsID in seq.GetListObsID():
 				self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
-#        	            self.seqHistory.addSequence (seq=self.sequences[fieldID],
-#                	                                 fieldID=fieldID,
-#                        	                         sessionID=self.sessionID,
-#                                	                 obsdate=date,
-#                                        	         status=MAX_MISSED_EVENTS)
+                            for misID in seq.GetListMisID():
+                                self.lsstDB.addSeqHistoryMissedHistory(seqHist.sequenceID, misID, self.sessionID)
+
+
 	                    seq_lost+=1
                             # ZZZZ - mm debug 2nd delete of tonightTargets
                             print "Prop[%d].suggestObs() seq lost: delete self.tonightTargets[%d] date = %d" % (self.propID, fieldID, date)
@@ -814,11 +813,8 @@ class TransSubSeqProp (Proposal):
 	for obsID in seq.GetListObsID():
 	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
-#        self.seqHistory.addSequence (seq=self.sequences[fieldID],
-#                   	                 fieldID=fieldID,
-#                        	         sessionID=self.sessionID,
-#                                	 obsdate=date,
-#	                                 status=SUCCESS)
+        for misID in seq.GetListMisID():
+            self.lsstDB.addSeqHistoryMissedHistory(seqHist.sequenceID, misID, self.sessionID)
 
         if not self.overflow:
             # ZZZZ - mm debug 2nd delete of tonightTargets
@@ -860,11 +856,8 @@ class TransSubSeqProp (Proposal):
         	for obsID in seq.GetListObsID():
 	            self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
-#                self.seqHistory.addSequence (seq=self.sequences[fieldID],
-#                                             fieldID=fieldID,
-#                                             sessionID=self.sessionID,
-#                                             obsdate=obsdate,
-#                                             status=CYCLE_END)
+	        for misID in seq.GetListMisID():
+        	    self.lsstDB.addSeqHistoryMissedHistory(seqHist.sequenceID, misID, self.sessionID)
 
         return
 
@@ -897,11 +890,8 @@ class TransSubSeqProp (Proposal):
 	        for obsID in seq.GetListObsID():
         	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
-#		self.seqHistory.addSequence (seq=self.sequences[fieldID],
-#                                             fieldID=fieldID,
-#                                             sessionID=self.sessionID,
-#                                             obsdate=time,
-#                                             status=SIMULATION_END)
+	        for misID in seq.GetListMisID():
+        	    self.lsstDB.addSeqHistoryMissedHistory(seqHist.sequenceID, misID, self.sessionID)
 
         # delete OlapField user-defined region table
         if not (self.userRegion[0] == None): 

@@ -513,11 +513,9 @@ class TransientProp (Proposal):
 		        for obsID in seq.GetListObsID():
 		            self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
-#                        self.seqHistory.addSequence (seq=self.sequences[fieldID],
-#                                                     fieldID=fieldID,
-#                                                     sessionID=self.sessionID,
-#                                                     obsdate=date,
-#                                                     status=MAX_MISSED_EVENTS)
+		        for misID in seq.GetListMisID():
+		            self.lsstDB.addSeqHistoryMissedHistory(seqHist.sequenceID, misID, self.sessionID)
+
                         fields_lost+=1
                         del self.tonightTargets[fieldID]
                     # it is also possible that the missed event was the last needed for completing the sequence
@@ -646,11 +644,8 @@ class TransientProp (Proposal):
         for obsID in seq.GetListObsID():
             self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
-#        self.seqHistory.addSequence (seq=self.sequences[fieldID],
-#                                     fieldID=fieldID,
-#                                     sessionID=self.sessionID,
-#                                     obsdate=date,
-#                                     status=SUCCESS)
+        for misID in seq.GetListMisID():
+            self.lsstDB.addSeqHistoryMissedHistory(seqHist.sequenceID, misID, self.sessionID)
 
         del self.tonightTargets[fieldID]
 
@@ -688,11 +683,8 @@ class TransientProp (Proposal):
 	        for obsID in seq.GetListObsID():
         	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
-#		self.seqHistory.addSequence (seq=self.sequences[fieldID],
-#                                             fieldID=fieldID,
-#                                             sessionID=self.sessionID,
-#                                             obsdate=obsdate,
-#                                             status=CYCLE_END)
+	        for misID in seq.GetListMisID():
+        	    self.lsstDB.addSeqHistoryMissedHistory(seqHist.sequenceID, misID, self.sessionID)
 
         return
 
@@ -725,11 +717,8 @@ class TransientProp (Proposal):
 	        for obsID in seq.GetListObsID():
         	    self.lsstDB.addSeqHistoryObsHistory(seqHist.sequenceID, obsID, self.sessionID)
 
-#                self.seqHistory.addSequence (seq=self.sequences[fieldID],
-#                                             fieldID=fieldID,
-#                                             sessionID=self.sessionID,
-#                                             obsdate=time,
-#                                             status=SIMULATION_END)
+	        for misID in seq.GetListMisID():
+        	    self.lsstDB.addSeqHistoryMissedHistory(seqHist.sequenceID, misID, self.sessionID)
 
         # delete OlapField user-defined region table
         if not (self.userRegion[0] == None):
