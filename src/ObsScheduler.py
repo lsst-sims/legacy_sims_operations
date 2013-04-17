@@ -46,6 +46,7 @@ import heapq
 class ObsScheduler (LSSTObject):
     def __init__ (self, 
                   lsstDB,
+		  schedulingData,
 		  obsProfile,
                   dbTableDict,
                   telescope,
@@ -78,6 +79,7 @@ class ObsScheduler (LSSTObject):
 
         """
 	self.lsstDB = lsstDB        
+	self.schedulingData = schedulingData
 	self.obsProfile = obsProfile
         self.telescope = telescope
         self.weather = weather
@@ -389,6 +391,9 @@ class ObsScheduler (LSSTObject):
 	self.twilightProfile = twilightProfile
         self.transparency = cloudiness
 
+	(sdnight, sdtime) = self.schedulingData.findNightAndTime(date)
+        self.log.info('ObsScheduler.suggestObs() time=%i sdtime=%i' %(date, sdtime))
+
 #	self.log.info("ObsScheduler:suggestObservation: reuseRanking=%d" % self.reuseRanking)
 	if self.reuseRanking <= 0:
           # Dictionary of {fieldID: {filter: totRank}}
@@ -411,7 +416,7 @@ class ObsScheduler (LSSTObject):
             self.seeing =  seeing * self.runSeeingFudge
         
             # Compute sky quantities for each field
-            self.targetProfiles = map (self.computeTargetProfiles, self.targets)
+#            self.targetProfiles = map (self.computeTargetProfiles, self.targets)
             self.recalcSky = self.recalcSkyCount
 
           # Build proximity array betwn cur tel position & potential fields
@@ -443,7 +448,10 @@ class ObsScheduler (LSSTObject):
                                             proximity,
                                             self.targetProfiles,
 					    self.exclusiveObs,
-					    self.minDistance2Moon)
+					    self.minDistance2Moon,
+					    self.rawSeeing, self.seeing,
+					    self.transparency,
+					    sdnight, sdtime)
             if not targetObs:
                 continue
                 
@@ -570,7 +578,7 @@ class ObsScheduler (LSSTObject):
 #        return (maxrank, t, s)
 	return self.winner    
 
-    def computeTargetProfiles (self, fieldID):
+#    def computeTargetProfiles (self, fieldID):
         """
         Precompute quantities relating to a Field for subsequent use 
         Given a fieldID, query self.sky for the airmass and sky brightness,
@@ -591,28 +599,28 @@ class ObsScheduler (LSSTObject):
                 altitude_RAD
 
         """
-        ra, dec = self.targets[fieldID]
+#        ra, dec = self.targets[fieldID]
 
-        dateProfile = self.dateProfile
-        (airmass,altitude_RAD,azimuth_RAD) = self.sky.airmass (dateProfile, ra, dec)
-        (date,mjd,lst_RAD) = dateProfile
-        cloudSeeing=0.0
+#        dateProfile = self.dateProfile
+#        (airmass,altitude_RAD,azimuth_RAD) = self.sky.airmass (dateProfile, ra, dec)
+#        (date,mjd,lst_RAD) = dateProfile
+#        cloudSeeing=0.0
 
         # throw away brightProfile for now.  We'll get it when we store
         # the winner. - MM
-        (skyBrightness,distance2moon,moonAlt_RAD, brightProfile) = \
-                self.sky.getSkyBrightness (fieldID,
-                                           ra, dec,
-                                           altitude_RAD,
-                                           dateProfile=dateProfile, 
-                                           moonProfile=self.moonProfile,
-					   twilightProfile=self.twilightProfile)
+#        (skyBrightness,distance2moon,moonAlt_RAD, brightProfile) = \
+#                self.sky.getSkyBrightness (fieldID,
+#                                           ra, dec,
+#                                           altitude_RAD,
+#                                           dateProfile=dateProfile, 
+#                                           moonProfile=self.moonProfile,
+#					   twilightProfile=self.twilightProfile)
 
-	filterlist=self.filters.computeFilterSeeing(self.seeing,airmass)
+#	filterlist=self.filters.computeFilterSeeing(self.seeing,airmass)
 
-        return (airmass, skyBrightness, filterlist, self.transparency,
-                 cloudSeeing,distance2moon,altitude_RAD,self.rawSeeing,
-                 moonAlt_RAD,azimuth_RAD)
+#       return (airmass, skyBrightness, filterlist, self.transparency,
+#                 cloudSeeing,distance2moon,altitude_RAD,self.rawSeeing,
+#                 moonAlt_RAD,azimuth_RAD)
 
     
     def closeObservation (self, winner):

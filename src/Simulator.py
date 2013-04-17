@@ -771,6 +771,7 @@ class Simulator(object):
         
         # We also need a Obs Scheduler
         self.obsScheduler = ObsScheduler (lsstDB=self.lsstDB,
+				schedulingData=self.schedulingData,
 				obsProfile=self.obsProfile,
                                 dbTableDict=self.dbTableDict,
                                 telescope=self.telescope,

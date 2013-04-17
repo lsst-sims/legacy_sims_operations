@@ -296,7 +296,10 @@ class WeakLensingProp (Proposal):
                     proximity=None,
                     targetProfiles=None,
 		    exclusiveObservation=None,
-		    minDistance2Moon=0.0):
+		    minDistance2Moon=0.0,
+		    rawSeeing=0.0, fudgedSeeing=0.0,
+		    transparency=0.0,
+		    sdnight=0, sdtime=0):
         """
         Return the list of (at most) the n (currently) higher ranking 
         observations.
@@ -368,7 +371,7 @@ class WeakLensingProp (Proposal):
         (date,mjd,lst_RAD) = dateProfile
         (moonRA_RAD,moonDec_RAD,moonPhase_PERCENT) = moonProfile
 
-        
+
         # Get the number of times we observed in each field
         # The idea here is to make sure that, over one year, we end up
         # with a balanced set of observations. For the Weak Lensing
@@ -413,7 +416,8 @@ class WeakLensingProp (Proposal):
             #       Field cuts
             #-----------------------------------------------------------
             # First, discard all the targets which are not visible right now.
-            airmass = intargetProfiles[i][0]
+	    airmass = self.schedulingData.airmass[fieldID][sdtime]
+#            airmass = intargetProfiles[i][0]
             if airmass > self.maxAirmass :
 		fields_invisible += 1
                 if self.log and self.verbose>1 :
@@ -421,7 +425,8 @@ class WeakLensingProp (Proposal):
                 #DBGprint "Toss: Field: %d ra:%f dec:%f am:%f > 5 " % (fieldID,ra,dec,airmass) 
                 continue
 
-	    distance2moon = intargetProfiles[i][5]
+	    distance2moon = self.schedulingData.dist2moon[fieldID][sdtime]
+#	    distance2moon = intargetProfiles[i][5]
             if distance2moon < minDistance2Moon:
                 fields_moon += 1
 		# remove the target for the rest of the night if it is too close to the moon
@@ -443,9 +448,11 @@ class WeakLensingProp (Proposal):
 	    if self.ProgressToStartBoost < progress_avg < 1.0:
 		FieldNeedFactor += self.MaxBoostToComplete*(progress_avg-self.ProgressToStartBoost)/(1.0-self.ProgressToStartBoost)
 
-            skyBrightness = intargetProfiles[i][1]
+	    skyBrightness = self.schedulingData.brightness[fieldID][sdtime]
+#            skyBrightness = intargetProfiles[i][1]
             allowedFilterList = self.allowedFiltersForBrightness(skyBrightness)
-            filterSeeingList = intargetProfiles[i][2]
+	    filterSeeingList = self.filters.computeFilterSeeing(fudgedSeeing,airmass)
+#            filterSeeingList = intargetProfiles[i][2]
             #print ".....field:%d ra:%f dec:%f am:%f phs:%f brite:%f" % (fieldID, ra,dec, airmass, moonPhase, intargetProfiles[i][1]) , filterSeeingList
             
             for filter in allowedFilterList:
@@ -503,21 +510,21 @@ class WeakLensingProp (Proposal):
                     recordFieldFilter.propRank = rank
                     #recordFieldFilter.finRank = finRank
                     recordFieldFilter.maxSeeing = self.FilterMaxSeeing[filter]
-                    recordFieldFilter.rawSeeing = intargetProfiles[i][7]
+		    recordFieldFilter.rawSeeing = rawSeeing
                     recordFieldFilter.seeing = filterSeeingList[filter]
-                    recordFieldFilter.transparency = intargetProfiles[i][3]
-                    recordFieldFilter.cloudSeeing = intargetProfiles[i][4]
+                    recordFieldFilter.transparency = transparency
+                    recordFieldFilter.cloudSeeing = 0.0
                     recordFieldFilter.airmass = airmass
                     recordFieldFilter.skyBrightness = skyBrightness
                     #recordFieldFilter.ra = ra
                     #recordFieldFilter.dec = dec
                     recordFieldFilter.lst = lst_RAD
-                    recordFieldFilter.altitude = intargetProfiles[i][6]
-                    recordFieldFilter.azimuth  = intargetProfiles[i][9]
-                    recordFieldFilter.distance2moon = intargetProfiles[i][5]
+                    recordFieldFilter.altitude = self.schedulingData.alt[fieldID][sdtime]
+                    recordFieldFilter.azimuth  = self.schedulingData.az[fieldID][sdtime]
+                    recordFieldFilter.distance2moon = self.schedulingData.dist2moon[fieldID][sdtime]
                     recordFieldFilter.moonRA = moonRA_RAD
                     recordFieldFilter.moonDec = moonDec_RAD
-                    recordFieldFilter.moonAlt = intargetProfiles[i][8]
+                    recordFieldFilter.moonAlt = 0.0
                     recordFieldFilter.moonPhase = moonPhase_PERCENT
 
                     self.addToSuggestList(recordFieldFilter, inproximity[i])
