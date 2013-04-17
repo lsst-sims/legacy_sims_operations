@@ -131,6 +131,7 @@ class SchedulingData (LSSTObject):
         self.az = {}
         self.airmass = {}
         self.brightness = {}
+	self.dist2moon = {}
         self.visible = {}
         self.filters = {}
         self.proposals = {}
@@ -221,30 +222,39 @@ class SchedulingData (LSSTObject):
 
     def findNightAndTime(self, time):
 	n = self.lookAhead_nights[0]
-	found = False
-	while (n<= self.lookAheadLastNight and not found):
+	foundNight = False
+	while (n<= self.lookAhead_nights[-1] and not foundNight):
 	    if (time < self.sunSet[n]):
 		t = self.sunSet[n]
-		found = True
+		foundNight = True
 	    elif (self.sunSet[n] <= time <= self.sunRise[n]):
 		t = time
-		found = True
+		foundNight = True
 	    else:
-	        n += 1 
-	if found:
+	        n += 1
+	if foundNight:
 	    ix = 0
-	    while (self.lookAhead_times[n][ix] < t):
-		ix += 1
-	    if ( (t-self.lookAhead_times[n][ix-1]) < (self.lookAhead_times[n][ix]-t) ):
-		next_time = self.lookAhead_times[n][ix-1]
-	    else:
-		next_time = self.lookAhead_times[n][ix]	
+	    foundTime = False
+	    while (ix < len(self.lookAhead_times[n]) and not foundTime):
+		if (t > self.lookAhead_times[n][ix]):
+		    ix += 1
+		elif (ix == 0):
+		    next_time = self.lookAhead_times[n][ix]
+		    foundTime = True
+		elif ( (t-self.lookAhead_times[n][ix-1]) < (self.lookAhead_times[n][ix]-t) ):
+		    next_time = self.lookAhead_times[n][ix-1]
+		    foundTime = True
+		else:
+                    next_time = self.lookAhead_times[n][ix]
+		    foundTime = True
+	    if not foundTime:
+		next_time = self.lookAhead_times[n][-1]
 	    return (n, next_time)
 	else:
 	    return None
 
 
-    def updateTargets (self, dictOfNewFields, propID, dateProfile):
+    def updateTargets(self, dictOfNewFields, propID, dateProfile):
 
 	(date,mjd,lst_RAD) = dateProfile
 
@@ -274,6 +284,7 @@ class SchedulingData (LSSTObject):
 		self.az[field] = {}
 		self.airmass[field] = {}
 		self.brightness[field] = {}
+		self.dist2moon[field] = {}
 		self.visible[field] = {}
 		self.filters[field] = {}
 
@@ -305,17 +316,17 @@ class SchedulingData (LSSTObject):
 		    if n not in self.computedNights[field]:
 			(ra, dec) = self.dictOfActiveFields[field]
                     	for t in self.lookAhead_times[n]:
-#                            (am, alt, az) = self.sky.airmasst(t, ra, dec)
-                            (am, alt, az) = (0,0,0)
+                            (am, alt, az) = self.sky.airmasst(t, ra, dec)
                             self.alt[field][t] = alt
                             self.az[field][t] = az
                             self.airmass[field][t] = am
-#                            br = self.sky.getSkyBrightness(0, ra, dec, alt,
-#                                                self.dateProfile[t],
-#                                                self.moonProfile[n],
-#                                                self.twilightProfile[n])
-			    br = 0
+                            (br, dist2moon, moonAlt, brprofile) = \
+				self.sky.getSkyBrightness(0, ra, dec, alt,
+                                		self.dateProfile[t],
+                                            	self.moonProfile[n],
+                                            	self.twilightProfile[n])
                             self.brightness[field][t] = br
+			    self.dist2moon[field][t] = dist2moon
                         self.computedNights[field].append(n)
                         computed += 1
 		else:
@@ -325,6 +336,7 @@ class SchedulingData (LSSTObject):
                             del self.az[field][t]
                             del self.airmass[field][t]
                             del self.brightness[field][t]
+			    del self.dist2moon[field][t]
                         self.computedNights[field].remove(n)
                         removed += 1
 
