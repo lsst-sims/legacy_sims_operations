@@ -2,7 +2,7 @@
 
 import sys, re, time, socket
 import math
-import MySQLdb
+#import MySQLdb
 from LSSTDBInit import *
 
 # SeqHistory Sequence completion status
@@ -67,7 +67,7 @@ def report(sessionID, notcs):
     print "Session ID: %d\tHost: %s\tSession Start Date: %s" % (sessionID,host,startDate)
 
     label = 'config'
-    sql   = 'select paramName,paramValue from Config where sessionID=%d and moduleName="LSST" order by paramIndex' % (sessionID)
+    sql   = 'select paramName,paramValue from Config where Session_sessionID=%d and moduleName="LSST" order by paramIndex' % (sessionID)
     config_LSST   = getDbData(sql, label)
     dict_LSST = {}
     for kv in config_LSST:
@@ -79,26 +79,32 @@ def report(sessionID, notcs):
     print "%s: %s" % (label, site)
 
     label = 'number of nights'
-    sql   = 'select count(event) from TimeHistory where sessionID=%d and event=%d' % (sessionID, START_NIGHT)
+    sql   = 'select count(event) from TimeHistory where Session_sessionID=%d and event=%d' % (sessionID, START_NIGHT)
     ret   = getDbData(sql, label)
     count_nights = ret[0][0]
     print "%s: %s" % (label, count_nights)
 
     label = 'number of visits'
-    sql   = 'select count(*) from SlewHistory where sessionID=%d' % (sessionID)
+    sql   = 'select count(*) from SlewHistory where ObsHistory_Session_sessionID=%d' % (sessionID)
     ret   = getDbData(sql, label)
     count_visits = ret[0][0]
     print "%s: %s" % (label, count_visits)
     print "visits/night: %6.1f" % (float(count_visits)/count_nights)
 
+    label = 'average exposure time'
+    sql   = 'select avg(visitExpTime) from ObsHistory where Session_sessionID=%d' % (sessionID)
+    ret   = getDbData(sql, label)
+    avg_visittime = ret[0][0]
+    print "%s: %5.2fs" % (label, avg_visittime)
+
     label = 'average visit time'
-    sql   = 'select avg(expTime) from ObsHistory where sessionID=%d' % (sessionID)
+    sql   = 'select avg(visitTime) from ObsHistory where Session_sessionID=%d' % (sessionID)
     ret   = getDbData(sql, label)
     avg_visittime = ret[0][0]
     print "%s: %5.2fs" % (label, avg_visittime)
 
     label = 'average slew time'
-    sql   = 'select avg(delay) from SlewHistory where sessionID=%d' % (sessionID)
+    sql   = 'select avg(slewTime) from SlewHistory where ObsHistory_Session_sessionID=%d' % (sessionID)
     ret   = getDbData(sql, label)
     avg_slewtime = ret[0][0]
     print "%s: %5.2fs" % (label, avg_slewtime)
@@ -106,13 +112,13 @@ def report(sessionID, notcs):
     print sepline
 
     label = 'list of proposals'
-    sql   = 'select propID,propConf,propName from Proposal where sessionID=%d' % (sessionID)
+    sql   = 'select propID,propConf,propName from Proposal where Session_sessionID=%d' % (sessionID)
     ret   = getDbData(sql, label)
     list_proposals = ret
 
     for filter in ['u','g','r','i','z','y']:
 	label = 'visits count for filter %s' % (filter)
-	sql   = 'select count(*) from SlewFinalState where sessionID=%d and Filter="%s"' % (sessionID, filter)
+	sql   = 'select count(*) from ObsHistory where Session_sessionID=%d and filter="%s"' % (sessionID, filter)
 	ret   = getDbData(sql, label)
 	filter_visits = ret[0][0]
 	print "%s: %6d" % (label, filter_visits)
@@ -125,14 +131,14 @@ def report(sessionID, notcs):
         propConf = proposal[1]
 	propName = proposal[2]
 	label = 'visits count for propID=%3d %5s %28s' % (propID, propName, propConf)
-	sql   = 'select count(*) from ObsHistory where propID=%d' % (propID)
+	sql   = 'select count(*) from ObsHistory_Proposal where Proposal_propID=%d' % (propID)
 	ret   = getDbData(sql, label)
 	numVisits = ret[0][0]
 	print "%s: %6d" % (label, numVisits)
 	accum_visits += numVisits
 	for filter in ['u','g','r','i','z','y']:
             label = 'visits count for propID=%d filter %s' % (propID, filter)
-	    sql   = 'select count(*) from ObsHistory where propID=%d and filter="%s"' % (propID, filter)
+	    sql   = 'select count(*) from ObsHistory oh INNER JOIN ObsHistory_Proposal ohp ON oh.obsHistID=ohp.ObsHistory_obsHistID where ohp.Proposal_propID=%d and oh.filter="%s" and oh.Session_sessionID=%d' % (propID, filter, sessionID)
 	    ret   = getDbData(sql, label)
 	    propfilter_visits = ret[0][0]
 	    print "%s: %6d" % (label, propfilter_visits)
