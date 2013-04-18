@@ -36,6 +36,7 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Config` (
   `paramValue` VARCHAR(64) NOT NULL COMMENT 'string of parameter value' ,
   `comment` VARCHAR(512) NULL DEFAULT NULL COMMENT 'comment' ,
   `Session_sessionID` INT(10) UNSIGNED NOT NULL ,
+  `nonPropID` INT(10) NULL ,
   PRIMARY KEY (`configID`) ,
   INDEX `fk_config_session_idx` (`Session_sessionID` ASC) ,
   CONSTRAINT `fk_config_session`

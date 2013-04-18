@@ -146,10 +146,11 @@ class Database :
             raise
         return oSession
 
-    def addConfig(self, sessionID, moduleName, paramIndex, paramName, paramValue, comment) :
+    def addConfig(self, sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment) :
         try:
             oConfig = Opsim_Config()
             oConfig.Session_sessionID = sessionID
+            oConfig.nonPropID = propID
             oConfig.moduleName = moduleName
             oConfig.paramIndex = paramIndex
             oConfig.paramName = paramName
