@@ -123,7 +123,7 @@ class ObsScheduler (LSSTObject):
         # List of potential targets (observations are a fieldID a filterID
         # and a rank)
         self.targets = {}
-        self.targetProfiles = {}
+#        self.targetProfiles = {}
         
         self.targetRank = {}
 	self.targetXblk = {}
@@ -392,7 +392,6 @@ class ObsScheduler (LSSTObject):
         self.transparency = cloudiness
 
 	(sdnight, sdtime) = self.schedulingData.findNightAndTime(date)
-        self.log.info('ObsScheduler.suggestObs() time=%i sdtime=%i' %(date, sdtime))
 
 #	self.log.info("ObsScheduler:suggestObservation: reuseRanking=%d" % self.reuseRanking)
 	if self.reuseRanking <= 0:
@@ -442,14 +441,15 @@ class ObsScheduler (LSSTObject):
             # note: since proximity is ordered accd sortedFieldID--need to
             #       pass that array instead of self.targets.
             targetObs = proposal.suggestObs(self.dateProfile,
-                                            self.moonProfile,
+#                                            self.moonProfile,
                                             self.numSuggObsPerProp, 
                                             sortedFieldID, 
                                             proximity,
-                                            self.targetProfiles,
+#                                            self.targetProfiles,
 					    self.exclusiveObs,
 					    self.minDistance2Moon,
-					    self.rawSeeing, self.seeing,
+					    self.rawSeeing,
+					    self.seeing,
 					    self.transparency,
 					    sdnight, sdtime)
             if not targetObs:
@@ -556,7 +556,8 @@ class ObsScheduler (LSSTObject):
                                 dateProfile = self.dateProfile,
                                 moonProfile = self.moonProfile)
             self.winner.finRank = maxrank
-	    self.winner.seeing = self.seeing
+            self.winner.rawSeeing = self.rawSeeing
+	    self.winner.transparency = self.transparency
 #            self.log.info("WINNER date = %d fieldID = %d filter=%s maxrank=%f propID=%s" % (date,win_fieldID,win_filter,maxrank,win_propXblk))
 
 	    if self.winner.exclusiveBlockRequired == True:
@@ -578,7 +579,7 @@ class ObsScheduler (LSSTObject):
 #        return (maxrank, t, s)
 	return self.winner    
 
-#    def computeTargetProfiles (self, fieldID):
+    def computeTargetProfiles (self, fieldID):
         """
         Precompute quantities relating to a Field for subsequent use 
         Given a fieldID, query self.sky for the airmass and sky brightness,
@@ -599,28 +600,28 @@ class ObsScheduler (LSSTObject):
                 altitude_RAD
 
         """
-#        ra, dec = self.targets[fieldID]
+        ra, dec = self.targets[fieldID]
 
-#        dateProfile = self.dateProfile
-#        (airmass,altitude_RAD,azimuth_RAD) = self.sky.airmass (dateProfile, ra, dec)
-#        (date,mjd,lst_RAD) = dateProfile
-#        cloudSeeing=0.0
+        dateProfile = self.dateProfile
+        (airmass,altitude_RAD,azimuth_RAD,pa_RAD) = self.sky.airmass (dateProfile, ra, dec)
+        (date,mjd,lst_RAD) = dateProfile
+        cloudSeeing=0.0
 
         # throw away brightProfile for now.  We'll get it when we store
         # the winner. - MM
-#        (skyBrightness,distance2moon,moonAlt_RAD, brightProfile) = \
-#                self.sky.getSkyBrightness (fieldID,
-#                                           ra, dec,
-#                                           altitude_RAD,
-#                                           dateProfile=dateProfile, 
-#                                           moonProfile=self.moonProfile,
-#					   twilightProfile=self.twilightProfile)
+        (skyBrightness,distance2moon,moonAlt_RAD, brightProfile) = \
+                self.sky.getSkyBrightness (fieldID,
+                                           ra, dec,
+                                           altitude_RAD,
+                                           dateProfile=dateProfile, 
+                                           moonProfile=self.moonProfile,
+					   twilightProfile=self.twilightProfile)
 
-#	filterlist=self.filters.computeFilterSeeing(self.seeing,airmass)
+	filterlist=self.filters.computeFilterSeeing(self.seeing,airmass)
 
-#       return (airmass, skyBrightness, filterlist, self.transparency,
-#                 cloudSeeing,distance2moon,altitude_RAD,self.rawSeeing,
-#                 moonAlt_RAD,azimuth_RAD)
+        return (airmass, skyBrightness, filterlist, self.transparency,
+                 cloudSeeing,distance2moon,altitude_RAD,self.rawSeeing,
+                 moonAlt_RAD,azimuth_RAD)
 
     
     def closeObservation (self, winner):
@@ -649,6 +650,8 @@ class ObsScheduler (LSSTObject):
         winner.rotatorTelPos = rotatorTelPos_RAD
         winner.altitude = alt_RAD
         winner.azimuth  = az_RAD
+	winner.parallactic = slewfinalstate.pa
+
         (sunAlt,sunAz) = self.sky.getSunAltAz(self.dateProfile)
         winner.airmass = 1/math.cos(1.5708 - alt_RAD)
 
@@ -660,16 +663,37 @@ class ObsScheduler (LSSTObject):
         # Adjust date to start of exposure by accounting for slew time - MM
         # Is self.dateProfile == self.winner.dateProfile here?
         (date,mjd,lst_RAD) = self.dateProfile
-        if date != winner.date:
-            print "WARNING: ObsScheduler.closeObservation date:%d != winner.date:%d" % (date,winner.date)
+#        if date != winner.date:
+#            print "WARNING: ObsScheduler.closeObservation date:%d != winner.date:%d" % (date,winner.date)
 
         t = date + delay
-        (winner.date, winner.mjd, winner.lst) = self.sky.computeDateProfile(t)
-        moonProfile = (winner.moonRA_RAD, winner.moonDec_RAD, winner.moonPhase)
-        (skyBright,distance2moon,moonAlt_RAD,brightProfile) = self.sky.getSkyBrightness(winner.fieldID, winner.ra, winner.dec, winner.altitude, self.dateProfile, moonProfile, self.twilightProfile)
+	dateProfile = self.sky.computeDateProfile(t)
+        (winner.date, winner.mjd, winner.lst) = dateProfile
+
+	moonProfileAltAz = self.sky.computeMoonProfileAltAz(t)
+        (winner.moonRA_RAD, winner.moonDec_RAD, winner.moonPhase, winner.moonAlt, winner.moonAz) = moonProfileAltAz
+	moonProfile = (winner.moonRA_RAD, winner.moonDec_RAD, winner.moonPhase)
+
+        (skyBright,distance2moon,moonAlt_RAD,brightProfile) = self.sky.getSkyBrightness(winner.fieldID, winner.ra, winner.dec, winner.altitude, dateProfile, moonProfile, self.twilightProfile)
         winner.skyBrightness = skyBright
         winner.distance2moon = distance2moon
-        winner.moonAlt = moonAlt_RAD
+        (winner.phaseAngle, winner.extinction, winner.rScatter,
+        winner.mieScatter, winner.moonIllum,
+	winner.moonBright, winner.darkBright) = brightProfile
+
+	winner.filterSkyBright = self.filters.computeSkyBrightnessForFilter(winner.filter, skyBright, t, self.twilightProfile, moonProfileAltAz)
+	filterSeeingList = self.filters.computeFilterSeeing(self.seeing, winner.airmass)
+	winner.seeing = filterSeeingList[winner.filter]
+
+	# calculate current solar elongation in DEGREES
+        target = (winner.ra*DEG2RAD, winner.dec*DEG2RAD)
+        solarElong_RAD = self.sky.getPlanetDistance ('Sun',target, winner.date)
+        winner.solarElong = math.degrees(solarElong_RAD)
+
+        self.log.info("visit=%i night=%i date=%i field=%i filter=%s expTime=%f visitTime=%f lst=%f" % (slewdata.slewCount, winner.night, winner.date, winner.fieldID, winner.filter, winner.exposureTime, winner.visitTime, winner.lst))
+        self.log.info("    finRank=%f airmass=%f brightness=%f filtBright=%f rawSeeing=%f seeing=%f" % (winner.finRank, winner.airmass, winner.skyBrightness, winner.filterSkyBright, winner.rawSeeing, winner.seeing))
+        self.log.info("    alt=%f az=%f pa=%f moonRA=%f moonDec=%f moonPh=%f dist2moon=%f transp=%f" % (winner.altitude, winner.azimuth, winner.parallactic, winner.moonRA_RAD, winner.moonDec_RAD, winner.moonPhase, winner.distance2moon, winner.transparency))
+        self.log.info("    solarE=%f sunAlt=%f sunAz=%f moonAlt=%f moonAz=%f moonBright=%f darkBright=%f" % (winner.solarElong, winner.sunAlt, winner.sunAz, winner.moonAlt, winner.moonAz, winner.moonBright, winner.darkBright))
 
         obsHist = self.lsstDB.addObservation(slewdata.slewCount, winner.filter, winner.date, winner.mjd,
 				winner.night, winner.visitTime, winner.exposureTime,
@@ -679,13 +703,14 @@ class ObsScheduler (LSSTObject):
 				winner.rotatorSkyPos, winner.lst,
 				winner.altitude, winner.azimuth,
 				winner.distance2moon, winner.solarElong,
-                winner.moonRA_RAD, winner.moonDec_RAD,
-                winner.moonAlt, winner.moonAz, winner.moonPhase,
-                winner.sunAlt, winner.sunAz,
-                winner.phaseAngle, winner.rScatter,
-                winner.mieScatter, winner.moonIllum,
-                winner.moonBright, winner.darkBright,
-                                             0.0, 0.0, 0.0, self.sessionID, winner.fieldID) # need to ask Francisco about rawSeeing, sending 0.0 right now and also about wind and humidity
+		                winner.moonRA_RAD, winner.moonDec_RAD,
+		                winner.moonAlt, winner.moonAz, winner.moonPhase,
+		                winner.sunAlt, winner.sunAz,
+		                winner.phaseAngle, winner.rScatter,
+		                winner.mieScatter, winner.moonIllum,
+		                winner.moonBright, winner.darkBright,
+				winner.rawSeeing,
+                                0.0, 0.0, self.sessionID, winner.fieldID) # need to ask Francisco about rawSeeing, sending 0.0 right now and also about wind and humidity
         slewHist = self.lsstDB.addSlewHistory(slewdata.slewCount,
 				slewdata.startDate,
 				slewdata.endDate,
