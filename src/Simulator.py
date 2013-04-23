@@ -596,32 +596,32 @@ class Simulator(object):
         self.lastNightPhase = previousDayPhase
         return
 
-    def computeMoonProfile(self, date):
-        """
-        Precompute quantities relating to the moon used by subsequent routines
+#    def computeMoonProfile(self, date):
+#        """
+#        Precompute quantities relating to the moon used by subsequent routines
 
-        Input
-            dateProfile:    an array containing
-                date
-                mjd
-                lst_RAD
-        Output
-            moonProfile:    an array containing
-                moonRA_RAD
-                moonDec_RAD
-                moonPhase_PERCENT
-        """
-        (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = self.obsProfile
-        mjd = (float (date) / float (DAY)) + epoch_MJD
+#        Input
+#            dateProfile:    an array containing
+#                date
+#                mjd
+#                lst_RAD
+#        Output
+#            moonProfile:    an array containing
+#                moonRA_RAD
+#                moonDec_RAD
+#                moonPhase_PERCENT
+#        """
+#        (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = self.obsProfile
+#        mjd = (float (date) / float (DAY)) + epoch_MJD
 
         # Get the Moon RA/Dec  in radians
-        (moonRA_RAD,moonDec_RAD,moonDiam) =  slalib.sla_rdplan(mjd,
-                                                    3,
-                                                    lon_RAD,
-                                                    lat_RAD)
-        moonPhase_PERCENT = self.sky.getMoonPhase(mjd)
+#        (moonRA_RAD,moonDec_RAD,moonDiam) =  slalib.sla_rdplan(mjd,
+#                                                    3,
+#                                                    lon_RAD,
+#                                                    lat_RAD)
+#        moonPhase_PERCENT = self.sky.getMoonPhase(mjd)
 
-        return(moonRA_RAD,moonDec_RAD,moonPhase_PERCENT)
+#        return(moonRA_RAD,moonDec_RAD,moonPhase_PERCENT)
 
 
     def startNight (self, date, midnight, sunRise):
@@ -643,7 +643,7 @@ class Simulator(object):
         self.dateProfile = self.sky.computeDateProfile(date)
         (date, MJD, lst_RAD) = self.dateProfile
 
-        self.moonProfile = self.computeMoonProfile(midnight)
+        self.moonProfile = self.sky.computeMoonProfile(midnight)
         (moonRA_RAD, moonDec_RAD, moonPhase_PERCENT) = self.moonProfile
 
         # Determine if new lunation indicated by change in moon phase trend
@@ -703,7 +703,7 @@ class Simulator(object):
 #        self.timeHist.add (self.sessionID, self.nightCnt, self.dateProfile,
 #                           END_NIGHT)
         
-        self.moonProfile = self.computeMoonProfile(date)
+        self.moonProfile = self.sky.computeMoonProfile(date)
 	self.obsScheduler.startDay(self.moonProfile)
 
 	return
