@@ -122,7 +122,7 @@ class TransientProp (Proposal):
         """
 
         # PAUSE
-        yield hold, self
+#        yield hold, self
         return
 
     def startNight(self,dateProfile,moonProfile,startNewLunation,randomizeSequencesSelection,nRun, mountedFiltersList):
