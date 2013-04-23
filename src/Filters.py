@@ -24,6 +24,44 @@ Accessors
 from utilities import *
 from LSSTObject import *
 
+skyBrightKeys = [0, 18, 50, 80, 100]
+filterOffset = { }
+
+# Corrections for moonPhase = 0 percent (new moon)
+filterOffset['u',0.] =  0.66
+filterOffset['g',0.] =  0.41
+filterOffset['r',0.] = -0.28
+filterOffset['i',0.] = -1.36
+filterOffset['z',0.] = -2.15
+
+# Corrections for moonPhase = 18 percent
+filterOffset['u',18.] =  0.28
+filterOffset['g',18.] =  0.30
+filterOffset['r',18.] = -0.19
+filterOffset['i',18.] = -1.17
+filterOffset['z',18.] = -1.99
+
+# Corrections for moonPhase = 50 percent
+filterOffset['u',50.] = -1.05
+filterOffset['g',50.] =  0.03
+filterOffset['r',50.] =  0.02
+filterOffset['i',50.] = -0.96
+filterOffset['z',50.] = -1.78
+
+# Corrections for moonPhase = 80 percent
+filterOffset['u',80.] = -1.83
+filterOffset['g',80.] = -0.08
+filterOffset['r',80.] =  0.10
+filterOffset['i',80.] = -0.78
+filterOffset['z',80.] = -1.54
+
+# Corrections for moonPhase = 100 percent (full moon)
+filterOffset['u',100.] = -2.50
+filterOffset['g',100.] = -0.35
+filterOffset['r',100.] =  0.31
+filterOffset['i',100.] = -0.47
+filterOffset['z',100.] = -1.16
+
 
 #class Filters (Simulation.Process):
 class Filters (object):
@@ -179,4 +217,49 @@ class Filters (object):
             filterList[self.filterNamesSorted[ix]] = adjustSee
 
         return filterList
+
+
+    def computeSkyBrightnessForFilter(self, filter, skyBrightness, date, twilightProfile, moonProfileAltAz):
+
+	(sunriseTwil, sunsetTwil) = twilightProfile
+	(moonRA_RAD, moonDec_RAD, moonPhase_PERCENT, moonAlt_RAD, moonAz_RAD) = moonProfileAltAz
+
+        # set y skybrightness for any kind of sky
+        if (filter == 'y'):
+	    filterSkyBright = 17.3
+        else:      # g,r,i,z,u
+	    # If moon below horizon, use new moon offset for filter
+            # brightness - MM
+            if (math.degrees(moonAlt_RAD) <= -6.0):
+		adjustBright = filterOffset[filter,0.]
+
+            # Interpolate if needed. Note: moonPhase is a float not int
+            elif (moonPhase_PERCENT not in skyBrightKeys):
+		i = 0
+		while (skyBrightKeys[i] < moonPhase_PERCENT):
+		    i = i+1
+
+                # find upper and lower bound
+                upperMoonPhase = skyBrightKeys[i]
+                lowerMoonPhase = skyBrightKeys[i-1]
+                lowerAdjustBright = filterOffset[filter,lowerMoonPhase]
+                upperAdjustBright = filterOffset[filter,upperMoonPhase]
+                # linear interpolation
+                adjustBright = lowerAdjustBright + (((moonPhase_PERCENT - lowerMoonPhase)*(upperAdjustBright - lowerAdjustBright))/(upperMoonPhase - lowerMoonPhase))
+
+	    else:          # moon not set and moon phase is key
+		adjustBright = filterOffset[filter, moonPhase_PERCENT]
+            filterSkyBright = skyBrightness + adjustBright
+
+            # z sky brightness should never be under 17.0
+            if (filter == 'z') and (filterSkyBright < 17.0):
+		filterSkyBright = 17.0
+
+        # If twilight, set brightness for z and y
+	if ( date < sunsetTwil) or (date > sunriseTwil):
+	    if (filter == 'z') or (filter == 'y'):
+		filterSkyBright = 17.0
+
+	return filterSkyBright
+
 
