@@ -251,7 +251,7 @@ class WeakLensingProp (Proposal):
 
         
         # PAUSE
-        yield hold, self
+#        yield hold, self
         return
     
     def startNight(self,dateProfile,moonProfile,startNewLunation,randomizeSequencesSelection, nRun, mountedFiltersList):
@@ -290,14 +290,15 @@ class WeakLensingProp (Proposal):
 
     def suggestObs (self, 
                     dateProfile, 
-                    moonProfile,
+#                    moonProfile,
                     n=1,
                     skyfields=None, 
                     proximity=None,
-                    targetProfiles=None,
+#                    targetProfiles=None,
 		    exclusiveObservation=None,
 		    minDistance2Moon=0.0,
-		    rawSeeing=0.0, fudgedSeeing=0.0,
+		    rawSeeing=0.0,
+		    seeing=0.0,
 		    transparency=0.0,
 		    sdnight=0, sdtime=0):
         """
@@ -367,11 +368,11 @@ class WeakLensingProp (Proposal):
         # Copy the input vars
         inFieldID = skyfields
         inproximity = proximity
-        intargetProfiles = targetProfiles
+#        intargetProfiles = targetProfiles
         (date,mjd,lst_RAD) = dateProfile
-        (moonRA_RAD,moonDec_RAD,moonPhase_PERCENT) = moonProfile
+        (moonRA_RAD,moonDec_RAD,moonPhase_PERCENT) = self.schedulingData.moonProfile[sdnight]
 
-
+        
         # Get the number of times we observed in each field
         # The idea here is to make sure that, over one year, we end up
         # with a balanced set of observations. For the Weak Lensing
@@ -416,8 +417,7 @@ class WeakLensingProp (Proposal):
             #       Field cuts
             #-----------------------------------------------------------
             # First, discard all the targets which are not visible right now.
-	    airmass = self.schedulingData.airmass[fieldID][sdtime]
-#            airmass = intargetProfiles[i][0]
+            airmass = self.schedulingData.airmass[fieldID][sdtime]
             if airmass > self.maxAirmass :
 		fields_invisible += 1
                 if self.log and self.verbose>1 :
@@ -426,7 +426,6 @@ class WeakLensingProp (Proposal):
                 continue
 
 	    distance2moon = self.schedulingData.dist2moon[fieldID][sdtime]
-#	    distance2moon = intargetProfiles[i][5]
             if distance2moon < minDistance2Moon:
                 fields_moon += 1
 		# remove the target for the rest of the night if it is too close to the moon
@@ -448,11 +447,10 @@ class WeakLensingProp (Proposal):
 	    if self.ProgressToStartBoost < progress_avg < 1.0:
 		FieldNeedFactor += self.MaxBoostToComplete*(progress_avg-self.ProgressToStartBoost)/(1.0-self.ProgressToStartBoost)
 
-	    skyBrightness = self.schedulingData.brightness[fieldID][sdtime]
-#            skyBrightness = intargetProfiles[i][1]
+            skyBrightness = self.schedulingData.brightness[fieldID][sdtime]
             allowedFilterList = self.allowedFiltersForBrightness(skyBrightness)
-	    filterSeeingList = self.filters.computeFilterSeeing(fudgedSeeing,airmass)
-#            filterSeeingList = intargetProfiles[i][2]
+	    #self.log.info('%s brightness=%f allowedFilterList=%s' % (self.weakLensConf, skyBrightness, str(allowedFilterList)))
+            filterSeeingList = self.filters.computeFilterSeeing(seeing,airmass)
             #print ".....field:%d ra:%f dec:%f am:%f phs:%f brite:%f" % (fieldID, ra,dec, airmass, moonPhase, intargetProfiles[i][1]) , filterSeeingList
             
             for filter in allowedFilterList:
@@ -503,28 +501,31 @@ class WeakLensingProp (Proposal):
                     #recordFieldFilter.seqn = seqn
                     recordFieldFilter.date = date
                     recordFieldFilter.mjd = mjd
+		    recordFieldFilter.night = sdnight
                     #recordFieldFilter.exposureTime = exposureTime
                     #recordFieldFilter.slewTime = slewTime
                     #recordFieldFilter.rotatorSkyPos = 0.0
                     #recordFieldFilter.rotatorTelPos = 0.0
                     recordFieldFilter.propRank = rank
                     #recordFieldFilter.finRank = finRank
-                    recordFieldFilter.maxSeeing = self.FilterMaxSeeing[filter]
-		    recordFieldFilter.rawSeeing = rawSeeing
+#                    recordFieldFilter.maxSeeing = self.FilterMaxSeeing[filter]
+                    recordFieldFilter.rawSeeing = rawSeeing
                     recordFieldFilter.seeing = filterSeeingList[filter]
                     recordFieldFilter.transparency = transparency
-                    recordFieldFilter.cloudSeeing = 0.0
+#                    recordFieldFilter.cloudSeeing = intargetProfiles[i][4]
                     recordFieldFilter.airmass = airmass
                     recordFieldFilter.skyBrightness = skyBrightness
+		    recordFieldFilter.filterSkyBright = 0.0
                     #recordFieldFilter.ra = ra
                     #recordFieldFilter.dec = dec
                     recordFieldFilter.lst = lst_RAD
                     recordFieldFilter.altitude = self.schedulingData.alt[fieldID][sdtime]
                     recordFieldFilter.azimuth  = self.schedulingData.az[fieldID][sdtime]
-                    recordFieldFilter.distance2moon = self.schedulingData.dist2moon[fieldID][sdtime]
+                    recordFieldFilter.parallactic = self.schedulingData.pa[fieldID][sdtime]
+                    recordFieldFilter.distance2moon = distance2moon
                     recordFieldFilter.moonRA = moonRA_RAD
                     recordFieldFilter.moonDec = moonDec_RAD
-                    recordFieldFilter.moonAlt = 0.0
+#                    recordFieldFilter.moonAlt = intargetProfiles[i][8]
                     recordFieldFilter.moonPhase = moonPhase_PERCENT
 
                     self.addToSuggestList(recordFieldFilter, inproximity[i])
