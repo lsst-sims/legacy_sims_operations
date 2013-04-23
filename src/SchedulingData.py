@@ -122,6 +122,7 @@ class SchedulingData (LSSTObject):
         self.sunRise     = {}
 
 	self.dictOfActiveFields = {}
+        self.listOfProposals = []
 
         self.dateProfile = {}
         self.moonProfile = {}
@@ -129,11 +130,10 @@ class SchedulingData (LSSTObject):
 	self.computedNights = {}
         self.alt = {}
         self.az = {}
+	self.pa = {}
         self.airmass = {}
         self.brightness = {}
 	self.dist2moon = {}
-        self.visible = {}
-        self.filters = {}
         self.proposals = {}
 
 	#self.initMoonPhase(midnight)
@@ -151,8 +151,9 @@ class SchedulingData (LSSTObject):
         self.sunRiseTwil[night]     = tonight_sunRiseTwil
         self.sunRise[night]         = tonight_sunRise
         self.moonProfile[night]     = self.sky.computeMoonProfile(midnight)
-	self.twilightProfile[night] = self.sky.computeTwilightProfile(t)
-
+#	self.twilightProfile[night] = self.sky.computeTwilightProfile(t)
+	self.twilightProfile[night] = (self.sunRiseTwil[night], self.sunSetTwil[night])
+	print ("night=%i twilightProfile=%s" % (night, str(self.twilightProfile[night]))) 
         self.lookAhead_nights       = [night]
 	self.lookAhead_times[night] = range(self.startTime, self.sunRise[night], self.dt)
 	for date in self.lookAhead_times[night]:
@@ -189,7 +190,8 @@ class SchedulingData (LSSTObject):
 	    self.sunRiseTwil[night]     = sunRiseTwil
 	    self.sunRise[night]         = sunRise
 	    self.moonProfile[night]     = self.sky.computeMoonProfile(midnight)
-	    self.twilightProfile[night] = self.sky.computeTwilightProfile(t)
+	    self.twilightProfile[night] = (self.sunRiseTwil[night], self.sunSetTwil[night])
+	    print ("night=%i twilightProfile=%s" % (night, str(self.twilightProfile[night])))
 
 	    self.lookAhead_nights   += [night]
 	    self.lookAhead_times[night] = range(self.sunSet[night], self.sunRise[night], self.dt)
@@ -271,6 +273,8 @@ class SchedulingData (LSSTObject):
 
     def computeTargetData(self, initNight, dictOfNewFields, propID):
 
+	if propID not in self.listOfProposals:
+	    self.listOfProposals.append(propID)
 	listOfNewFields = sorted(dictOfNewFields.iterkeys())
 	listOfActiveFields = sorted(self.dictOfActiveFields.iterkeys())
 	newfields = 0
@@ -282,11 +286,10 @@ class SchedulingData (LSSTObject):
 		self.computedNights[field] = []
 		self.alt[field] = {}
 		self.az[field] = {}
+		self.pa[field] = {}
 		self.airmass[field] = {}
 		self.brightness[field] = {}
 		self.dist2moon[field] = {}
-		self.visible[field] = {}
-		self.filters[field] = {}
 
                 self.proposals[field] = [propID]
                 #print ("new field=%4i new propID=%i" % (field, propID))
@@ -302,7 +305,7 @@ class SchedulingData (LSSTObject):
 	print ("SchedulingData:: %4i new fields from propID=%4i" % (newfields, propID))
 	print ("SchedulingData:: %4i existing fields registered for propID=%4i" % (newprops, propID))
 
-        print initNight
+        print ("night %i" % (initNight))
         listOfActiveFields = sorted(self.dictOfActiveFields.iterkeys())
 	print self.lookAhead_nights
         for n in self.lookAhead_nights:
@@ -316,9 +319,10 @@ class SchedulingData (LSSTObject):
 		    if n not in self.computedNights[field]:
 			(ra, dec) = self.dictOfActiveFields[field]
                     	for t in self.lookAhead_times[n]:
-                            (am, alt, az) = self.sky.airmasst(t, ra, dec)
+                            (am, alt, az, pa) = self.sky.airmasst(t, ra, dec)
                             self.alt[field][t] = alt
                             self.az[field][t] = az
+			    self.pa[field][t] = divmod(pa, TWOPI)[1]
                             self.airmass[field][t] = am
                             (br, dist2moon, moonAlt, brprofile) = \
 				self.sky.getSkyBrightness(0, ra, dec, alt,
@@ -334,6 +338,7 @@ class SchedulingData (LSSTObject):
                         for t in self.lookAhead_times[n]:
                             del self.alt[field][t]
                             del self.az[field][t]
+			    del self.pa[field][t]
                             del self.airmass[field][t]
                             del self.brightness[field][t]
 			    del self.dist2moon[field][t]
