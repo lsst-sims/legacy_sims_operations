@@ -96,43 +96,43 @@ from Sequence     import *
 
 import heapq
 
-skyBrightKeys = [0, 18, 50, 80, 100]
-filterOffset = { }
+#skyBrightKeys = [0, 18, 50, 80, 100]
+#filterOffset = { }
 
 # Corrections for moonPhase = 0 percent (new moon)
-filterOffset['u',0.] =  0.66
-filterOffset['g',0.] =  0.41
-filterOffset['r',0.] = -0.28
-filterOffset['i',0.] = -1.36
-filterOffset['z',0.] = -2.15
+#filterOffset['u',0.] =  0.66
+#filterOffset['g',0.] =  0.41
+#filterOffset['r',0.] = -0.28
+#filterOffset['i',0.] = -1.36
+#filterOffset['z',0.] = -2.15
 
 # Corrections for moonPhase = 18 percent
-filterOffset['u',18.] =  0.28
-filterOffset['g',18.] =  0.30
-filterOffset['r',18.] = -0.19
-filterOffset['i',18.] = -1.17
-filterOffset['z',18.] = -1.99
+#filterOffset['u',18.] =  0.28
+#filterOffset['g',18.] =  0.30
+#filterOffset['r',18.] = -0.19
+#filterOffset['i',18.] = -1.17
+#filterOffset['z',18.] = -1.99
 
 # Corrections for moonPhase = 50 percent
-filterOffset['u',50.] = -1.05
-filterOffset['g',50.] =  0.03
-filterOffset['r',50.] =  0.02
-filterOffset['i',50.] = -0.96
-filterOffset['z',50.] = -1.78
+#filterOffset['u',50.] = -1.05
+#filterOffset['g',50.] =  0.03
+#filterOffset['r',50.] =  0.02
+#filterOffset['i',50.] = -0.96
+#filterOffset['z',50.] = -1.78
 
 # Corrections for moonPhase = 80 percent
-filterOffset['u',80.] = -1.83
-filterOffset['g',80.] = -0.08
-filterOffset['r',80.] =  0.10
-filterOffset['i',80.] = -0.78
-filterOffset['z',80.] = -1.54
+#filterOffset['u',80.] = -1.83
+#filterOffset['g',80.] = -0.08
+#filterOffset['r',80.] =  0.10
+#filterOffset['i',80.] = -0.78
+#filterOffset['z',80.] = -1.54
 
 # Corrections for moonPhase = 100 percent (full moon)
-filterOffset['u',100.] = -2.50
-filterOffset['g',100.] = -0.35
-filterOffset['r',100.] =  0.31
-filterOffset['i',100.] = -0.47
-filterOffset['z',100.] = -1.16
+#filterOffset['u',100.] = -2.50
+#filterOffset['g',100.] = -0.35
+#filterOffset['r',100.] =  0.31
+#filterOffset['i',100.] = -0.47
+#filterOffset['z',100.] = -1.16
 
 #class Proposal (Simulation.Process):
 class Proposal (object):
@@ -588,7 +588,7 @@ class Proposal (object):
                                                    verbose=self.verbose))
             
             # wait 1 second before sumbitting the next observation
-            yield hold, self
+#            yield hold, self
         return
     
     
@@ -762,118 +762,125 @@ class Proposal (object):
         self.last_observed_filter  = obs.filter
         self.last_observed_wasForThisProposal = False
 
-        obsfound = None
+        winner = None
         # Find obs in self.winners
         for o in self.winners:
 #            if (o.fieldID == obs.fieldID and o.filter == obs.filter and o.exposureTime == obs.exposureTime):
             if (o.fieldID == obs.fieldID and o.filter == obs.filter):
-                obsfound = o
+                winner = o
                 #print "Proposal: closeObs date=%d field=%d filter=%s propID=%d dist2moon=%f" % (obs.date, obs.fieldID, obs.filter, self.propID, o.distance2moon)
 		self.winners.remove(o)
                 break
         # If the observation was not found among the winners,
         # look for it in the losers set.
-        if obsfound == None :
+        if winner == None :
             for o in self.loosers:
 #                if (o.fieldID == obs.fieldID and o.filter == obs.filter and o.exposureTime >= obs.exposureTime):
                 if (o.fieldID == obs.fieldID and o.filter == obs.filter):
-                    obsfound = o
+                    winner = o
 		    self.loosers.remove(o)
                     break
-            if obsfound != None:
+            if winner != None:
                 # It found it! Serendipitus
                 if ( self.log and self.verbose > 0 ):
                     self.log.info('Proposal: closeObservation() propID=%d SERENDIPITOUS' %(self.propID))
 
-        if obsfound != None:
+        if winner != None:
 	    self.last_observed_wasForThisProposal = True
 
-	    self.lsstDB.addObsHistoryProposal(self.propID, obsHistID, self.sessionID, obsfound.propRank)
+	    self.lsstDB.addObsHistoryProposal(self.propID, obsHistID, self.sessionID, winner.propRank)
+
+	    self.log.info("propID=%i night=%i date=%i field=%i filter=%s expTime=%f visitTime=%f lst=%f" % (self.propID, winner.night, winner.date, winner.fieldID, winner.filter, winner.exposureTime, winner.visitTime, winner.lst))
+            self.log.info("    propRank=%f airmass=%f brightness=%f filtBright=%f rawSeeing=%f seeing=%f" % (winner.propRank, winner.airmass, winner.skyBrightness, winner.filterSkyBright, winner.rawSeeing, winner.seeing))
+	    self.log.info("    alt=%f az=%f pa=%f moonRA=%f moonDec=%f moonPh=%f dist2moon=%f transp=%f" % (winner.altitude, winner.azimuth, winner.parallactic, winner.moonRA_RAD, winner.moonDec_RAD, winner.moonPhase, winner.distance2moon, winner.transparency))
+#            self.log.info("    solarE=%f sunAlt=%f sunAz=%f moonAlt=%f moonAz=%f moonBright=%f darkBright=%f" % (winner.solarElong, winner.sunAlt, winner.sunAz, winner.moonAlt, winner.moonAz, winner.moonBright, winner.darkBright))
+
+
 
             # Update suggested Observation with actual observing conditions 
-            obsfound.date = obs.date
-            obsfound.mjd = obs.mjd
-            obsfound.lst = obs.lst
-            obsfound.finRank = obs.finRank
-            obsfound.slewTime = obs.slewTime
-            obsfound.rotatorSkyPos = obs.rotatorSkyPos
-            obsfound.rotatorTelPos = obs.rotatorTelPos
-            obsfound.altitude = obs.altitude
-            obsfound.azimuth = obs.azimuth
-            obsfound.sunAlt = obs.sunAlt
-            obsfound.sunAz = obs.sunAz
-            obsfound.exposureTime = obs.exposureTime
-            obsfound.night = obs.night
+#            obsfound.date = obs.date
+#            obsfound.mjd = obs.mjd
+#            obsfound.lst = obs.lst
+#            obsfound.finRank = obs.finRank
+#            obsfound.slewTime = obs.slewTime
+#            obsfound.rotatorSkyPos = obs.rotatorSkyPos
+#            obsfound.rotatorTelPos = obs.rotatorTelPos
+#            obsfound.altitude = obs.altitude
+#            obsfound.azimuth = obs.azimuth
+#            obsfound.sunAlt = obs.sunAlt
+#            obsfound.sunAz = obs.sunAz
+#            obsfound.exposureTime = obs.exposureTime
+#            obsfound.night = obs.night
 
             # get most current skyBrightness 
-            dateProfile = obs.date, obs.mjd, obs.lst
-            moonProfile = (obsfound.moonRA_RAD, obsfound.moonDec_RAD, 
-                           obsfound.moonPhase)
-            (skyBright,distance2moon,moonAlt_RAD,brightProfile) = \
-                        self.sky.getSkyBrightness (obsfound.fieldID,
-                                      obsfound.ra, obsfound.dec,
-                                      obsfound.altitude, 
-                                      dateProfile,
-                                      moonProfile,
-                                      twilightProfile)
+#            dateProfile = obs.date, obs.mjd, obs.lst
+#            moonProfile = (obsfound.moonRA_RAD, obsfound.moonDec_RAD, 
+#                           obsfound.moonPhase)
+#            (skyBright,distance2moon,moonAlt_RAD,brightProfile) = \
+#                        self.sky.getSkyBrightness (obsfound.fieldID,
+#                                      obsfound.ra, obsfound.dec,
+#                                      obsfound.altitude, 
+#                                      dateProfile,
+#                                      moonProfile,
+#                                      twilightProfile)
 
             #print "latest skyBright = %f\toriginal skyBright = %f" % (skyBright, obsfound.skyBrightness)
 
-            (obsfound.phaseAngle, obsfound.extinction, obsfound.rScatter, 
-                 obsfound.mieScatter, obsfound.moonIllum, 
-                 obsfound.moonBright, obsfound.darkBright) = brightProfile
+#            (obsfound.phaseAngle, obsfound.extinction, obsfound.rScatter, 
+#                 obsfound.mieScatter, obsfound.moonIllum, 
+#                 obsfound.moonBright, obsfound.darkBright) = brightProfile
 
             # store new value since it is most accurate
-            obsfound.skyBrightness = skyBright
-            obsfound.distance2moon = distance2moon
-            obsfound.moonAlt = moonAlt_RAD
+#            obsfound.skyBrightness = skyBright
+#            obsfound.distance2moon = distance2moon
+#            obsfound.moonAlt = moonAlt_RAD
  
             # calculate airmass of actual observation 
-            obsfound.airmass = 1/math.cos(1.5708 - obsfound.altitude)
+#            obsfound.airmass = 1/math.cos(1.5708 - obsfound.altitude)
 
             # calculate current solar elongation in DEGREES
-            target = (obsfound.ra*DEG2RAD, obsfound.dec*DEG2RAD)
-            solarElong_RAD = self.sky.getPlanetDistance ('Sun',target, obs.date)
-            obsfound.solarElong = math.degrees(solarElong_RAD)
+#            target = (obsfound.ra*DEG2RAD, obsfound.dec*DEG2RAD)
+#            solarElong_RAD = self.sky.getPlanetDistance ('Sun',target, obs.date)
+#            obsfound.solarElong = math.degrees(solarElong_RAD)
 
             # Derive skyBrightness for filter.  Interpolate if needed. - MM
-            (sunrise, sunset) = twilightProfile
+#            (sunrise, sunset) = twilightProfile
 
             # set y skybrightness for any kind of sky
-            if (obsfound.filter == 'y'):
-               obsfound.filterSkyBright = 17.3  
-            else:      # g,r,i,z,u
+#            if (obsfound.filter == 'y'):
+#               obsfound.filterSkyBright = 17.3  
+#            else:      # g,r,i,z,u
                # If moon below horizon, use new moon offset for filter
                # brightness - MM
-               if (math.degrees(obsfound.moonAlt) <= -6.0):
-                  adjustBright = filterOffset[obsfound.filter,0.]
+#               if (math.degrees(obsfound.moonAlt) <= -6.0):
+#                  adjustBright = filterOffset[obsfound.filter,0.]
 
                # Interpolate if needed. Note: moonPhase is a float not int
-               elif (obsfound.moonPhase not in skyBrightKeys):
-                  i = 0
-                  while (skyBrightKeys[i] < obsfound.moonPhase):
-                     i = i+1
+#               elif (obsfound.moonPhase not in skyBrightKeys):
+#                  i = 0
+#                  while (skyBrightKeys[i] < obsfound.moonPhase):
+#                     i = i+1
 
                   # find upper and lower bound
-                  upperMoonPhase = skyBrightKeys[i]
-                  lowerMoonPhase = skyBrightKeys[i-1]
-                  lowerAdjustBright = filterOffset[obsfound.filter,lowerMoonPhase]
-                  upperAdjustBright = filterOffset[obsfound.filter,upperMoonPhase]
+#                  upperMoonPhase = skyBrightKeys[i]
+#                  lowerMoonPhase = skyBrightKeys[i-1]
+#                  lowerAdjustBright = filterOffset[obsfound.filter,lowerMoonPhase]
+#                  upperAdjustBright = filterOffset[obsfound.filter,upperMoonPhase]
                   # linear interpolation
-                  adjustBright = lowerAdjustBright + (((obsfound.moonPhase - lowerMoonPhase)*(upperAdjustBright - lowerAdjustBright))/(upperMoonPhase - lowerMoonPhase))
+#                  adjustBright = lowerAdjustBright + (((obsfound.moonPhase - lowerMoonPhase)*(upperAdjustBright - lowerAdjustBright))/(upperMoonPhase - lowerMoonPhase))
    
-               else:          # moon not set and moon phase is key
-                  adjustBright = filterOffset[obsfound.filter, obsfound.moonPhase]
-               obsfound.filterSkyBright = obsfound.skyBrightness + adjustBright
+#               else:          # moon not set and moon phase is key
+#                  adjustBright = filterOffset[obsfound.filter, obsfound.moonPhase]
+#               obsfound.filterSkyBright = obsfound.skyBrightness + adjustBright
 
                # z sky brightness should never be under 17.0
-               if (obsfound.filter == 'z') and (obsfound.filterSkyBright < 17.0):
-                  obsfound.filterSkyBright = 17.0
+#               if (obsfound.filter == 'z') and (obsfound.filterSkyBright < 17.0):
+#                  obsfound.filterSkyBright = 17.0
 
 	    # If twilight, set brightness for z and y
-            if ( obs.date < sunset) or (obs.date > sunrise):
-	       if (obsfound.filter == 'z') or (obsfound.filter == 'y'):
-		   obsfound.filterSkyBright = 17.0
+#            if ( obs.date < sunset) or (obs.date > sunrise):
+#	       if (obsfound.filter == 'z') or (obsfound.filter == 'y'):
+#		   obsfound.filterSkyBright = 17.0
 
 	    # build visit history
             fieldID = obs.fieldID
@@ -882,12 +889,12 @@ class Proposal (object):
                 self.fieldVisits[fieldID] += 1
             except:
                 self.fieldVisits[fieldID] = 0
-            obsfound.fieldVisits = self.fieldVisits[fieldID]
+            winner.fieldVisits = self.fieldVisits[fieldID]
 
             try:
-                obsfound.fieldInterval = obs.date-self.lastFieldVisit[fieldID]
+                winner.fieldInterval = obs.date-self.lastFieldVisit[fieldID]
             except:
-                obsfound.fieldInterval = 0
+                winner.fieldInterval = 0
             self.lastFieldVisit[fieldID] = obs.date
 
             if not self.lastFieldFilterVisit.has_key(fieldID):
@@ -895,16 +902,16 @@ class Proposal (object):
             else:
                 if not self.lastFieldFilterVisit[fieldID].has_key(filter):
                     self.lastFieldFilterVisit[fieldID][filter] = obs.date
-            obsfound.fieldFilterInterval = obs.date - self.lastFieldFilterVisit[fieldID][filter]
+            winner.fieldFilterInterval = obs.date - self.lastFieldFilterVisit[fieldID][filter]
             self.lastFieldFilterVisit[fieldID][filter] = obs.date
 
-            obsfound.slewDistance = slalib.sla_dsep(self.lastTarget[0],self.lastTarget[1],obsfound.ra*DEG2RAD,obsfound.dec*DEG2RAD)
-            self.lastTarget = (obsfound.ra*DEG2RAD,obsfound.dec*DEG2RAD)
+#            obsfound.slewDistance = slalib.sla_dsep(self.lastTarget[0],self.lastTarget[1],obsfound.ra*DEG2RAD,obsfound.dec*DEG2RAD)
+            self.lastTarget = (winner.ra*DEG2RAD,winner.dec*DEG2RAD)
 
             # update the ObsHistory DB with the new observation
 #            self.obsHistory.addObservation (obsfound, self.sessionID)
         
-        return obsfound
+        return winner
 
     def missObservation(self, obs):
 
