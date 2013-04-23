@@ -750,7 +750,7 @@ class AstronomicalSky (LSSTObject):
         lha_RAD = lst_RAD - ra * DEG2RAD
         
         # Compute altitude 
-        (az_RAD,d1,d2,alt_RAD,d4,d5,d6,d7,d8) = slalib.sla_altaz (lha_RAD,
+        (az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (lha_RAD,
                                    dec * DEG2RAD,
                                    self.latitude_RAD)
 
@@ -763,7 +763,7 @@ class AstronomicalSky (LSSTObject):
         
         # Update the cache
         self.airmassCache[key] = (am,alt_RAD,az_RAD)
-        return (am,alt_RAD,az_RAD)
+        return (am,alt_RAD,az_RAD,pa_RAD)
 
     def airmasst (self, date, ra, dec):
 
@@ -771,6 +771,62 @@ class AstronomicalSky (LSSTObject):
 
         return self.airmass(dateProfile, ra, dec)
 
+
+    def computeMoonProfile(self, date):
+        """
+        Precompute quantities relating to the moon used by subsequent routines
+
+        Input
+            dateProfile:    an array containing
+                date
+                mjd
+                lst_RAD
+        Output
+            moonProfile:    an array containing
+                moonRA_RAD
+                moonDec_RAD
+                moonPhase_PERCENT
+        """
+        (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = self.obsProfile
+        mjd = (float (date) / float (DAY)) + epoch_MJD
+
+        # Get the Moon RA/Dec  in radians
+        (moonRA_RAD,moonDec_RAD,moonDiam) =  slalib.sla_rdplan(mjd,
+                                                    3,
+                                                    lon_RAD,
+                                                    lat_RAD)
+        moonPhase_PERCENT = self.getMoonPhase(mjd)
+
+        return(moonRA_RAD,moonDec_RAD,moonPhase_PERCENT)
+
+
+    def computeMoonProfileAltAz(self, date):
+        """
+        Precompute quantities relating to the moon used by subsequent routines
+
+        Input
+            dateProfile:    an array containing
+                date
+                mjd
+                lst_RAD
+        Output
+            moonProfile:    an array containing
+                moonRA_RAD
+                moonDec_RAD
+                moonPhase_PERCENT
+        """
+        (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = self.obsProfile
+        mjd = (float (date) / float (DAY)) + epoch_MJD
+        lst_RAD = slalib.sla_gmst(mjd)  + lon_RAD
+
+        (moonRA_RAD, moonDec_RAD, moonPhase_PERCENT) = self.computeMoonProfile(date)
+
+        # Compute moon altitude in radians
+        moonha_RAD = lst_RAD - moonRA_RAD
+        (moonAz_RAD,d1,d2,moonAlt_RAD,d4,d5,d6,d7,d8) = \
+                slalib.sla_altaz(moonha_RAD, moonDec_RAD, self.latitude_RAD)
+
+	return (moonRA_RAD, moonDec_RAD, moonPhase_PERCENT, moonAlt_RAD, moonAz_RAD)
     
     def getHAforAirmass(self, airmass):
 	"""
