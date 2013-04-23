@@ -135,6 +135,7 @@ class Observation (LSSTObject):
         self.dec = dec 
         self.altitude = altitude
         self.azimuth = azimuth
+	self.parallactic = 0.0
         self.distance2moon = 0.0
         self.rotatorSkyPos = 0.0
         self.rotatorTelPos = 0.0
