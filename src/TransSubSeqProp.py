@@ -348,13 +348,17 @@ class TransSubSeqProp (Proposal):
 
     def suggestObs (self, 
                     dateProfile, 
-                    moonProfile,
+#                    moonProfile,
                     n=100,
                     skyfields=None,
 		    proximity=None, 
-                    targetProfiles=None,
+#                    targetProfiles=None,
 		    exclusiveObservation=None,
-		    minDistance2Moon=0.0):
+		    minDistance2Moon=0.0,
+                    rawSeeing=0.0,
+                    seeing=0.0,
+                    transparency=0.0,
+                    sdnight=0, sdtime=0):
         """
         Return the list of (at most) the n (currently) higher ranking
         observations.
@@ -380,9 +384,9 @@ class TransSubSeqProp (Proposal):
         # Copy the input vars
         inFieldID = skyfields
 	inproximity = proximity
-        intargetProfiles = targetProfiles
+#        intargetProfiles = targetProfiles
         (date,mjd,lst_RAD) = dateProfile
-        (moonRA_RAD,moonDec_RAD,moonPhase_PERCENT) = moonProfile
+        (moonRA_RAD,moonDec_RAD,moonPhase_PERCENT) = self.schedulingData.moonProfile[sdnight]
 
 	# Check the start/end of observing cycle.
 	# For NEA the lunation is checked
@@ -405,7 +409,7 @@ class TransSubSeqProp (Proposal):
 		    rank = 1.0
 
                     i = inFieldID.index (fieldID)
-	            airmass = intargetProfiles[i][0]
+	            #airmass = self.schedulingData.airmass[fieldID][sdtime]
 
 		    filter = self.sequences[fieldID].GetNextFilter(subseq)
 		    #print filter
@@ -426,7 +430,7 @@ class TransSubSeqProp (Proposal):
                     recordFieldFilter.seeing		= self.exclusiveObs.seeing
                     recordFieldFilter.transparency	= self.exclusiveObs.transparency
                     recordFieldFilter.cloudSeeing	= self.exclusiveObs.cloudSeeing
-                    recordFieldFilter.airmass		= airmass
+                    recordFieldFilter.airmass		= self.exclusiveObs.airmass
                     recordFieldFilter.skyBrightness	= self.exclusiveObs.skyBrightness
                     recordFieldFilter.lst		= lst_RAD
                     recordFieldFilter.altitude		= self.exclusiveObs.altitude
@@ -499,14 +503,14 @@ class TransSubSeqProp (Proposal):
 		if (fieldID==self.last_observed_fieldID) and (self.last_observed_wasForThisProposal) and (not self.AcceptConsecutiveObs):
 		    continue
 
-                airmass = intargetProfiles[i][0]
+                airmass = self.schedulingData.airmass[fieldID][sdtime]
                 if (airmass > self.maxAirmass):
                     if self.log and self.verbose>2:
                         self.log.info('%sProp: suggestObs() propID=%d field=%i too low:%f' % (self.propFullName, self.propID,fieldID,airmass))
                     fields_invisible+=1
                     continue
 
-                distance2moon = intargetProfiles[i][5]
+                distance2moon = self.schedulingData.dist2moon[fieldID][sdtime]
                 if (distance2moon < minDistance2Moon):
                     fields_moon+=1
                     # remove the target for the rest of the night if it is too close to the moon
@@ -521,9 +525,9 @@ class TransSubSeqProp (Proposal):
 #		    continue
                 #.............................................................
                 # Gets the list of possible filters based on the sky brightness
-		skyBrightness = intargetProfiles[i][1]
+		skyBrightness = self.schedulingData.brightness[fieldID][sdtime]
 		allowedFilterList = self.allowedFiltersForBrightness(skyBrightness)
-                filterSeeingList = intargetProfiles[i][2]
+                filterSeeingList = self.filters.computeFilterSeeing(seeing, airmass)
                 #rankForFilters = self.RankFilters(fieldID, filterSeeingList)
                 #.............................................................
                 for subseq in self.tonightSubseqsForTarget[fieldID]:
@@ -605,21 +609,22 @@ class TransSubSeqProp (Proposal):
                         recordFieldFilter.propRank = rank
                         #recordFieldFilter.finRank = finRank
                         recordFieldFilter.maxSeeing = self.FilterMaxSeeing[filter]
-                        recordFieldFilter.rawSeeing = intargetProfiles[i][7]
+                        recordFieldFilter.rawSeeing = rawSeeing
                         recordFieldFilter.seeing = filterSeeingList[filter]
-                        recordFieldFilter.transparency = intargetProfiles[i][3]
-                        recordFieldFilter.cloudSeeing = intargetProfiles[i][4]
+                        recordFieldFilter.transparency = transparency
+#                        recordFieldFilter.cloudSeeing = intargetProfiles[i][4]
                         recordFieldFilter.airmass = airmass
                         recordFieldFilter.skyBrightness = skyBrightness
                         #recordFieldFilter.ra = ra
                         #recordFieldFilter.dec = dec
                         recordFieldFilter.lst = lst_RAD
-                        recordFieldFilter.altitude = intargetProfiles[i][6]
-                        recordFieldFilter.azimuth  = intargetProfiles[i][9]
-                        recordFieldFilter.distance2moon = intargetProfiles[i][5]
+                        recordFieldFilter.altitude = self.schedulingData.alt[fieldID][sdtime]
+                        recordFieldFilter.azimuth  = self.schedulingData.az[fieldID][sdtime]
+			recordFieldFilter.parallactic = self.schedulingData.pa[fieldID][sdtime]
+                        recordFieldFilter.distance2moon = distance2moon
                         recordFieldFilter.moonRA = moonRA_RAD
                         recordFieldFilter.moonDec = moonDec_RAD
-                        recordFieldFilter.moonAlt = intargetProfiles[i][8]
+#                        recordFieldFilter.moonAlt = intargetProfiles[i][8]
                         recordFieldFilter.moonPhase = moonPhase_PERCENT
 			recordFieldFilter.exclusiveBlockRequired = exclusiveBlockRequired
 
@@ -759,8 +764,8 @@ class TransSubSeqProp (Proposal):
 	    self.last_observed_wasForThisProposal = False
 	    return None
 
-        if ( self.log and self.verbose > 1 ):
-           self.log.info('%sProp: closeObservation()' % (self.propFullName))
+#        if ( self.log and self.verbose > 1 ):
+#           self.log.info('%sProp: closeObservation()' % (self.propFullName))
 
         obs = super (TransSubSeqProp, self).closeObservation(observation, obsHistID, twilightProfile)
 
@@ -778,7 +783,7 @@ class TransSubSeqProp (Proposal):
 		    progrmod = '+'
 		else:
 		    progrmod = ''
-                self.log.info('%sProp: closeObservation() propID=%d field=%d filter=%s propRank=%.4f finRank=%.4f t=%dd%02dh%02dm%02ds progress=%d%s%%' % (self.propFullName, self.propID, obs.fieldID, obs.filter, obs.propRank, obs.finRank, t_days, t_hour, t_mins, t_secs, int(100*progress), progrmod))
+                self.log.info('%s: closeObservation() propID=%d field=%d filter=%s propRank=%.4f finRank=%.4f t=%dd%02dh%02dm%02ds progress=%d%s%%' % (self.propConf, self.propID, obs.fieldID, obs.filter, obs.propRank, obs.finRank, t_days, t_hour, t_mins, t_secs, int(100*progress), progrmod))
 
 	    if obs.exclusiveBlockRequired == True:
 		self.exclusiveBlockNeeded = True
