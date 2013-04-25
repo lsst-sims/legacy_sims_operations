@@ -541,8 +541,8 @@ class WeakLensingProp (Proposal):
     
     def closeObservation (self, observation, obsHistID, twilightProfile):
 
-        if (self.log and self.verbose > 1):
-           self.log.info('WeakLensingProp: closeObservation() propID=%d' %(self.propID))
+#        if (self.log and self.verbose > 1):
+#           self.log.info('WeakLensingProp: closeObservation() propID=%d' %(self.propID))
 
         obs = super (WeakLensingProp, self).closeObservation(observation, obsHistID, twilightProfile)
 
@@ -555,13 +555,13 @@ class WeakLensingProp (Proposal):
  
 	    progress = self.visits[obs.filter][obs.fieldID]/self.GoalVisitsFieldFilter[obs.filter]
 
-            if (self.log and self.verbose>0):
-                t_secs = obs.date%60
-                t_mins = (obs.date%3600)/60
-                t_hour = (obs.date%86400)/3600
-                t_days = (obs.date)/86400
+#            if (self.log and self.verbose>0):
+#                t_secs = obs.date%60
+#                t_mins = (obs.date%3600)/60
+#                t_hour = (obs.date%86400)/3600
+#                t_days = (obs.date)/86400
 
-                self.log.info('WeakLensingProp: closeObservation() propID=%d field=%d filter=%s propRank=%.4f finRank=%.4f t=%dd%02dh%02dm%02ds progress=%d%%' % (self.propID, obs.fieldID, obs.filter, obs.propRank, obs.finRank, t_days, t_hour, t_mins, t_secs, int(100*progress)))
+#                self.log.info('WeakLensingProp: closeObservation() propID=%d field=%d filter=%s propRank=%.4f finRank=%.4f t=%dd%02dh%02dm%02ds progress=%d%%' % (self.propID, obs.fieldID, obs.filter, obs.propRank, obs.finRank, t_days, t_hour, t_mins, t_secs, int(100*progress)))
 
             #print ('%i %i' % (self.visits[obs.filter][obs.fieldID], self.VisitsTonight))
         return obs
