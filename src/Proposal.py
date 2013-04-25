@@ -311,8 +311,8 @@ class Proposal (object):
         self.getPropID ()
 
         self.log.info('FilterNames     for propID=%d %s = %s' % (self.propID, self.propFullName, str(self.FilterNames)))
-        self.log.info('FilterMinBrig   for propID=%d %s = %s' % (self.propID, self.propFullName, str(self.FilterMinBrig)))
-        self.log.info('FilterMaxBrig   for propID=%d %s = %s' % (self.propID, self.propFullName, str(self.FilterMaxBrig)))
+        self.log.info('FilterMinBrig   for propID=%d %s = %s' % (self.propID, self.propFullName, repr(self.FilterMinBrig)))
+        self.log.info('FilterMaxBrig   for propID=%d %s = %s' % (self.propID, self.propFullName, repr(self.FilterMaxBrig)))
         self.log.info('FilterMaxSeeing for propID=%d %s = %s' % (self.propID, self.propFullName, str(self.FilterMaxSeeing)))
 
         return
@@ -780,10 +780,10 @@ class Proposal (object):
                     winner = o
 		    self.loosers.remove(o)
                     break
-            if winner != None:
+#            if winner != None:
                 # It found it! Serendipitus
-                if ( self.log and self.verbose > 0 ):
-                    self.log.info('Proposal: closeObservation() propID=%d SERENDIPITOUS' %(self.propID))
+#                if ( self.log and self.verbose > 0 ):
+#                    self.log.info('Proposal: closeObservation() propID=%d SERENDIPITOUS' %(self.propID))
 
         if winner != None:
 	    self.last_observed_wasForThisProposal = True
