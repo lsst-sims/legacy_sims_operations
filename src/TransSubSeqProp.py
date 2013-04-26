@@ -423,6 +423,7 @@ class TransSubSeqProp (Proposal):
                     recordFieldFilter.pairNum = self.sequences[fieldID].GetPairNum(subseq)
 		    recordFieldFilter.date		= date
                     recordFieldFilter.mjd		= mjd
+                    recordFieldFilter.night             = sdnight
                     recordFieldFilter.exposureTime	= self.exposureTime
                     recordFieldFilter.propRank		= rank
                     recordFieldFilter.maxSeeing		= self.exclusiveObs.maxSeeing
@@ -602,6 +603,7 @@ class TransSubSeqProp (Proposal):
                         recordFieldFilter.pairNum = self.sequences[fieldID].GetPairNum(subseq)
                         recordFieldFilter.date = date
                         recordFieldFilter.mjd = mjd
+			recordFieldFilter.night = sdnight
                         recordFieldFilter.exposureTime = self.exposureTime
                         #recordFieldFilter.slewTime = slewTime
                         #recordFieldFilter.rotatorSkyPos = 0.0
