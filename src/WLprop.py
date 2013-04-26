@@ -61,6 +61,32 @@ class WLprop (TransSubSeqProp):
 	self.lsstDB = lsstDB        
 	self.schedulingData = schedulingData
 	self.nextNight = 0
+        self.maxSeeing = {}
+        try:
+            defaultMaxSeeing = eval(str(config_dict['MaxSeeing']))
+        except:
+            pass
+        try:
+            self.maxSeeing['r'] = config_dict['rMaxSeeing']
+        except:
+            self.maxSeeing['r'] = defaultMaxSeeing
+        try:
+            self.maxSeeing['g'] = config_dict['gMaxSeeing']
+        except:
+            self.maxSeeing['g'] = defaultMaxSeeing
+        try:
+            self.maxSeeing['y'] = config_dict['yMaxSeeing']
+        except:
+            self.maxSeeing['y'] = defaultMaxSeeing
+        try:
+            self.maxSeeing['i'] = config_dict['iMaxSeeing']
+        except:
+            self.maxSeeing['i'] = defaultMaxSeeing
+        try:
+            self.maxSeeing['z'] = config_dict['zMaxSeeing']
+        except:
+            self.maxSeeing['z'] = defaultMaxSeeing
+
         self.maxAirmass = eval(str(config_dict['MaxAirmass']))
         self.ha_maxairmass = sky.getHAforAirmass(self.maxAirmass)
 
@@ -84,12 +110,11 @@ class WLprop (TransSubSeqProp):
         try:
             self.subSeqNested = (config_dict['SubSeqNested'])
         except:
-	    self.subSeqNested = []
-	    for s in self.subSeqName:
-		self.subSeqNested.append(None)
+           self.subSeqNested = []
+           for s in self.subSeqName:
+               self.subSeqNested.append(None)
         if not isinstance(self.subSeqNested, list):
             self.subSeqNested = [self.subSeqNested]
-
 
         try:
             self.subSeqExposures = (config_dict['SubSeqExposures'])
@@ -126,6 +151,18 @@ class WLprop (TransSubSeqProp):
         self.rankTimeMax    = eval(str(config_dict['RankTimeMax']))
         self.rankIdleSeq    = eval(str(config_dict['RankIdleSeq']))
         self.rankLossRiskMax= eval(str(config_dict['RankLossRiskMax']))
+
+        self.log.info('proposal configfile=%s subsequences:' % (str(WLpropConf)))
+        self.log.info('         SubSeqName=%s' % (str(self.subSeqName)))
+        self.log.info('         SubSeqNested=%s' % (str(self.subSeqNested)))
+        self.log.info('         SubSeqFilters=%s' % (str(self.subSeqFilters)))
+        self.log.info('         SubSeqExposures=%s' % (str(self.subSeqExposures)))
+        self.log.info('         SubSeqEvents=%s' % (str(self.subSeqEvents)))
+        self.log.info('         SubSeqMaxMissed=%s' % (str(self.subSeqMaxMissed)))
+        self.log.info('         SubSeqInterval=%s' % (str(self.subSeqInterval)))
+        self.log.info('         SubSeqWindowStart=%s' % (str(self.subSeqWindowStart)))
+        self.log.info('         SubSeqWindowMax=%s' % (str(self.subSeqWindowMax)))
+        self.log.info('         SubSeqWindowEnd=%s' % (str(self.subSeqWindowEnd)))
 
         try:
             self.rankDaysLeftMax= eval(str(config_dict['RankDaysLeftMax']))
@@ -263,22 +300,22 @@ class WLprop (TransSubSeqProp):
                                                                                                                                                  
         return True
                                                                                                                                                  
-    def RankFilters(self, fieldID, filterSeeingList, allowedFilterList):
+#    def RankFilters(self, fieldID, filterSeeingList, allowedFilterList):
 
-	rankForFilters = {}
+#	rankForFilters = {}
 
-        for filter in allowedFilterList:
+#        for filter in allowedFilterList:
 
-            if (filterSeeingList[filter] > self.maxSeeing):
-                continue
+#            if (filterSeeingList[filter] > self.maxSeeing):
+#                continue
             # Check if the proposed filter is in the list
             # of allowed filters for the SuperNova configuration.
-            if not filter in self.subSeqFilters:
-                continue
+#            if not filter in self.subSeqFilters:
+#                continue
 
-	    rankForFilters[filter] = 1.0
+#	    rankForFilters[filter] = 1.0
 
-        return rankForFilters
+#        return rankForFilters
 
     
     def closeObservation (self, observation, obsHistID, twilightProfile):
@@ -330,21 +367,17 @@ class WLprop (TransSubSeqProp):
         #s0 = stacksize()
         ##self.log.info("WL: updateTargetList entry: mem: %d resMem: %d stack: %d" % (m0, r0, s0))
                                                                                                                             
-        if ( self.log):
-            self.log.info ('Proposal:updateTargetList propID=%d' %(self.propID))
         dbFov = 'fieldFov'
         dbRA = 'fieldRA'
         dbDec = 'fieldDec'
-        #dbL = 'fieldGL'
-        #dbB = 'fieldGB'
         dbID = 'fieldID'
                                                                                                                             
         (date,mjd,lst_RAD) = dateProfile
         (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = obsProfile
-                                                                                                                            
+
         # MJD -> calendar date
         (yy, mm, dd) = mjd2gre (mjd)[:3]
-                                                                                                                            
+
         # determine twilight times based on user param: TwilightBoundary
         s = Sun.Sun ()
         (sunRise, sunSet) = s.__sunriset__ (yy, mm, dd, lon_RAD*RAD2DEG, lat_RAD*RAD2DEG,self.twilightBoundary,0)
@@ -359,14 +392,18 @@ class WLprop (TransSubSeqProp):
         # Compute RA min (at twilight)
         date_MJD = int (mjd) + (sunSet / 24.)
         raMin = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.deltaLST
+        raMinNewSeq = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG)  + self.newFieldsLimitEast_afterLSTatSunset
                                                                                                                             
         # Compute RA max (at twilight)
         date_MJD = int (mjd) + (sunRise / 24.)
         raMax = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) + self.deltaLST
+        raMaxNewSeq = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.newFieldsLimitWest_beforeLSTatSunrise
                                                                                                                             
         # Make sure that both raMin and raMax are in the [0; 360] range
         raMin = normalize (angle=raMin, min=0., max=360, degrees=True)
         raMax = normalize (angle=raMax, min=0., max=360, degrees=True)
+        raMinNewSeq = normalize (angle=raMinNewSeq, min=0., max=360, degrees=True)
+        raMaxNewSeq = normalize (angle=raMaxNewSeq, min=0., max=360, degrees=True)
                                                                                                                             
         # self.targets is a convenience dictionary. Its keys are
         # fieldIDs, its values are the corresponding RA and Dec.
@@ -407,13 +444,30 @@ class WLprop (TransSubSeqProp):
                                                     raMax)
         else:
             sql += '%s BETWEEN 0.0 AND 360.0 AND ' % (dbRA)
-                                                                                                                            
+        # select reduced range for starting new sequences
+        sqlNewSeq = sql
+        if (raMaxNewSeq > raMinNewSeq):
+            sqlNewSeq += '%s BETWEEN %f AND %f AND ' % (dbRA,
+                                                  raMinNewSeq,
+                                                  raMaxNewSeq)
+        elif (raMaxNewSeq < raMinNewSeq):
+            sqlNewSeq += '(%s BETWEEN %f AND 360.0 OR ' % (dbRA,
+                                                     raMinNewSeq)
+            sqlNewSeq += '%s BETWEEN 0.0 AND %f) AND ' % (dbRA,
+                                                    raMaxNewSeq)
+        else:
+            sqlNewSeq += '%s BETWEEN 0.0 AND 360.0 AND ' % (dbRA)
+                                                                                                                     
         DecLimit = math.acos(1./float(self.maxAirmass)) * RAD2DEG
         sql += '%s BETWEEN %f AND %f  and %f < %s < %f' % (dbDec,
+                                          (lat_RAD*RAD2DEG)-DecLimit,
+                                          (lat_RAD*RAD2DEG)+DecLimit,
+                                          -abs(self.maxReach),dbDec,abs(self.maxReach))
+        sqlNewSeq += '%s BETWEEN %f AND %f  and %f < %s < %f' % (dbDec,
                                          (lat_RAD*RAD2DEG)-DecLimit,
                                          (lat_RAD*RAD2DEG)+DecLimit,
                                          -abs(self.maxReach),dbDec,abs(self.maxReach))
-                                                                                                                            
+                                                                                                                             
         # Send the query to the DB
         (n, res) = self.lsstDB.executeSQL (sql)
                                                                                                                             
@@ -422,27 +476,19 @@ class WLprop (TransSubSeqProp):
             fields[fieldID] = (ra, dec)
                                                                                                                             
         self.targets = fields
-	self.targetsNewSeq = fields.copy()
-                  
-	#print lst_RAD  
-	#print lst_RAD*12.0/math.pi
 
-	self.computeTargetsHAatTwilight(lst_RAD)
+        self.computeTargetsHAatTwilight(lst_RAD)
 
-        #self.NumberOfFieldsTonight = len(self.targets)
-        #print('NumberOfFieldsTonight = %i' % (self.NumberOfFieldsTonight))
-        #self.GoalVisitsTonight = self.GoalVisitsField * self.NumberOfFieldsTonight
-        #print('Goal Visits with Tonight targets = %i' % (self.GoalVisitsTonight))
-        #self.VisitsTonight = 0
-        #for filter in self.visits.keys():
-            #print('visits in %s = %i' % (filter, len(self.visits[filter].keys())))
-        #    for field in self.visits[filter].keys():
-        #        if self.targets.has_key(field):
-        #            self.VisitsTonight += self.visits[filter][field]
-                    #print field
-        #print('Visits up to Tonight for propID %d for current targets = %i' % (self.propID,self.VisitsTonight))
-        print ('*** Found %d WLTSS fields for propID=%d ***' % (len (res),self.propID))
-                                                                                                                            
+        #print (sql)
+        print ('*** Found %d WLTSS fields for propID=%d***' % (len (res),self.propID))
+
+        (n, res) = self.lsstDB.executeSQL (sqlNewSeq)
+        fields = {}
+        for (ra, dec, fieldID) in res:
+            fields[fieldID] = (ra, dec)
+        self.targetsNewSeq = fields.copy()
+        print ('*** Found %d WLTSS fields for propID=%d for new sequences ***' % (len (res),self.propID))
+
         ## Benchmark memory use - exit
         #m1 = memory()
         #r1 = resident()
@@ -453,5 +499,4 @@ class WLprop (TransSubSeqProp):
 	self.schedulingData.updateTargets(self.targets, self.propID, dateProfile)
 
         return (self.targets)
-
 
