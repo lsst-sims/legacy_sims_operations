@@ -39,10 +39,6 @@ class SchedulingData (LSSTObject):
         #      sunRise                 sunSet          t
 	x = self.sky.getIntTwilightSunriseSunset (t)
         (sunRise,sunSet,sunRiseMJD,sunSetMJD, sunRiseTwil,sunSetTwil) = x
-	#print sunRiseTwil
-	#print sunRise
-	#print sunSet
-	#print sunSetTwil
 
 	if (t < sunRise):
             #  <---------------DAY------------------->
@@ -55,10 +51,6 @@ class SchedulingData (LSSTObject):
             #   t  sunSet                  sunRise        t
             x = self.sky.getIntTwilightSunriseSunset(t - DAY)
             (yesterday_sunRise, yesterday_sunSet, yesterday_sunRiseMJD, yesterday_sunSetMJD, yesterday_sunRiseTwil, yesterday_sunSetTwil) = x
-            #print yesterday_sunRiseTwil
-            #print yesterday_sunRise
-            #print yesterday_sunSet
-            #print yesterday_sunSetTwil
 
             if t < yesterday_sunSet:
                 t = yesterday_sunSet
@@ -75,10 +67,6 @@ class SchedulingData (LSSTObject):
             #   sunRise    t            sunSet          t
             x = self.sky.getIntTwilightSunriseSunset (t + DAY)
             (tomorrow_sunRise, tomorrow_sunSet, tomorrow_sunRiseMJD, tomorrow_sunSetMJD, tomorrow_sunRiseTwil, tomorrow_sunSetTwil) = x
-            #print tomorrow_sunRiseTwil
-            #print tomorrow_sunRise
-            #print tomorrow_sunSet
-            #print tomorrow_sunSetTwil
 
             t = sunSet
 
@@ -105,11 +93,6 @@ class SchedulingData (LSSTObject):
 
         midnight = (int(tonight_sunSetTwil + tonight_sunRiseTwil)/2)
 
-	#print t
-	#print tonight_sunSet
-	#print tonight_sunSetTwil
-	#print tonight_sunRiseTwil
-	#print tonight_sunRise
 
 	self.lookAhead_nights = []
 	self.lookAhead_times  = {}
@@ -128,15 +111,16 @@ class SchedulingData (LSSTObject):
         self.moonProfile = {}
         self.twilightProfile = {}
 	self.computedNights = {}
+	self.computedVisibleNights = {}
         self.alt = {}
         self.az = {}
 	self.pa = {}
         self.airmass = {}
         self.brightness = {}
 	self.dist2moon = {}
+	self.visible = {}
+	self.visibleTime = {}
         self.proposals = {}
-
-	#self.initMoonPhase(midnight)
 
         self.startTime = int(t)
         self.endTime   = int(endTime)
@@ -151,7 +135,6 @@ class SchedulingData (LSSTObject):
         self.sunRiseTwil[night]     = tonight_sunRiseTwil
         self.sunRise[night]         = tonight_sunRise
         self.moonProfile[night]     = self.sky.computeMoonProfile(midnight)
-#	self.twilightProfile[night] = self.sky.computeTwilightProfile(t)
 	self.twilightProfile[night] = (self.sunRiseTwil[night], self.sunSetTwil[night])
 	print ("night=%i twilightProfile=%s" % (night, str(self.twilightProfile[night]))) 
         self.lookAhead_nights       = [night]
@@ -202,7 +185,7 @@ class SchedulingData (LSSTObject):
 	    last_sunSet     = sunSet
 	    last_sunSetTwil = sunSetTwil
 
-        self.computeTargetData(self.currentNight, {}, 0)
+        self.computeTargetData(self.currentNight, {}, 0, 0.0, {}, {})
 
 	for n in range(self.lookAhead_nights[0], self.currentNight):
 	    del self.sunSetMJD[n]
@@ -256,7 +239,7 @@ class SchedulingData (LSSTObject):
 	    return None
 
 
-    def updateTargets(self, dictOfNewFields, propID, dateProfile):
+    def updateTargets(self, dictOfNewFields, propID, dateProfile, maxAirmass, dictFilterMinBrig, dictFilterMaxBrig):
 
 	(date,mjd,lst_RAD) = dateProfile
 
@@ -267,14 +250,18 @@ class SchedulingData (LSSTObject):
 	if ( (self.lookAhead_nights[-1] - self.currentNight) < self.lookAheadNights):
 	    self.updateLookAheadWindow()
 
-	self.computeTargetData(nextNight, dictOfNewFields, propID)
+	self.computeTargetData(nextNight, dictOfNewFields, propID, maxAirmass, dictFilterMinBrig, dictFilterMaxBrig)
 
 	return
 
-    def computeTargetData(self, initNight, dictOfNewFields, propID):
+    def computeTargetData(self, initNight, dictOfNewFields, propID, maxAirmass, dictFilterMinBrig, dictFilterMaxBrig):
 
+        listOfFilters = sorted(dictFilterMinBrig.iterkeys())
 	if propID not in self.listOfProposals:
 	    self.listOfProposals.append(propID)
+	    self.visible[propID] = {}
+	    self.visibleTime[propID] = {}
+	    self.computedVisibleNights[propID] = {}
 	listOfNewFields = sorted(dictOfNewFields.iterkeys())
 	listOfActiveFields = sorted(self.dictOfActiveFields.iterkeys())
 	newfields = 0
@@ -284,6 +271,8 @@ class SchedulingData (LSSTObject):
 		self.dictOfActiveFields[field] = dictOfNewFields[field]
 
 		self.computedNights[field] = []
+		self.computedVisibleNights[propID][field] = []
+
 		self.alt[field] = {}
 		self.az[field] = {}
 		self.pa[field] = {}
@@ -291,16 +280,29 @@ class SchedulingData (LSSTObject):
 		self.brightness[field] = {}
 		self.dist2moon[field] = {}
 
+		self.visible[propID][field] = {}
+		self.visibleTime[propID][field] = {}
+		for filter in listOfFilters:
+		    self.visible[propID][field][filter] = {}
+		    self.visibleTime[propID][field][filter] = 0
+
                 self.proposals[field] = [propID]
-                #print ("new field=%4i new propID=%i" % (field, propID))
                 self.lsstDB.addProposalField(self.sessionID, propID, field)
 		newfields += 1
             else:
                 if propID not in self.proposals[field]:
+		    self.computedVisibleNights[propID][field] = []
+
+                    self.visible[propID][field] = {}
+		    self.visibleTime[propID][field] = {}
+                    for filter in listOfFilters:
+                        self.visible[propID][field][filter] = {}
+			self.visibleTime[propID][field][filter] = 0
+
                     self.proposals[field].append(propID)
-                    #print ("    field=%4i new propID=%i" % (field, propID))
                     self.lsstDB.addProposalField(self.sessionID, propID, field)
 		    newprops += 1
+
 
 	print ("SchedulingData:: %4i new fields from propID=%4i" % (newfields, propID))
 	print ("SchedulingData:: %4i existing fields registered for propID=%4i" % (newprops, propID))
@@ -309,12 +311,9 @@ class SchedulingData (LSSTObject):
         listOfActiveFields = sorted(self.dictOfActiveFields.iterkeys())
 	print self.lookAhead_nights
         for n in self.lookAhead_nights:
-	    #print n
-	    #print self.lookAhead_times[n][0:3]
 	    computed = 0
 	    removed  = 0
 	    for field in listOfActiveFields:
-		#print self.computedNights[field]
 		if (n >= initNight):
 		    if n not in self.computedNights[field]:
 			(ra, dec) = self.dictOfActiveFields[field]
@@ -331,8 +330,22 @@ class SchedulingData (LSSTObject):
                                             	self.twilightProfile[n])
                             self.brightness[field][t] = br
 			    self.dist2moon[field][t] = dist2moon
+
                         self.computedNights[field].append(n)
                         computed += 1
+
+		    if propID in self.proposals[field]:
+			if n not in self.computedVisibleNights[propID][field]: 
+			    for t in self.lookAhead_times[n]:
+				if (self.airmass[field][t] < maxAirmass):
+		                    for filter in listOfFilters:
+					if (dictFilterMinBrig[filter] < self.brightness[field][t] < dictFilterMaxBrig[filter]):
+					    self.visible[propID][field][filter][t] = True
+					    self.visibleTime[propID][field][filter] += self.dt
+	                                else:
+	                                    self.visible[propID][field][filter][t] = False
+			    self.computedVisibleNights[propID][field].append(n)
+
 		else:
                     if n in self.computedNights[field]:
                         for t in self.lookAhead_times[n]:
@@ -342,6 +355,14 @@ class SchedulingData (LSSTObject):
                             del self.airmass[field][t]
                             del self.brightness[field][t]
 			    del self.dist2moon[field][t]
+			for prop in self.listOfProposals:
+			    if field in self.visible[prop].keys():
+				for filter in self.visible[prop][field].keys():
+				    for t in self.lookAhead_times[n]:
+					if self.visible[prop][field][filter][t]:
+					    self.visibleTime[prop][field][filter] -= self.dt
+					del self.visible[prop][field][filter][t]
+				self.computedVisibleNights[prop][field].remove(n)
                         self.computedNights[field].remove(n)
                         removed += 1
 
