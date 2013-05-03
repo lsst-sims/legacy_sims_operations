@@ -925,12 +925,12 @@ class Proposal (object):
 
         return
 
-    def addToSuggestList(self, observation, proximity):
+    def addToSuggestList(self, observation):#, proximity):
 
         # Compute an internal rank considering proximity and use it as
         # the sorting key to the heap.
-        rankProximity = self.maxProximityBonus/(proximity+0.1)/0.1
-        rankInternal  = observation.propRank + rankProximity
+#        rankProximity = self.maxProximityBonus/(proximity+0.1)/0.1
+        rankInternal  = observation.propRank# + rankProximity
        
 	# Add the relative proposal priority coefficient.
 	observation.propRank *= self.relativeProposalPriority
