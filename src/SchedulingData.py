@@ -147,7 +147,7 @@ class SchedulingData (LSSTObject):
     def updateLookAheadWindow(self):
 
 	lastnight = self.lookAhead_nights[-1]
-        nightsToAdd = 2*self.lookAheadNights - (lastnight - self.currentNight)
+        nightsToAdd = 2*self.lookAheadNights - (lastnight - self.currentNight) -1
 
 	self.lookAheadLastNight = lastnight + nightsToAdd
 
@@ -159,7 +159,7 @@ class SchedulingData (LSSTObject):
 	last_sunSetMJD  = sunSetMJD
 	last_sunSet     = sunSet
 	last_sunSetTwil = sunSetTwil
-	while ( (t < self.endTime) and (night < self.lookAheadLastNight) ):
+	while ( (last_sunSet < self.endTime) and (night < self.lookAheadLastNight) ):
 	    night += 1
             t += DAY
 	    x = self.sky.getIntTwilightSunriseSunset(t)
@@ -344,6 +344,9 @@ class SchedulingData (LSSTObject):
 					    self.visibleTime[propID][field][filter] += self.dt
 	                                else:
 	                                    self.visible[propID][field][filter][t] = False
+				else:
+				    for filter in listOfFilters:
+					self.visible[propID][field][filter][t] = False
 			    self.computedVisibleNights[propID][field].append(n)
 
 		else:
@@ -356,13 +359,15 @@ class SchedulingData (LSSTObject):
                             del self.brightness[field][t]
 			    del self.dist2moon[field][t]
 			for prop in self.listOfProposals:
-			    if field in self.visible[prop].keys():
-				for filter in self.visible[prop][field].keys():
-				    for t in self.lookAhead_times[n]:
-					if self.visible[prop][field][filter][t]:
-					    self.visibleTime[prop][field][filter] -= self.dt
-					del self.visible[prop][field][filter][t]
-				self.computedVisibleNights[prop][field].remove(n)
+			    if field in self.computedVisibleNights[prop].keys():
+				if n in self.computedVisibleNights[prop][field]:
+				    for filter in self.visible[prop][field].keys():
+#					print("prop=%i field=%i filter=%s" % (prop, field, filter))
+				        for t in self.lookAhead_times[n]:
+					    if self.visible[prop][field][filter][t]:
+					        self.visibleTime[prop][field][filter] -= self.dt
+						del self.visible[prop][field][filter][t]
+				    self.computedVisibleNights[prop][field].remove(n)
                         self.computedNights[field].remove(n)
                         removed += 1
 
