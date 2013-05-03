@@ -496,7 +496,7 @@ class WLprop (TransSubSeqProp):
         ##self.log.info("WL: updateTargetList:(entry:exit) mem: %d:%d resMem: %d:%d stack: %d:%d" % (m0,m1, r0,r1, s0,s1))
         #print("WL: updateTargetList:(entry:exit) mem: %d:%d resMem: %d:%d stack: %d:%d" % (m0,m1, r0,r1, s0,s1))
                                                                                                                             
-	self.schedulingData.updateTargets(self.targets, self.propID, dateProfile)
+	self.schedulingData.updateTargets(self.targets, self.propID, dateProfile, self.maxAirmass, self.FilterMinBrig, self.FilterMaxBrig)
 
         return (self.targets)
 
