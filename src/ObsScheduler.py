@@ -425,12 +425,12 @@ class ObsScheduler (LSSTObject):
           sortedFieldRaDec = []
 	  for aField in sorted(self.targets.iterkeys()):
             sortedFieldID.append(aField)
-            sortedFieldRaDec.append((self.targets[aField][0]*DEG2RAD, 
-                                     self.targets[aField][1]*DEG2RAD)) 
+#            sortedFieldRaDec.append((self.targets[aField][0]*DEG2RAD, 
+#                                     self.targets[aField][1]*DEG2RAD)) 
           # Second: build proximity array
-          (ra_RAD,dec_RAD) = self.telescope.GetCurrentTelescopePosition\
-                                                (dateProfile)
-          proximity = distance((ra_RAD,dec_RAD), sortedFieldRaDec)
+#          (ra_RAD,dec_RAD) = self.telescope.GetCurrentTelescopePosition\
+#                                                (dateProfile)
+#          proximity = distance((ra_RAD,dec_RAD), sortedFieldRaDec)
 
           totPotentialTargets = 0
 
@@ -444,7 +444,7 @@ class ObsScheduler (LSSTObject):
 #                                            self.moonProfile,
                                             self.numSuggObsPerProp, 
                                             sortedFieldID, 
-                                            proximity,
+#                                            proximity,
 #                                            self.targetProfiles,
 					    self.exclusiveObs,
 					    self.minDistance2Moon,
