@@ -293,7 +293,7 @@ class WeakLensingProp (Proposal):
 #                    moonProfile,
                     n=1,
                     skyfields=None, 
-                    proximity=None,
+#                    proximity=None,
 #                    targetProfiles=None,
 		    exclusiveObservation=None,
 		    minDistance2Moon=0.0,
@@ -367,7 +367,7 @@ class WeakLensingProp (Proposal):
         
         # Copy the input vars
         inFieldID = skyfields
-        inproximity = proximity
+#        inproximity = proximity
 #        intargetProfiles = targetProfiles
         (date,mjd,lst_RAD) = dateProfile
         (moonRA_RAD,moonDec_RAD,moonPhase_PERCENT) = self.schedulingData.moonProfile[sdnight]
@@ -406,7 +406,7 @@ class WeakLensingProp (Proposal):
 	    GlobalNeedFactor = (self.maxNeedAfterOverflow/(self.VisitsTonight-self.GoalVisitsTonight+1)) / self.GoalVisitsTonight
 
         for fieldID in listOfFieldsToEvaluate:
-            i = inFieldID.index(fieldID)
+#            i = inFieldID.index(fieldID)
             ra = self.targets[fieldID][0]
             dec = self.targets[fieldID][1]
 
@@ -528,7 +528,7 @@ class WeakLensingProp (Proposal):
 #                    recordFieldFilter.moonAlt = intargetProfiles[i][8]
                     recordFieldFilter.moonPhase = moonPhase_PERCENT
 
-                    self.addToSuggestList(recordFieldFilter, inproximity[i])
+                    self.addToSuggestList(recordFieldFilter)#, inproximity[i])
                 #print "WLRANK: f:%d am:%f see:%f brt:%f phs:%f dt:%d flt:%s rnk:%f" % (fieldID, airmass,filterSeeingList[filter],intargetProfiles[i][1],moonPhase, date, filter, rank)
 
         if self.log and self.verbose>0:
@@ -708,7 +708,7 @@ class WeakLensingProp (Proposal):
         ##self.log.info("WL: updateTargetList:(entry:exit) mem: %d:%d resMem: %d:%d stack: %d:%d" % (m0,m1, r0,r1, s0,s1))
         #print("WL: updateTargetList:(entry:exit) mem: %d:%d resMem: %d:%d stack: %d:%d" % (m0,m1, r0,r1, s0,s1))
 
-	self.schedulingData.updateTargets(fields, self.propID, dateProfile)
+	self.schedulingData.updateTargets(fields, self.propID, dateProfile, self.maxAirmass, self.FilterMinBrig, self.FilterMaxBrig)
 
         return (fields)
 

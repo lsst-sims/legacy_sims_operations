@@ -351,7 +351,7 @@ class TransSubSeqProp (Proposal):
 #                    moonProfile,
                     n=100,
                     skyfields=None,
-		    proximity=None, 
+#		    proximity=None, 
 #                    targetProfiles=None,
 		    exclusiveObservation=None,
 		    minDistance2Moon=0.0,
@@ -383,7 +383,7 @@ class TransSubSeqProp (Proposal):
             
         # Copy the input vars
         inFieldID = skyfields
-	inproximity = proximity
+#	inproximity = proximity
 #        intargetProfiles = targetProfiles
         (date,mjd,lst_RAD) = dateProfile
         (moonRA_RAD,moonDec_RAD,moonPhase_PERCENT) = self.schedulingData.moonProfile[sdnight]
@@ -408,7 +408,7 @@ class TransSubSeqProp (Proposal):
 		    subseq = self.exclusiveSubseq
 		    rank = 1.0
 
-                    i = inFieldID.index (fieldID)
+#                    i = inFieldID.index (fieldID)
 	            #airmass = self.schedulingData.airmass[fieldID][sdtime]
 
 		    filter = self.sequences[fieldID].GetNextFilter(subseq)
@@ -443,7 +443,7 @@ class TransSubSeqProp (Proposal):
                     recordFieldFilter.moonPhase		= self.exclusiveObs.moonPhase
                     recordFieldFilter.exclusiveBlockRequired = exclusiveBlockRequired
 
-                    self.addToSuggestList (recordFieldFilter, inproximity[i])
+                    self.addToSuggestList (recordFieldFilter)#, inproximity[i])
 	            return self.getSuggestList(1)
 
 		else:
@@ -688,7 +688,7 @@ class TransSubSeqProp (Proposal):
 		    del self.tonightTargets[fieldID]
 
 		for record in fieldRecordList:
-		    self.addToSuggestList (record, inproximity[i])
+		    self.addToSuggestList (record)#, inproximity[i])
 
             if self.log and self.verbose>0:
                 self.log.info('%sProp: suggestObs() propID=%d : Fields received=%i invisible=%i moon=%i Events nottonight=%i waiting=%i nofilter=%i noseeing=%i proposed=%i missed=%i Sequences lost=%i completed=%i' % (self.propFullName, self.propID, fields_received, fields_invisible, fields_moon, events_nottonight, events_waiting, events_nofilter, events_noseeing, events_proposed, events_missed, seq_lost, seq_completed))
