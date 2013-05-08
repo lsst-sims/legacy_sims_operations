@@ -288,13 +288,222 @@ class WeakLensingProp (Proposal):
 
 	return progressFilter
 
+
+    def rankAreaDistribution(self, listOfFieldsToEvaluate, sdnight, sdtime,
+			dateProfile, rawSeeing, seeing, transparency):
+
+        (date,mjd,lst_RAD) = dateProfile
+        (moonRA_RAD,moonDec_RAD,moonPhase_PERCENT) = self.schedulingData.moonProfile[sdnight]
+
+        fields_received   = len(listOfFieldsToEvaluate)
+        fields_invisible  = 0
+        fields_moon       = 0
+        ffilter_allowed   = 0
+        ffilter_badseeing = 0
+        ffilter_proposed  = 0
+
+        needTonight = self.GoalVisitsTonight - self.VisitsTonight
+        if needTonight > 0:
+            GlobalNeedFactor = float(needTonight) / self.GoalVisitsTonight
+        else:
+            GlobalNeedFactor = (self.maxNeedAfterOverflow/(self.VisitsTonight-self.GoalVisitsTonight+1)) / self.GoalVisitsTonight
+
+        for fieldID in listOfFieldsToEvaluate:
+            ra = self.targets[fieldID][0]
+            dec = self.targets[fieldID][1]
+
+            if (fieldID==self.last_observed_fieldID) and (self.last_observed_wasForThisProposal) and (not self.AcceptConsecutiveObs):
+                continue
+
+            #-----------------------------------------------------------
+            #       Field cuts
+            #-----------------------------------------------------------
+            # First, discard all the targets which are not visible right now.
+            airmass = self.schedulingData.airmass[fieldID][sdtime]
+            if airmass > self.maxAirmass :
+                fields_invisible += 1
+                if self.log and self.verbose>1 :
+                    self.log.info('TOSS: propID=%d field=%d  WeakLensingProp: suggestObs(): too low:%f' % (self.propID,fieldID,airmass))
+                continue
+
+            distance2moon = self.schedulingData.dist2moon[fieldID][sdtime]
+            if distance2moon < self.minDistance2Moon:
+                fields_moon += 1
+                # remove the target for the rest of the night if it is too close to the moon
+                del self.targets[fieldID]
+                continue
+
+            nVisits  = {}
+            progress = {}
+            progress_avg = 0.0
+            for filter in self.FilterNames:
+                try:
+                    nVisits[filter] = self.visits[filter][fieldID]
+                except:
+                    nVisits[filter] = 0.
+                progress[filter] = nVisits[filter] / self.GoalVisitsFieldFilter[filter]
+                progress_avg += min(progress[filter],1.0)/len(self.FilterNames)
+
+            FieldNeedFactor = 1.0 - progress_avg
+            if self.ProgressToStartBoost < progress_avg < 1.0:
+                FieldNeedFactor += self.MaxBoostToComplete*(progress_avg-self.ProgressToStartBoost)/(1.0-self.ProgressToStartBoost)
+
+            skyBrightness = self.schedulingData.brightness[fieldID][sdtime]
+            allowedFilterList = self.allowedFiltersForBrightness(skyBrightness)
+            filterSeeingList = self.filters.computeFilterSeeing(seeing,airmass)
+
+            for filter in allowedFilterList:
+                ffilter_allowed += 1
+                #-----------------------------------------------------------
+                #       Field/filter cuts
+                #-----------------------------------------------------------
+                if filterSeeingList[filter]  > self.FilterMaxSeeing[filter] :
+                    ffilter_badseeing += 1
+                    if self.log and self.verbose>1 :
+                        self.log.info('TOSS: propID=%d field=%d  filter=%s  WeakLensingProp: suggestObs(): bad seeing:%f' % (self.propID,fieldID,filter,filterSeeingList[filter]))
+                    continue
+
+                #-----------------------------------------------------------
+                #           Ranking
+                #-----------------------------------------------------------
+                # Assign the priority to the fields. The priority/rank is
+                # reflecting the fact that we want to end up observing in
+                # each filter with a given frequency (see above).
+
+                # The partial rank for this field/filter varies between
+                # 0 and 1. It is 0 if we already have self.filterVisits[filter]
+                # visits. It is 1 if we have no visit...
+                if GlobalNeedFactor > 0.0:
+                    if FieldNeedFactor > 0.0:
+                        if progress[filter] < 1.0:
+                            FilterNeedFactor = 1.0 - progress[filter]
+                            rank = self.scale * 0.5*(FieldNeedFactor + FilterNeedFactor) / GlobalNeedFactor
+                        else:
+                            rank = 0.0
+                    else:
+                        FilterNeedFactor = (self.maxNeedAfterOverflow/(nVisits[filter]-self.GoalVisitsFieldFilter[filter]+1)) / self.GoalVisitsFieldFilter[filter]
+                        rank = self.scale * FilterNeedFactor / GlobalNeedFactor
+                else:
+                    rank = 0.0
+
+                if (rank >0.0):
+                    ffilter_proposed += 1
+                    recordFieldFilter = self.obsPool[fieldID][filter]
+                    recordFieldFilter.date = date
+                    recordFieldFilter.mjd = mjd
+                    recordFieldFilter.night = sdnight
+                    recordFieldFilter.propRank = rank
+                    recordFieldFilter.rawSeeing = rawSeeing
+                    recordFieldFilter.seeing = filterSeeingList[filter]
+                    recordFieldFilter.transparency = transparency
+                    recordFieldFilter.airmass = airmass
+                    recordFieldFilter.skyBrightness = skyBrightness
+                    recordFieldFilter.filterSkyBright = 0.0
+                    recordFieldFilter.lst = lst_RAD
+                    recordFieldFilter.altitude = self.schedulingData.alt[fieldID][sdtime]
+                    recordFieldFilter.azimuth  = self.schedulingData.az[fieldID][sdtime]
+                    recordFieldFilter.parallactic = self.schedulingData.pa[fieldID][sdtime]
+                    recordFieldFilter.distance2moon = distance2moon
+                    recordFieldFilter.moonRA = moonRA_RAD
+                    recordFieldFilter.moonDec = moonDec_RAD
+                    recordFieldFilter.moonPhase = moonPhase_PERCENT
+
+                    self.addToSuggestList(recordFieldFilter)
+
+        if self.log and self.verbose>0:
+            self.log.info('%s: rankAreaDistribution propID=%d : Fields received=%i invisible=%i moon=%i Field-Filters allowed=%i badseeing=%i proposed=%i' % (self.propConf, self.propID, fields_received, fields_invisible, fields_moon, ffilter_allowed, ffilter_badseeing, ffilter_proposed))
+
+	return
+
+
+    def rankAreaDistributionWithLookAhead(self, listOfFieldsToEvaluate, sdnight, sdtime,
+		                        dateProfile, rawSeeing, seeing, transparency):
+
+        (date,mjd,lst_RAD) = dateProfile
+        (moonRA_RAD,moonDec_RAD,moonPhase_PERCENT) = self.schedulingData.moonProfile[sdnight]
+
+        fields_received   = len(listOfFieldsToEvaluate)
+        fields_invisible  = 0
+        fields_moon       = 0
+        ffilter_allowed   = 0
+        ffilter_badseeing = 0
+        ffilter_proposed  = 0
+	ffilter_notime    = 0
+	ffilter_noneed    = 0
+
+	maxTargetNeed = 0.0
+	listOfProposedTargets = []
+	for field in listOfFieldsToEvaluate:
+
+            if (field==self.last_observed_fieldID) and (self.last_observed_wasForThisProposal) and (not self.AcceptConsecutiveObs):
+                continue
+
+	    airmass = self.schedulingData.airmass[field][sdtime]
+	    distance2moon = self.schedulingData.dist2moon[field][sdtime]
+	    if (distance2moon < self.minDistance2Moon):
+                fields_moon += 1
+                # remove the target for the rest of the night if it is too close to the moon
+                del self.targets[field]
+		continue
+
+            filterSeeingList = self.filters.computeFilterSeeing(seeing, airmass)
+	    for filter in self.schedulingData.visible[self.propID][field].keys():
+		if self.schedulingData.visible[self.propID][field][filter][sdtime]:
+		    if (filterSeeingList[filter] > self.FilterMaxSeeing[filter]):
+			ffilter_badseeing += 1
+			continue
+
+		    availableTime = self.schedulingData.visibleTime[self.propID][field][filter]
+		    if (availableTime <= 0):
+			ffilter_notime += 1
+	                #del self.targets[field]
+			continue
+
+		    if field not in self.visits[filter].keys():
+			self.visits[filter][field] = 0
+		    targetNeed = (self.GoalVisitsFieldFilter[filter] - self.visits[filter][field]) / availableTime
+		    if (targetNeed <= 0.0):
+			ffilter_noneed += 1
+	                #del self.targets[field]
+			continue
+
+		    maxTargetNeed = max(targetNeed, maxTargetNeed)
+                    ffilter_proposed += 1
+                    recordFieldFilter = self.obsPool[field][filter]
+                    recordFieldFilter.date = date
+                    recordFieldFilter.mjd = mjd
+                    recordFieldFilter.night = sdnight
+                    recordFieldFilter.propRank = targetNeed
+                    recordFieldFilter.rawSeeing = rawSeeing
+                    recordFieldFilter.seeing = filterSeeingList[filter]
+                    recordFieldFilter.transparency = transparency
+                    recordFieldFilter.airmass = airmass
+                    recordFieldFilter.skyBrightness = self.schedulingData.brightness[field][sdtime]
+                    recordFieldFilter.filterSkyBright = 0.0
+                    recordFieldFilter.lst = lst_RAD
+                    recordFieldFilter.altitude = self.schedulingData.alt[field][sdtime]
+                    recordFieldFilter.azimuth  = self.schedulingData.az[field][sdtime]
+                    recordFieldFilter.parallactic = self.schedulingData.pa[field][sdtime]
+                    recordFieldFilter.distance2moon = distance2moon
+                    recordFieldFilter.moonRA = moonRA_RAD
+                    recordFieldFilter.moonDec = moonDec_RAD
+                    recordFieldFilter.moonPhase = moonPhase_PERCENT
+
+		    listOfProposedTargets.append(recordFieldFilter)
+
+	for target in listOfProposedTargets:
+	    target.propRank = target.propRank/maxTargetNeed
+            self.addToSuggestList(target)
+
+        if self.log and self.verbose>0:
+            self.log.info('%s: rankAreaDistributionWithLookAhead propID=%d : Fields received=%i moon=%i badseeing=%i notime=%i noneed=%i proposed=%i' % (self.propConf, self.propID, fields_received, fields_moon, ffilter_badseeing, ffilter_notime, ffilter_noneed, ffilter_proposed))
+
+	return
+
+
     def suggestObs (self, 
                     dateProfile, 
-#                    moonProfile,
                     n=1,
-                    skyfields=None, 
-#                    proximity=None,
-#                    targetProfiles=None,
 		    exclusiveObservation=None,
 		    minDistance2Moon=0.0,
 		    rawSeeing=0.0,
@@ -337,6 +546,8 @@ class WeakLensingProp (Proposal):
         if (self.log and self.verbose > 1):
            self.log.info('WeakLensingProp: suggestObs() propID=%d' %(self.propID))
 
+	self.minDistance2Moon = minDistance2Moon
+
         # If in an exclusive block, no new observation candidates. Return null.
 #        if (exclusiveObservation != None):
             # adjust counter for one obs
@@ -358,181 +569,13 @@ class WeakLensingProp (Proposal):
             listOfFieldsToEvaluate = sorted(self.targets.iterkeys())
             numberOfObsToPropose = n
 
-#        listOfFieldsToEvaluate = self.targets.keys()
-#	listOfFieldsToEvaluate = sorted(self.targets.iterkeys())
-#        numberOfObsToPropose = n
-
-        # Create a priority queue to choose the best n obs
         self.clearSuggestList()
         
-        # Copy the input vars
-        inFieldID = skyfields
-#        inproximity = proximity
-#        intargetProfiles = targetProfiles
-        (date,mjd,lst_RAD) = dateProfile
-        (moonRA_RAD,moonDec_RAD,moonPhase_PERCENT) = self.schedulingData.moonProfile[sdnight]
+##        self.rankAreaDistribution(listOfFieldsToEvaluate, sdnight, sdtime,
+ ##                               dateProfile, rawSeeing, seeing, transparency)
 
-        
-        # Get the number of times we observed in each field
-        # The idea here is to make sure that, over one year, we end up
-        # with a balanced set of observations. For the Weak Lensing
-        # proposal, we want to observe each field-filter combo approx.
-        # GOAL times/year. This means that we do not want to observe 
-        # each field-filter more than 6 times per lunation or once per
-        # night.
-        # numVisits is a dict of the form {filter: {fieldID: n}}
-#        visits = self.obsHistory.getNVisitsPerFilterField (self.propID,
-#                                    self.sessionID, fieldID=None)
-        
-
-        #..................   T o   D o  .................................
-        # Compute the normalization constant for SignalToNoise (SNR) ranking
-        #..................   T o   D o  .................................
-
-	fields_received   = len(listOfFieldsToEvaluate)
-	fields_invisible  = 0
-	fields_moon       = 0
-	ffilter_allowed   = 0
-	ffilter_badseeing = 0
-	ffilter_proposed  = 0
-
-        # Adjust the partial rank so that we end with 
-        # self.sumFieldFilterGoal for all field/filter combos
-        # Adjust the scaling
-	needTonight = self.GoalVisitsTonight - self.VisitsTonight
-	if needTonight > 0:
-	    GlobalNeedFactor = float(needTonight) / self.GoalVisitsTonight
-	else:
-	    GlobalNeedFactor = (self.maxNeedAfterOverflow/(self.VisitsTonight-self.GoalVisitsTonight+1)) / self.GoalVisitsTonight
-
-        for fieldID in listOfFieldsToEvaluate:
-#            i = inFieldID.index(fieldID)
-            ra = self.targets[fieldID][0]
-            dec = self.targets[fieldID][1]
-
-            if (fieldID==self.last_observed_fieldID) and (self.last_observed_wasForThisProposal) and (not self.AcceptConsecutiveObs):
-                continue
-                
-            #-----------------------------------------------------------
-            #       Field cuts
-            #-----------------------------------------------------------
-            # First, discard all the targets which are not visible right now.
-            airmass = self.schedulingData.airmass[fieldID][sdtime]
-            if airmass > self.maxAirmass :
-		fields_invisible += 1
-                if self.log and self.verbose>1 :
-                    self.log.info('TOSS: propID=%d field=%d  WeakLensingProp: suggestObs(): too low:%f' % (self.propID,fieldID,airmass))
-                #DBGprint "Toss: Field: %d ra:%f dec:%f am:%f > 5 " % (fieldID,ra,dec,airmass) 
-                continue
-
-	    distance2moon = self.schedulingData.dist2moon[fieldID][sdtime]
-            if distance2moon < minDistance2Moon:
-                fields_moon += 1
-		# remove the target for the rest of the night if it is too close to the moon
-		del self.targets[fieldID]
-                continue
-	
-	    nVisits  = {}
-	    progress = {}
-	    progress_avg = 0.0
-	    for filter in self.FilterNames:
-                try:
-                    nVisits[filter] = self.visits[filter][fieldID]
-                except:
-                    nVisits[filter] = 0.
-		progress[filter] = nVisits[filter] / self.GoalVisitsFieldFilter[filter]
-		progress_avg += min(progress[filter],1.0)/len(self.FilterNames)
-
-	    FieldNeedFactor = 1.0 - progress_avg
-	    if self.ProgressToStartBoost < progress_avg < 1.0:
-		FieldNeedFactor += self.MaxBoostToComplete*(progress_avg-self.ProgressToStartBoost)/(1.0-self.ProgressToStartBoost)
-
-            skyBrightness = self.schedulingData.brightness[fieldID][sdtime]
-            allowedFilterList = self.allowedFiltersForBrightness(skyBrightness)
-	    #self.log.info('%s brightness=%f allowedFilterList=%s' % (self.weakLensConf, skyBrightness, str(allowedFilterList)))
-            filterSeeingList = self.filters.computeFilterSeeing(seeing,airmass)
-            #print ".....field:%d ra:%f dec:%f am:%f phs:%f brite:%f" % (fieldID, ra,dec, airmass, moonPhase, intargetProfiles[i][1]) , filterSeeingList
-            
-            for filter in allowedFilterList:
-		ffilter_allowed += 1
-                #-----------------------------------------------------------
-                #       Field/filter cuts
-                #-----------------------------------------------------------
-                if filterSeeingList[filter]  > self.FilterMaxSeeing[filter] :
-		    ffilter_badseeing += 1
-                    #DBGprint "TOSS: fld:%d fltr:%s ra:%f dec%f airms:%f phs:%f  airAdjSee:%f > maxSee:%f" % (fieldID,filter,ra,dec,airmass,moonPhase,filterSeeingList[filter],self.FilterMaxSeeing[filter])
-                    if self.log and self.verbose>1 :
-                        self.log.info('TOSS: propID=%d field=%d  filter=%s  WeakLensingProp: suggestObs(): bad seeing:%f' % (self.propID,fieldID,filter,filterSeeingList[filter]))
-                    continue
-
-                #-----------------------------------------------------------
-                #           Ranking
-                #-----------------------------------------------------------
-                # Assign the priority to the fields. The priority/rank is
-                # reflecting the fact that we want to end up observing in
-                # each filter with a given frequency (see above).
-                    
-                # The partial rank for this field/filter varies between 
-                # 0 and 1. It is 0 if we already have self.filterVisits[filter] 
-                # visits. It is 1 if we have no visit...
-		if GlobalNeedFactor > 0.0:
-		    if FieldNeedFactor > 0.0:
-			if progress[filter] < 1.0:
-			    FilterNeedFactor = 1.0 - progress[filter]
-			    rank = self.scale * 0.5*(FieldNeedFactor + FilterNeedFactor) / GlobalNeedFactor
-			else:
-			    rank = 0.0
-		    else:
-			FilterNeedFactor = (self.maxNeedAfterOverflow/(nVisits[filter]-self.GoalVisitsFieldFilter[filter]+1)) / self.GoalVisitsFieldFilter[filter]
-		        rank = self.scale * FilterNeedFactor / GlobalNeedFactor
-		else:
-		    rank = 0.0
-
- 
-                if (rank >0.0):
-		    ffilter_proposed += 1
-                    #print "WeakLensing", intargetProfiles[i]
-                    # Edit corresponding Observation instance in self.obsPool
-                    recordFieldFilter = self.obsPool[fieldID][filter]
-                    #recordFieldFilter.sessionID = sessionID
-                    #recordFieldFilter.propID = propID
-                    #recordFieldFilter.fieldID = fieldID
-                    #recordFieldFilter.filter = filter
-                    #recordFieldFilter.seqn = seqn
-                    recordFieldFilter.date = date
-                    recordFieldFilter.mjd = mjd
-		    recordFieldFilter.night = sdnight
-                    #recordFieldFilter.exposureTime = exposureTime
-                    #recordFieldFilter.slewTime = slewTime
-                    #recordFieldFilter.rotatorSkyPos = 0.0
-                    #recordFieldFilter.rotatorTelPos = 0.0
-                    recordFieldFilter.propRank = rank
-                    #recordFieldFilter.finRank = finRank
-#                    recordFieldFilter.maxSeeing = self.FilterMaxSeeing[filter]
-                    recordFieldFilter.rawSeeing = rawSeeing
-                    recordFieldFilter.seeing = filterSeeingList[filter]
-                    recordFieldFilter.transparency = transparency
-#                    recordFieldFilter.cloudSeeing = intargetProfiles[i][4]
-                    recordFieldFilter.airmass = airmass
-                    recordFieldFilter.skyBrightness = skyBrightness
-		    recordFieldFilter.filterSkyBright = 0.0
-                    #recordFieldFilter.ra = ra
-                    #recordFieldFilter.dec = dec
-                    recordFieldFilter.lst = lst_RAD
-                    recordFieldFilter.altitude = self.schedulingData.alt[fieldID][sdtime]
-                    recordFieldFilter.azimuth  = self.schedulingData.az[fieldID][sdtime]
-                    recordFieldFilter.parallactic = self.schedulingData.pa[fieldID][sdtime]
-                    recordFieldFilter.distance2moon = distance2moon
-                    recordFieldFilter.moonRA = moonRA_RAD
-                    recordFieldFilter.moonDec = moonDec_RAD
-#                    recordFieldFilter.moonAlt = intargetProfiles[i][8]
-                    recordFieldFilter.moonPhase = moonPhase_PERCENT
-
-                    self.addToSuggestList(recordFieldFilter)#, inproximity[i])
-                #print "WLRANK: f:%d am:%f see:%f brt:%f phs:%f dt:%d flt:%s rnk:%f" % (fieldID, airmass,filterSeeingList[filter],intargetProfiles[i][1],moonPhase, date, filter, rank)
-
-        if self.log and self.verbose>0:
-	    self.log.info('%sProp: suggestObs() propID=%d : Fields received=%i invisible=%i moon=%i Field-Filters allowed=%i badseeing=%i proposed=%i' % (self.propFullName, self.propID, fields_received, fields_invisible, fields_moon, ffilter_allowed, ffilter_badseeing, ffilter_proposed))
+	self.rankAreaDistributionWithLookAhead(listOfFieldsToEvaluate, sdnight, sdtime,
+				dateProfile, rawSeeing, seeing, transparency)
 
         # Chose the n highest ranking observations
 #        self.reuseRanking = self.reuseRankingCount
