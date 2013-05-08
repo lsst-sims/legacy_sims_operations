@@ -142,6 +142,8 @@ class SchedulingData (LSSTObject):
 	for date in self.lookAhead_times[night]:
 	    self.dateProfile[date] = self.sky.computeDateProfile(date)
 
+	self.newMoonThreshold = 100.0
+
 	self.updateLookAheadWindow()
 
     def updateLookAheadWindow(self):
@@ -154,7 +156,7 @@ class SchedulingData (LSSTObject):
         night = lastnight
         t = self.midnight[night]
         x = self.sky.getIntTwilightSunriseSunset(t)
-        print x
+        #print x
         (sunRise,sunSet,sunRiseMJD,sunSetMJD,sunRiseTwil,sunSetTwil) = x
 	last_sunSetMJD  = sunSetMJD
 	last_sunSet     = sunSet
@@ -339,7 +341,9 @@ class SchedulingData (LSSTObject):
 			    for t in self.lookAhead_times[n]:
 				if (self.airmass[field][t] < maxAirmass):
 		                    for filter in listOfFilters:
-					if (dictFilterMinBrig[filter] < self.brightness[field][t] < dictFilterMaxBrig[filter]):
+					if (filter == "u") and (self.moonProfile[n][2] > self.newMoonThreshold):
+						self.visible[propID][field][filter][t] = False
+					elif (dictFilterMinBrig[filter] < self.brightness[field][t] < dictFilterMaxBrig[filter]):
 					    self.visible[propID][field][filter][t] = True
 					    self.visibleTime[propID][field][filter] += self.dt
 	                                else:
