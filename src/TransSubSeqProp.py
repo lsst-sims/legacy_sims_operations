@@ -350,7 +350,7 @@ class TransSubSeqProp (Proposal):
                     dateProfile, 
 #                    moonProfile,
                     n=100,
-                    skyfields=None,
+#                    skyfields=None,
 #		    proximity=None, 
 #                    targetProfiles=None,
 		    exclusiveObservation=None,
@@ -382,7 +382,7 @@ class TransSubSeqProp (Proposal):
            self.log.info('%sProp: suggestObs() propID=%d' %(self.propFullName, self.propID))
             
         # Copy the input vars
-        inFieldID = skyfields
+#        inFieldID = skyfields
 #	inproximity = proximity
 #        intargetProfiles = targetProfiles
         (date,mjd,lst_RAD) = dateProfile
@@ -499,7 +499,7 @@ class TransSubSeqProp (Proposal):
 
                 ra = self.tonightTargets[fieldID][0]
                 dec = self.tonightTargets[fieldID][1]
-                i = inFieldID.index (fieldID)
+#                i = inFieldID.index (fieldID)
 
 		if (fieldID==self.last_observed_fieldID) and (self.last_observed_wasForThisProposal) and (not self.AcceptConsecutiveObs):
 		    continue
