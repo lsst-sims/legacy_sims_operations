@@ -158,6 +158,7 @@ class ObsScheduler (LSSTObject):
 	self.NewMoonPhaseThreshold = float(config_dict["NewMoonPhaseThreshold"])
 	self.NminFiltersToSwap = int(config_dict["NminFiltersToSwap"])
         self.NmaxFiltersToSwap = int(config_dict["NmaxFiltersToSwap"])
+	self.schedulingData.newMoonThreshold = self.NewMoonPhaseThreshold
 
 	try:
 	    self.minDistance2Moon = float(config_dict["MinDistance2Moon"])*DEG2RAD
@@ -421,10 +422,10 @@ class ObsScheduler (LSSTObject):
           # Build proximity array betwn cur tel position & potential fields
           # first: build FieldPosition (peerFields) list ordered identically 
           #   to FieldID (targets) list
-          sortedFieldID = []
-          sortedFieldRaDec = []
-	  for aField in sorted(self.targets.iterkeys()):
-            sortedFieldID.append(aField)
+#          sortedFieldID = []
+#          sortedFieldRaDec = []
+#	  for aField in sorted(self.targets.iterkeys()):
+#            sortedFieldID.append(aField)
 #            sortedFieldRaDec.append((self.targets[aField][0]*DEG2RAD, 
 #                                     self.targets[aField][1]*DEG2RAD)) 
           # Second: build proximity array
@@ -443,7 +444,7 @@ class ObsScheduler (LSSTObject):
             targetObs = proposal.suggestObs(self.dateProfile,
 #                                            self.moonProfile,
                                             self.numSuggObsPerProp, 
-                                            sortedFieldID, 
+#                                            sortedFieldID, 
 #                                            proximity,
 #                                            self.targetProfiles,
 					    self.exclusiveObs,
