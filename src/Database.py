@@ -138,11 +138,19 @@ class Database :
             oSession.sessionDate = sessionDate
             oSession.version = version
             oSession.runComment = runComment
-            self.dbSession.add(oSession)
-            self.dbSession.commit()
-            self.dbSession.refresh(oSession)
+            #self.dbSession.add(oSession)
+            #self.dbSession.commit()
+            #self.dbSession.refresh(oSession)
+            ins = self.opsim_session.insert().values(sessionUser=oSession.sessionUser,
+                                                     sessionHost=oSession.sessionHost,
+                                                     sessionDate=oSession.sessionDate,
+                                                     version=oSession.version,
+                                                     runComment=oSession.runComment)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
+            oSession.sessionID = result.inserted_primary_key[0]
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
         return oSession
 
@@ -156,10 +164,19 @@ class Database :
             oConfig.paramName = paramName
             oConfig.paramValue = paramValue
             oConfig.comment = comment
-            self.dbSession.add(oConfig)
-            self.dbSession.commit()
+            #self.dbSession.add(oConfig)
+            #self.dbSession.commit()
+            ins = self.opsim_config.insert().values(Session_sessionID=oConfig.Session_sessionID,
+                                                    nonPropID=oConfig.nonPropID,
+                                                    moduleName=oConfig.moduleName,
+                                                    paramIndex=oConfig.paramIndex,
+                                                    paramName=oConfig.paramName,
+                                                    paramValue=oConfig.paramValue,
+                                                    comment=oConfig.comment)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
     
     def addTimeHistory(self, sessionID, date, mjd, nightCnt, event) :
@@ -170,10 +187,17 @@ class Database :
             oTimeHistory.night = nightCnt
             oTimeHistory.event = event
             oTimeHistory.Session_sessionID = sessionID
-            self.dbSession.add(oTimeHistory)
-            self.dbSession.commit()
+            #self.dbSession.add(oTimeHistory)
+            #self.dbSession.commit()
+            ins = self.opsim_timehistory.insert().values(Session_sessionID=oTimeHistory.Session_sessionID,
+                                                         date=oTimeHistory.date,
+                                                         mjd=oTimeHistory.mjd,
+                                                         night=oTimeHistory.night,
+                                                         event=oTimeHistory.event)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
 
     def addProposal(self, propConf, propName, sessionID, objectID, objectHost) :
@@ -184,11 +208,19 @@ class Database :
             oProposal.Session_sessionID = sessionID
             oProposal.objectID = objectID
             oProposal.objectHost = objectHost
-            self.dbSession.add(oProposal)
-            self.dbSession.commit()
-            self.dbSession.refresh(oProposal)
+            #self.dbSession.add(oProposal)
+            #self.dbSession.commit()
+            #self.dbSession.refresh(oProposal)
+            ins = self.opsim_proposal.insert().values(propConf=oProposal.propConf,
+                                                      propName=oProposal.propName,
+                                                      Session_sessionID=oProposal.Session_sessionID,
+                                                      objectID=oProposal.objectID,
+                                                      objectHost=oProposal.objectHost)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
+            oProposal.propID = result.inserted_primary_key[0]
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
         return oProposal
 
@@ -218,10 +250,15 @@ class Database :
             oConfigFile.filename = filename
             oConfigFile.data = data
             oConfigFile.Session_sessionID = sessionID
-            self.dbSession.add(oConfigFile)
-            self.dbSession.commit()
+            #self.dbSession.add(oConfigFile)
+            #self.dbSession.commit()
+            ins = self.opsim_config.insert().values(filename=oConfigFile.filename,
+                                                    data=oConfigFile.data,
+                                                    Session_sessionID=oConfigFile.Session_sessionID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
 
     def addLog(self, log_name, log_value, sessionID):
@@ -230,10 +267,15 @@ class Database :
             oLog.log_name = log_name
             oLog.log_value = log_value
             oLog.Session_sessionID = sessionID;
-            self.dbSession.add(oLog)
-            self.dbSession.commit()
+            #self.dbSession.add(oLog)
+            #self.dbSession.commit()
+            ins = self.opsim_log.insert().values(log_name=oLog.log_name,
+                                                 log_value=oLog.log_value,
+                                                 Session_sessionID=oLog.Session_sessionID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
 
     def addProposalField(self, sessionID, propID, fieldID):
@@ -242,10 +284,15 @@ class Database :
             oPropField.Session_sessionID = sessionID
             oPropField.Proposal_propID = propID
             oPropField.Field_fieldID = fieldID
-            self.dbSession.add(oPropField)
-            self.dbSession.commit()
+            #self.dbSession.add(oPropField)
+            #self.dbSession.commit()
+            ins = self.opsim_proposal_field.insert().values(Session_sessionID=oPropField.Session_sessionID,
+                                                            Proposal_propID=oPropField.Proposal_propID,
+                                                            Field_fieldID=oPropField.Field_fieldID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
 
     def addSeqHistory(self, startDate, expDate, seqnNum, completion, reqEvents, actualEvents,
@@ -263,11 +310,25 @@ class Database :
             oSeqHistory.Field_fieldID = fieldID
             oSeqHistory.Session_sessionID = sessionID
             oSeqHistory.Proposal_propID = propID
-            self.dbSession.add(oSeqHistory)
-            self.dbSession.commit()
-            self.dbSession.refresh(oSeqHistory)
+            #self.dbSession.add(oSeqHistory)
+            #self.dbSession.commit()
+            #self.dbSession.refresh(oSeqHistory)
+            ins = self.opsim_seqhistory.insert().values(startDate=oSeqHistory.startDate,
+                                                        expDate=oSeqHistory.expDate,
+                                                        seqnNum=oSeqHistory.seqnNum,
+                                                        completion=oSeqHistory.completion,
+                                                        reqEvents=oSeqHistory.reqEvents,
+                                                        actualEvents=oSeqHistory.actualEvents,
+                                                        endStatus=oSeqHistory.endStatus,
+                                                        parent_sequenceID=oSeqHistory.parent_sequenceID,
+                                                        Field_fieldID=oSeqHistory.Field_fieldID,
+                                                        Session_sessionID=oSeqHistory.Session_sessionID,
+                                                        Proposal_propID=oSeqHistory.Proposal_propID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
+            oSeqHistory.sequenceID = result.inserted_primary_key[0]
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
         return oSeqHistory
 
@@ -277,10 +338,15 @@ class Database :
             oSeqHistoryObsHistory.SeqHistory_sequenceID = sequenceID
             oSeqHistoryObsHistory.ObsHistory_obsHistID = obsHistID
             oSeqHistoryObsHistory.ObsHistory_Session_sessionID = sessionID
-            self.dbSession.add(oSeqHistoryObsHistory)
-            self.dbSession.commit()
+            #self.dbSession.add(oSeqHistoryObsHistory)
+            #self.dbSession.commit()
+            ins = self.opsim_seqhistory_obshistory.insert().values(SeqHistory_sequenceID=oSeqHistoryObsHistory.SeqHistory_sequenceID,
+                                                                   ObsHistory_obsHistID=oSeqHistoryObsHistory.ObsHistory_obsHistID,
+                                                                   ObsHistory_Session_sessionID=oSeqHistoryObsHistory.ObsHistory_Session_sessionID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
 
     def addSeqHistoryMissedHistory(self, sequenceID, missedHistID, sessionID):
@@ -289,10 +355,15 @@ class Database :
             oSeqHistoryMissedHistory.SeqHistory_sequenceID = sequenceID
             oSeqHistoryMissedHistory.MissedHistory_missedHistID = missedHistID
             oSeqHistoryMissedHistory.MissedHistory_Session_sessionID = sessionID
-            self.dbSession.add(oSeqHistoryMissedHistory)
-            self.dbSession.commit()
+            #self.dbSession.add(oSeqHistoryMissedHistory)
+            #self.dbSession.commit()
+            ins = self.opsim_seqhistory_missedhistory.insert().values(SeqHistory_sequenceID=oSeqHistoryMissedHistory.SeqHistory_sequenceID,
+                                                                      MissedHistory_missedHistID=oSeqHistoryMissedHistory.MissedHistory_missedHistID,
+                                                                      MissedHistory_Session_sessionID=oSeqHistoryMissedHistory.MissedHistory_Session_sessionID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
 
     def addObsHistoryProposal(self, propID, obsHistID, sessionID, propRank):
@@ -302,10 +373,16 @@ class Database :
             oObsHistoryProposal.ObsHistory_obsHistID = obsHistID
             oObsHistoryProposal.ObsHistory_Session_sessionID = sessionID
             oObsHistoryProposal.propRank = propRank
-            self.dbSession.add(oObsHistoryProposal)
-            self.dbSession.commit()
+            #self.dbSession.add(oObsHistoryProposal)
+            #self.dbSession.commit()
+            ins = self.opsim_obshistory_proposal.insert().values(Proposal_propID=oObsHistoryProposal.Proposal_propID,
+                                                                 ObsHistory_obsHistID=oObsHistoryProposal.ObsHistory_obsHistID,
+                                                                 ObsHistory_Session_sessionID=oObsHistoryProposal.ObsHistory_Session_sessionID,
+                                                                 propRank=oObsHistoryProposal.propRank)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
 
     def addMissedObservation(self, filter, expDate, expMJD, night, lst, sessionID, fieldID):
@@ -318,11 +395,21 @@ class Database :
             oMissed.lst = lst
             oMissed.Session_sessionID = sessionID
             oMissed.Field_fieldID = fieldID
-            self.dbSession.add(oMissed)
-            self.dbSession.commit()
-            self.dbSession.refresh(oMissed)
+            #self.dbSession.add(oMissed)
+            #self.dbSession.commit()
+            #self.dbSession.refresh(oMissed)
+            ins = self.opsim_missedhistory.insert().values(filter=oMissed.filter,
+                                                           expDate=oMissed.expDate,
+                                                           expMJD=oMissed.expMJD,
+                                                           night=oMissed.night,
+                                                           lst=oMissed.lst,
+                                                           Session_sessionID=oMissed.Session_sessionID,
+                                                           Field_fieldID=oMissed.Field_fieldID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
+            oMissed.missedHistID = result.inserted_primary_key[0]
         except:
-            self.dbSEssion.rollback()
+            #self.dbSEssion.rollback()
             raise
         return oMissed
 
@@ -370,10 +457,49 @@ class Database :
             oObs.humidity = humidity            
             oObs.Session_sessionID = sessionID
             oObs.Field_fieldID = fieldID
-            self.dbSession.add(oObs)
-            self.dbSession.commit()
+            #self.dbSession.add(oObs)
+            #self.dbSession.commit()
+            ins = self.opsim_obshistory.insert().values(obsHistID=oObs.obsHistID,
+                                                        filter=oObs.filter,
+                                                        expDate=oObs.expDate,
+                                                        expMJD=oObs.expMJD,
+                                                        night=oObs.night,
+                                                        visitTime=oObs.visitTime,
+                                                        visitExpTime=oObs.visitExpTime,
+                                                        finRank=oObs.finRank,
+                                                        finSeeing=oObs.finSeeing,
+                                                        transparency=oObs.transparency,
+                                                        airmass=oObs.airmass,
+                                                        vSkyBright=oObs.vSkyBright,
+                                                        filtSkyBright=oObs.filtSkyBright,
+                                                        rotSkyPos=oObs.rotSkyPos,
+                                                        lst=oObs.lst,
+                                                        alt=oObs.alt,
+                                                        az=oObs.az,
+                                                        dist2Moon=oObs.dist2Moon,
+                                                        solarElong=oObs.solarElong,
+                                                        moonRA=oObs.moonRA,
+                                                        moonDec=oObs.moonDec,
+                                                        moonAlt=oObs.moonAlt,
+                                                        moonAZ=oObs.moonAZ,
+                                                        moonPhase=oObs.moonPhase,
+                                                        sunAlt=oObs.sunAlt,
+                                                        sunAZ=oObs.sunAZ,
+                                                        phaseAngle=oObs.phaseAngle,
+                                                        rScatter=oObs.rScatter,
+                                                        mieScatter=oObs.mieScatter,
+                                                        moonIllum=oObs.moonIllum,
+                                                        moonBright=oObs.moonBright,
+                                                        darkBright=oObs.darkBright,
+                                                        rawSeeing=oObs.rawSeeing,
+                                                        wind=oObs.wind,
+                                                        humidity=oObs.humidity,
+                                                        Session_sessionID=oObs.Session_sessionID,
+                                                        Field_fieldID=oObs.Field_fieldID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
         return oObs
 
@@ -387,9 +513,19 @@ class Database :
             oSlewHist.slewDist = slewDist
             oSlewHist.ObsHistory_obsHistID = obsHistID
             oSlewHist.ObsHistory_Session_sessionID = sessionID
-            self.dbSession.add(oSlewHist)
-            self.dbSession.commit()
-            self.dbSession.refresh(oSlewHist)
+            #self.dbSession.add(oSlewHist)
+            #self.dbSession.commit()
+            #self.dbSession.refresh(oSlewHist)
+            ins = self.opsim_slewhistory.insert().values(slewCount=oSlewHist.slewCount,
+                                                         startDate=oSlewHist.startDate,
+                                                         endDate=oSlewHist.endDate,
+                                                         slewTime=oSlewHist.slewTime,
+                                                         slewDist=oSlewHist.slewDist,
+                                                         ObsHistory_obsHistID=oSlewHist.ObsHistory_obsHistID,
+                                                         ObsHistory_Session_sessionID=oSlewHist.ObsHistory_Session_sessionID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
+            oSlewHist.slewID = result.inserted_primary_key[0]
         except:
             self.dbSession.rollback()
             raise
@@ -402,10 +538,16 @@ class Database :
             oSlewAct.actDelay = actDelay
             oSlewAct.inCriticalPath = inCriticalPath
             oSlewAct.SlewHistory_slewID = slewID
-            self.dbSession.add(oSlewAct)
-            self.dbSession.commit()
+            #self.dbSession.add(oSlewAct)
+            #self.dbSession.commit()
+            ins = self.opsim_slewactivities.insert().values(activity=oSlewAct.activity,
+                                                            actDelay=oSlewAct.actDelay,
+                                                            inCriticalPath=oSlewAct.inCriticalPath,
+                                                            SlewHistory_slewID=oSlewAct.SlewHistory_slewID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
 
     def addSlewMaxSpeeds(self, domAltSpd, domAzSpd, telAltSpd, telAzSpd, rotSpd, slewID):
@@ -417,10 +559,18 @@ class Database :
             oSlewMaxSpeed.telAzSpd = telAzSpd
             oSlewMaxSpeed.rotSpd = rotSpd
             oSlewMaxSpeed.SlewHistory_slewID = slewID
-            self.dbSession.add(oSlewMaxSpeed)
-            self.dbSession.commit()
+            #self.dbSession.add(oSlewMaxSpeed)
+            #self.dbSession.commit()
+            ins = self.opsim_slewmaxspeeds.insert().values(domAltSpd=oSlewMaxSpeed.domAltSpd,
+                                                           domAzSpd=oSlewMaxSpeed.domAzSpd,
+                                                           telAltSpd=oSlewMaxSpeed.telAltSpd,
+                                                           telAzSpd=oSlewMaxSpeed.telAzSpd,
+                                                           rotSpd=oSlewMaxSpeed.rotSpd,
+                                                           SlewHistory_slewID=oSlewMaxSpeed.SlewHistory_slewID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
 
     def addSlewState(self, slewStateDate, tra, tdec, tracking, alt, az, pa, domAlt,
@@ -442,10 +592,27 @@ class Database :
             oSlewState.filter = filter
             oSlewState.state = state
             oSlewState.SlewHistory_slewID = slewID
-            self.dbSession.add(oSlewState)
-            self.dbSession.commit()
+            #self.dbSession.add(oSlewState)
+            #self.dbSession.commit()
+            ins = self.opsim_slewstate.insert().values(slewStateDate=oSlewState.slewStateDate,
+                                                       tra=oSlewState.tra,
+                                                       tdec=oSlewState.tdec,
+                                                       tracking=oSlewState.tracking,
+                                                       alt=oSlewState.alt,
+                                                       az=oSlewState.az,
+                                                       pa=oSlewState.pa,
+                                                       domAlt=oSlewState.domAlt,
+                                                       domAz=oSlewState.domAz,
+                                                       telAlt=oSlewState.telAlt,
+                                                       telAz=oSlewState.telAz,
+                                                       rotTelPos=oSlewState.rotTelPos,
+                                                       filter=oSlewState.filter,
+                                                       state=oSlewState.state,
+                                                       SlewHistory_slewID=oSlewState.SlewHistory_slewID)
+            conn = self.engine.connect()
+            result = conn.execute(ins)
         except:
-            self.dbSession.rollback()
+            #self.dbSession.rollback()
             raise
 
     def addOlap(self, olapTable, id, fov, ra, dec, gl, gb, el, eb) :
