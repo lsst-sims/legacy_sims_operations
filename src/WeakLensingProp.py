@@ -81,6 +81,12 @@ class WeakLensingProp (Proposal):
         config, pairs = readConfFile (weakLensConf)
         
         self.nextNight = 0
+
+        try:
+            self.useLookAhead = config['UseLookAhead']
+        except:
+            self.useLookAhead = False
+
         try:
             self.maxAirmass = config['MaxAirmass']
         except:
@@ -570,11 +576,12 @@ class WeakLensingProp (Proposal):
             numberOfObsToPropose = n
 
         self.clearSuggestList()
-        
-##        self.rankAreaDistribution(listOfFieldsToEvaluate, sdnight, sdtime,
- ##                               dateProfile, rawSeeing, seeing, transparency)
 
-	self.rankAreaDistributionWithLookAhead(listOfFieldsToEvaluate, sdnight, sdtime,
+	if self.useLookAhead:
+	    self.rankAreaDistributionWithLookAhead(listOfFieldsToEvaluate, sdnight, sdtime,
+				dateProfile, rawSeeing, seeing, transparency)
+	else:
+	    self.rankAreaDistribution(listOfFieldsToEvaluate, sdnight, sdtime,
 				dateProfile, rawSeeing, seeing, transparency)
 
         # Chose the n highest ranking observations
