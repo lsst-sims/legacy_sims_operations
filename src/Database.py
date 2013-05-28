@@ -371,7 +371,7 @@ class Database :
 
             sql = 'select missedHistID from MissedHistory where '
             sql += 'filter="%s" and ' % (filter)
-            sql += 'expDate=%d" and ' % (expDate)
+            sql += 'expDate=%d and ' % (expDate)
             sql += 'Field_fieldID=%d and ' % (fieldID)
             sql += 'Session_sessionID=%d' % (sessionID)
             (n, res) = self.executeSQL (sql)
