@@ -3,7 +3,7 @@ As root
 
 mysql> drop schema OpsimDB;
 mysql> source v3_0.sql;
-mysql> grant all privileges on LSST.* to 'www'@'localhost' identified by 'zxcvbnm' with grant option;
+mysql> grant all privileges on OpsimDB.* to 'www'@'localhost' identified by 'zxcvbnm' with grant option;
 mysql> flush privileges;
 mysql> exit;
 

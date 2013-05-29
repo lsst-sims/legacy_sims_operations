@@ -20,7 +20,7 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Session` (
   `runComment` VARCHAR(200) NULL DEFAULT NULL COMMENT 'user startup comment' ,
   PRIMARY KEY (`sessionID`) ,
   UNIQUE INDEX `s_host_user_date_idx` (`sessionUser` ASC, `sessionHost` ASC, `sessionDate` ASC) )
-ENGINE = InnoDB;
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -38,13 +38,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Config` (
   `Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   `nonPropID` INT(10) NULL ,
   PRIMARY KEY (`configID`) ,
-  INDEX `fk_config_session_idx` (`Session_sessionID` ASC) ,
-  CONSTRAINT `fk_config_session`
-    FOREIGN KEY (`Session_sessionID` )
-    REFERENCES `OpsimDB`.`Session` (`sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_config_session_idx` (`Session_sessionID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -66,7 +61,7 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Field` (
   UNIQUE INDEX `fov_gl_gb` (`fieldFov` ASC, `fieldGL` ASC, `fieldGB` ASC) ,
   UNIQUE INDEX `fov_el_eb` (`fieldFov` ASC, `fieldEL` ASC, `fieldEB` ASC) ,
   UNIQUE INDEX `fov_ra_dec` (`fieldFov` ASC, `fieldRA` ASC, `fieldDec` ASC) )
-ENGINE = InnoDB;
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -115,18 +110,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`ObsHistory` (
   PRIMARY KEY (`obsHistID`, `Session_sessionID`) ,
   INDEX `oh_field_filter_idx` (`filter` ASC) ,
   INDEX `fk_Obshistory_Session1_idx` (`Session_sessionID` ASC) ,
-  INDEX `fk_Obshistory_Field1_idx` (`Field_fieldID` ASC) ,
-  CONSTRAINT `fk_Obshistory_Session1`
-    FOREIGN KEY (`Session_sessionID` )
-    REFERENCES `OpsimDB`.`Session` (`sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Obshistory_Field1`
-    FOREIGN KEY (`Field_fieldID` )
-    REFERENCES `OpsimDB`.`Field` (`fieldID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_Obshistory_Field1_idx` (`Field_fieldID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -142,13 +127,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Proposal` (
   `objectHost` VARCHAR(80) NOT NULL COMMENT 'hostname for proposal object instance' ,
   `Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   PRIMARY KEY (`propID`) ,
-  INDEX `fk_Proposal_Session1_idx` (`Session_sessionID` ASC) ,
-  CONSTRAINT `fk_Proposal_Session1`
-    FOREIGN KEY (`Session_sessionID` )
-    REFERENCES `OpsimDB`.`Session` (`sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_Proposal_Session1_idx` (`Session_sessionID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -172,23 +152,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`SeqHistory` (
   PRIMARY KEY (`sequenceID`) ,
   INDEX `fk_SeqHistory_Field1_idx` (`Field_fieldID` ASC) ,
   INDEX `fk_SeqHistory_Session1_idx` (`Session_sessionID` ASC) ,
-  INDEX `fk_SeqHistory_Proposal1_idx` (`Proposal_propID` ASC) ,
-  CONSTRAINT `fk_SeqHistory_Field1`
-    FOREIGN KEY (`Field_fieldID` )
-    REFERENCES `OpsimDB`.`Field` (`fieldID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_SeqHistory_Session1`
-    FOREIGN KEY (`Session_sessionID` )
-    REFERENCES `OpsimDB`.`Session` (`sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_SeqHistory_Proposal1`
-    FOREIGN KEY (`Proposal_propID` )
-    REFERENCES `OpsimDB`.`Proposal` (`propID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_SeqHistory_Proposal1_idx` (`Proposal_propID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -206,13 +171,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`SlewHistory` (
   `ObsHistory_obsHistID` INT(10) UNSIGNED NOT NULL ,
   `ObsHistory_Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   PRIMARY KEY (`slewID`) ,
-  INDEX `fk_SlewHistory_ObsHistory1_idx` (`ObsHistory_obsHistID` ASC, `ObsHistory_Session_sessionID` ASC) ,
-  CONSTRAINT `fk_SlewHistory_ObsHistory1`
-    FOREIGN KEY (`ObsHistory_obsHistID` , `ObsHistory_Session_sessionID` )
-    REFERENCES `OpsimDB`.`ObsHistory` (`obsHistID` , `Session_sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_SlewHistory_ObsHistory1_idx` (`ObsHistory_obsHistID` ASC, `ObsHistory_Session_sessionID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -227,13 +187,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`SlewActivities` (
   `inCriticalPath` VARCHAR(16) NOT NULL COMMENT 'bool, is this activity in the critical path of the total slew delay?' ,
   `SlewHistory_slewID` BIGINT(20) NOT NULL ,
   PRIMARY KEY (`slewActivityID`) ,
-  INDEX `fk_SlewActivities_SlewHistory1_idx` (`SlewHistory_slewID` ASC) ,
-  CONSTRAINT `fk_SlewActivities_SlewHistory1`
-    FOREIGN KEY (`SlewHistory_slewID` )
-    REFERENCES `OpsimDB`.`SlewHistory` (`slewID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
+  INDEX `fk_SlewActivities_SlewHistory1_idx` (`SlewHistory_slewID` ASC) )
+ENGINE = MyISAM
 MAX_ROWS = 4000000000;
 
 
@@ -260,13 +215,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`SlewState` (
   `state` INT(10) NOT NULL ,
   `SlewHistory_slewID` BIGINT(20) NOT NULL ,
   PRIMARY KEY (`slewIniStatID`) ,
-  INDEX `fk_SlewState_SlewHistory1_idx` (`SlewHistory_slewID` ASC) ,
-  CONSTRAINT `fk_SlewState_SlewHistory1`
-    FOREIGN KEY (`SlewHistory_slewID` )
-    REFERENCES `OpsimDB`.`SlewHistory` (`slewID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_SlewState_SlewHistory1_idx` (`SlewHistory_slewID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -283,13 +233,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`SlewMaxSpeeds` (
   `rotSpd` FLOAT NOT NULL COMMENT 'absolute Rotator Angle maximum speed radians/sec' ,
   `SlewHistory_slewID` BIGINT(20) NOT NULL ,
   PRIMARY KEY (`slewMaxSpeedID`) ,
-  INDEX `fk_SlewMaxSpeeds_SlewHistory1_idx` (`SlewHistory_slewID` ASC) ,
-  CONSTRAINT `fk_SlewMaxSpeeds_SlewHistory1`
-    FOREIGN KEY (`SlewHistory_slewID` )
-    REFERENCES `OpsimDB`.`SlewHistory` (`slewID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_SlewMaxSpeeds_SlewHistory1_idx` (`SlewHistory_slewID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -306,13 +251,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`TimeHistory` (
   `Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   PRIMARY KEY (`timeHistID`) ,
   INDEX `th_sessID_event_idx` (`event` ASC) ,
-  INDEX `fk_TimeHistory_Session1_idx` (`Session_sessionID` ASC) ,
-  CONSTRAINT `fk_TimeHistory_Session1`
-    FOREIGN KEY (`Session_sessionID` )
-    REFERENCES `OpsimDB`.`Session` (`sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_TimeHistory_Session1_idx` (`Session_sessionID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -327,18 +267,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`ObsHistory_Proposal` (
   `ObsHistory_obsHistID` INT(10) UNSIGNED NOT NULL ,
   `ObsHistory_Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   PRIMARY KEY (`obsHistory_propID`) ,
-  INDEX `fk_ObsHistory_Proposal_ObsHistory1_idx` (`ObsHistory_obsHistID` ASC, `ObsHistory_Session_sessionID` ASC) ,
-  CONSTRAINT `fk_ObsHistory_Proposal_Proposal1`
-    FOREIGN KEY (`Proposal_propID` )
-    REFERENCES `OpsimDB`.`Proposal` (`propID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ObsHistory_Proposal_ObsHistory1`
-    FOREIGN KEY (`ObsHistory_obsHistID` , `ObsHistory_Session_sessionID` )
-    REFERENCES `OpsimDB`.`ObsHistory` (`obsHistID` , `Session_sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_ObsHistory_Proposal_ObsHistory1_idx` (`ObsHistory_obsHistID` ASC, `ObsHistory_Session_sessionID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -351,7 +281,7 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Cloud` (
   `c_date` BIGINT(20) NOT NULL ,
   `cloud` FLOAT NOT NULL ,
   PRIMARY KEY (`cloudID`) )
-ENGINE = InnoDB;
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -364,7 +294,7 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Seeing` (
   `s_date` BIGINT(20) NOT NULL ,
   `seeing` FLOAT NOT NULL ,
   PRIMARY KEY (`seeingID`) )
-ENGINE = InnoDB;
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -378,13 +308,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Log` (
   `log_value` VARCHAR(512) NOT NULL ,
   `Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   PRIMARY KEY (`logID`) ,
-  INDEX `fk_Log_Session1_idx` (`Session_sessionID` ASC) ,
-  CONSTRAINT `fk_Log_Session1`
-    FOREIGN KEY (`Session_sessionID` )
-    REFERENCES `OpsimDB`.`Session` (`sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_Log_Session1_idx` (`Session_sessionID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -398,13 +323,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Config_File` (
   `data` BLOB NOT NULL ,
   `Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   PRIMARY KEY (`config_fileID`) ,
-  INDEX `fk_Config_File_Session1_idx` (`Session_sessionID` ASC) ,
-  CONSTRAINT `fk_Config_File_Session1`
-    FOREIGN KEY (`Session_sessionID` )
-    REFERENCES `OpsimDB`.`Session` (`sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_Config_File_Session1_idx` (`Session_sessionID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -420,23 +340,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Proposal_Field` (
   INDEX `fk_Proposal_Field_Session1_idx` (`Session_sessionID` ASC) ,
   INDEX `fk_Proposal_Field_Proposal1_idx` (`Proposal_propID` ASC) ,
   INDEX `fk_Proposal_Field_Field1_idx` (`Field_fieldID` ASC) ,
-  PRIMARY KEY (`proposal_field_id`) ,
-  CONSTRAINT `fk_Proposal_Field_Session1`
-    FOREIGN KEY (`Session_sessionID` )
-    REFERENCES `OpsimDB`.`Session` (`sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Proposal_Field_Proposal1`
-    FOREIGN KEY (`Proposal_propID` )
-    REFERENCES `OpsimDB`.`Proposal` (`propID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Proposal_Field_Field1`
-    FOREIGN KEY (`Field_fieldID` )
-    REFERENCES `OpsimDB`.`Field` (`fieldID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  PRIMARY KEY (`proposal_field_id`) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -451,18 +356,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`SeqHistory_ObsHistory` (
   `ObsHistory_Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   INDEX `fk_SeqHistory_ObsHistory_SeqHistory1_idx` (`SeqHistory_sequenceID` ASC) ,
   PRIMARY KEY (`seqhistory_obsHistID`) ,
-  INDEX `fk_SeqHistory_ObsHistory_ObsHistory1_idx` (`ObsHistory_obsHistID` ASC, `ObsHistory_Session_sessionID` ASC) ,
-  CONSTRAINT `fk_SeqHistory_ObsHistory_SeqHistory1`
-    FOREIGN KEY (`SeqHistory_sequenceID` )
-    REFERENCES `OpsimDB`.`SeqHistory` (`sequenceID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_SeqHistory_ObsHistory_ObsHistory1`
-    FOREIGN KEY (`ObsHistory_obsHistID` , `ObsHistory_Session_sessionID` )
-    REFERENCES `OpsimDB`.`ObsHistory` (`obsHistID` , `Session_sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_SeqHistory_ObsHistory_ObsHistory1_idx` (`ObsHistory_obsHistID` ASC, `ObsHistory_Session_sessionID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -482,18 +377,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`MissedHistory` (
   PRIMARY KEY (`missedHistID`, `Session_sessionID`) ,
   INDEX `oh_field_filter_idx` (`filter` ASC) ,
   INDEX `fk_Obshistory_Session1_idx` (`Session_sessionID` ASC) ,
-  INDEX `fk_Obshistory_Field1_idx` (`Field_fieldID` ASC) ,
-  CONSTRAINT `fk_Obshistory_Session10`
-    FOREIGN KEY (`Session_sessionID` )
-    REFERENCES `OpsimDB`.`Session` (`sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Obshistory_Field10`
-    FOREIGN KEY (`Field_fieldID` )
-    REFERENCES `OpsimDB`.`Field` (`fieldID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_Obshistory_Field1_idx` (`Field_fieldID` ASC) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -508,18 +393,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`SeqHistory_MissedHistory` (
   `MissedHistory_Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   PRIMARY KEY (`seqhistory_missedHistID`) ,
   INDEX `fk_SeqHistory_MissedHistory_SeqHistory1_idx` (`SeqHistory_sequenceID` ASC) ,
-  INDEX `fk_SeqHistory_MissedHistory_MissedHistory1_idx` (`MissedHistory_missedHistID` ASC, `MissedHistory_Session_sessionID` ASC) ,
-  CONSTRAINT `fk_SeqHistory_MissedHistory_SeqHistory1`
-    FOREIGN KEY (`SeqHistory_sequenceID` )
-    REFERENCES `OpsimDB`.`SeqHistory` (`sequenceID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_SeqHistory_MissedHistory_MissedHistory1`
-    FOREIGN KEY (`MissedHistory_missedHistID` , `MissedHistory_Session_sessionID` )
-    REFERENCES `OpsimDB`.`MissedHistory` (`missedHistID` , `Session_sessionID` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
+  INDEX `fk_SeqHistory_MissedHistory_MissedHistory1_idx` (`MissedHistory_missedHistID` ASC, `MissedHistory_Session_sessionID` ASC) )
+ENGINE = MyISAM;
 
 
 
