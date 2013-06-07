@@ -325,14 +325,14 @@ class WeakLensingProp (Proposal):
             #       Field cuts
             #-----------------------------------------------------------
             # First, discard all the targets which are not visible right now.
-            airmass = self.schedulingData.airmass[fieldID][sdtime]
+            airmass = self.schedulingData.airmass[sdtime][fieldID]
             if airmass > self.maxAirmass :
                 fields_invisible += 1
                 if self.log and self.verbose>1 :
                     self.log.info('TOSS: propID=%d field=%d  WeakLensingProp: suggestObs(): too low:%f' % (self.propID,fieldID,airmass))
                 continue
 
-            distance2moon = self.schedulingData.dist2moon[fieldID][sdtime]
+            distance2moon = self.schedulingData.dist2moon[sdtime][fieldID]
             if distance2moon < self.minDistance2Moon:
                 fields_moon += 1
                 # remove the target for the rest of the night if it is too close to the moon
@@ -354,7 +354,7 @@ class WeakLensingProp (Proposal):
             if self.ProgressToStartBoost < progress_avg < 1.0:
                 FieldNeedFactor += self.MaxBoostToComplete*(progress_avg-self.ProgressToStartBoost)/(1.0-self.ProgressToStartBoost)
 
-            skyBrightness = self.schedulingData.brightness[fieldID][sdtime]
+            skyBrightness = self.schedulingData.brightness[sdtime][fieldID]
             allowedFilterList = self.allowedFiltersForBrightness(skyBrightness)
             filterSeeingList = self.filters.computeFilterSeeing(seeing,airmass)
 
@@ -406,9 +406,9 @@ class WeakLensingProp (Proposal):
                     recordFieldFilter.skyBrightness = skyBrightness
                     recordFieldFilter.filterSkyBright = 0.0
                     recordFieldFilter.lst = lst_RAD
-                    recordFieldFilter.altitude = self.schedulingData.alt[fieldID][sdtime]
-                    recordFieldFilter.azimuth  = self.schedulingData.az[fieldID][sdtime]
-                    recordFieldFilter.parallactic = self.schedulingData.pa[fieldID][sdtime]
+                    recordFieldFilter.altitude = self.schedulingData.alt[sdtime][fieldID]
+                    recordFieldFilter.azimuth  = self.schedulingData.az[sdtime][fieldID]
+                    recordFieldFilter.parallactic = self.schedulingData.pa[sdtime][fieldID]
                     recordFieldFilter.distance2moon = distance2moon
                     recordFieldFilter.moonRA = moonRA_RAD
                     recordFieldFilter.moonDec = moonDec_RAD
@@ -444,8 +444,8 @@ class WeakLensingProp (Proposal):
             if (field==self.last_observed_fieldID) and (self.last_observed_wasForThisProposal) and (not self.AcceptConsecutiveObs):
                 continue
 
-	    airmass = self.schedulingData.airmass[field][sdtime]
-	    distance2moon = self.schedulingData.dist2moon[field][sdtime]
+	    airmass = self.schedulingData.airmass[sdtime][field]
+	    distance2moon = self.schedulingData.dist2moon[sdtime][field]
 	    if (distance2moon < self.minDistance2Moon):
                 fields_moon += 1
                 # remove the target for the rest of the night if it is too close to the moon
@@ -453,14 +453,13 @@ class WeakLensingProp (Proposal):
 		continue
 
             filterSeeingList = self.filters.computeFilterSeeing(seeing, airmass)
-	    for filter in self.schedulingData.visible[self.propID][field].keys():
-		ixt = self.schedulingData.ticks.index(sdtime)
-		if self.schedulingData.visible[self.propID][field][filter][ixt]:
+	    for filter in self.FilterNames:
+		if self.schedulingData.visible[sdtime][field][filter][self.propID]:
 		    if (filterSeeingList[filter] > self.FilterMaxSeeing[filter]):
 			ffilter_badseeing += 1
 			continue
 
-		    availableTime = self.schedulingData.visibleTime[self.propID][field][filter]
+		    availableTime = self.schedulingData.visibleTime[field][filter][self.propID]
 		    if (availableTime <= 0):
 			ffilter_notime += 1
 	                #del self.targets[field]
@@ -485,12 +484,12 @@ class WeakLensingProp (Proposal):
                     recordFieldFilter.seeing = filterSeeingList[filter]
                     recordFieldFilter.transparency = transparency
                     recordFieldFilter.airmass = airmass
-                    recordFieldFilter.skyBrightness = self.schedulingData.brightness[field][sdtime]
+                    recordFieldFilter.skyBrightness = self.schedulingData.brightness[sdtime][field]
                     recordFieldFilter.filterSkyBright = 0.0
                     recordFieldFilter.lst = lst_RAD
-                    recordFieldFilter.altitude = self.schedulingData.alt[field][sdtime]
-                    recordFieldFilter.azimuth  = self.schedulingData.az[field][sdtime]
-                    recordFieldFilter.parallactic = self.schedulingData.pa[field][sdtime]
+                    recordFieldFilter.altitude = self.schedulingData.alt[sdtime][field]
+                    recordFieldFilter.azimuth  = self.schedulingData.az[sdtime][field]
+                    recordFieldFilter.parallactic = self.schedulingData.pa[sdtime][field]
                     recordFieldFilter.distance2moon = distance2moon
                     recordFieldFilter.moonRA = moonRA_RAD
                     recordFieldFilter.moonDec = moonDec_RAD

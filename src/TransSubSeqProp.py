@@ -504,14 +504,14 @@ class TransSubSeqProp (Proposal):
 		if (fieldID==self.last_observed_fieldID) and (self.last_observed_wasForThisProposal) and (not self.AcceptConsecutiveObs):
 		    continue
 
-                airmass = self.schedulingData.airmass[fieldID][sdtime]
+                airmass = self.schedulingData.airmass[sdtime][fieldID]
                 if (airmass > self.maxAirmass):
                     if self.log and self.verbose>2:
                         self.log.info('%sProp: suggestObs() propID=%d field=%i too low:%f' % (self.propFullName, self.propID,fieldID,airmass))
                     fields_invisible+=1
                     continue
 
-                distance2moon = self.schedulingData.dist2moon[fieldID][sdtime]
+                distance2moon = self.schedulingData.dist2moon[sdtime][fieldID]
                 if (distance2moon < minDistance2Moon):
                     fields_moon+=1
                     # remove the target for the rest of the night if it is too close to the moon
@@ -526,7 +526,7 @@ class TransSubSeqProp (Proposal):
 #		    continue
                 #.............................................................
                 # Gets the list of possible filters based on the sky brightness
-		skyBrightness = self.schedulingData.brightness[fieldID][sdtime]
+		skyBrightness = self.schedulingData.brightness[sdtime][fieldID]
 		allowedFilterList = self.allowedFiltersForBrightness(skyBrightness)
                 filterSeeingList = self.filters.computeFilterSeeing(seeing, airmass)
                 #rankForFilters = self.RankFilters(fieldID, filterSeeingList)
@@ -620,9 +620,9 @@ class TransSubSeqProp (Proposal):
                         #recordFieldFilter.ra = ra
                         #recordFieldFilter.dec = dec
                         recordFieldFilter.lst = lst_RAD
-                        recordFieldFilter.altitude = self.schedulingData.alt[fieldID][sdtime]
-                        recordFieldFilter.azimuth  = self.schedulingData.az[fieldID][sdtime]
-			recordFieldFilter.parallactic = self.schedulingData.pa[fieldID][sdtime]
+                        recordFieldFilter.altitude = self.schedulingData.alt[sdtime][fieldID]
+                        recordFieldFilter.azimuth  = self.schedulingData.az[sdtime][fieldID]
+			recordFieldFilter.parallactic = self.schedulingData.pa[sdtime][fieldID]
                         recordFieldFilter.distance2moon = distance2moon
                         recordFieldFilter.moonRA = moonRA_RAD
                         recordFieldFilter.moonDec = moonDec_RAD
