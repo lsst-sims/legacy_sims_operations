@@ -228,6 +228,8 @@ class ObsScheduler (LSSTObject):
                 # Notify all proposal of startYear Processing
                 proposal.startNewYear()
 
+	self.schedulingData.startNight(dateProfile)
+
         return
 
     # flush sky brightness cache and reset recalcSky to zero to

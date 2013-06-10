@@ -105,6 +105,7 @@ class SchedulingData (LSSTObject):
         self.sunRiseTwil = {}
         self.sunRise     = {}
 
+	self.dictOfAllFields = {}
 	self.dictOfActiveFields = {}
         self.listOfProposals = []
 
@@ -152,6 +153,12 @@ class SchedulingData (LSSTObject):
             self.visible[date]    = {}
         self.computedFields[night] = []
         self.computedVisible[night] = {}
+
+        self.list_propID            = []
+        self.dict_dictOfNewFields   = {}
+        self.dict_maxAirmass        = {}
+        self.dict_dictFilterMinBrig = {}
+        self.dict_dictFilterMaxBrig = {}
 
 	self.newMoonThreshold = 100.0
 
@@ -260,7 +267,9 @@ class SchedulingData (LSSTObject):
                     len_visible += len(self.visible[t][field][filter])
         print("CLEANED  DATA alt=%i visible=%i " % (len_alt, len_visible))
 
-        self.computeTargetData(self.currentNight, {}, 0, 0.0, {}, {})
+	self.dictOfActiveFields = {}
+
+#        self.computeTargetData(self.currentNight, {}, 0, 0.0, {}, {})
 
 	return
 
@@ -301,6 +310,16 @@ class SchedulingData (LSSTObject):
 
     def updateTargets(self, dictOfNewFields, propID, dateProfile, maxAirmass, dictFilterMinBrig, dictFilterMaxBrig):
 
+	self.list_propID.append(propID)
+	self.dict_dictOfNewFields[propID]   = dictOfNewFields
+	self.dict_maxAirmass[propID]        = maxAirmass
+	self.dict_dictFilterMinBrig[propID] = dictFilterMinBrig
+	self.dict_dictFilterMaxBrig[propID] = dictFilterMaxBrig
+
+	return
+
+    def startNight(self, dateProfile):
+
 	(date,mjd,lst_RAD) = dateProfile
 
 	(nextNight, nextTime) = self.findNightAndTime(date)
@@ -310,8 +329,20 @@ class SchedulingData (LSSTObject):
 	if ( (self.lookAhead_nights[-1] - self.currentNight) < self.lookAheadNights):
 	    self.updateLookAheadWindow()
 
-	self.computeTargetData(nextNight, dictOfNewFields, propID, maxAirmass, dictFilterMinBrig, dictFilterMaxBrig)
+	for propID in self.list_propID:
+	    dictOfNewFields   = self.dict_dictOfNewFields[propID]
+            maxAirmass        = self.dict_maxAirmass[propID]
+            dictFilterMinBrig = self.dict_dictFilterMinBrig[propID]
+            dictFilterMaxBrig = self.dict_dictFilterMaxBrig[propID]
 
+	    self.computeTargetData(nextNight, dictOfNewFields, propID, maxAirmass, dictFilterMinBrig, dictFilterMaxBrig)
+
+        self.list_propID            = []
+        self.dict_dictOfNewFields   = {}
+        self.dict_maxAirmass        = {}
+        self.dict_dictFilterMinBrig = {}
+        self.dict_dictFilterMaxBrig = {}
+	
 	return
 
     def computeTargetData(self, initNight, dictOfNewFields, propID, maxAirmass, dictFilterMinBrig, dictFilterMaxBrig):
@@ -320,13 +351,14 @@ class SchedulingData (LSSTObject):
 	if propID not in self.listOfProposals:
 	    self.listOfProposals.append(propID)
 #	    self.computedVisibleNighrs[propID] = {}
-	listOfNewFields = sorted(dictOfNewFields.iterkeys())
+	listOfNewFields    = sorted(dictOfNewFields.iterkeys())
+	listOfAllFields    = sorted(self.dictOfAllFields.iterkeys())
 	listOfActiveFields = sorted(self.dictOfActiveFields.iterkeys())
 	newfields = 0
 	newprops  = 0
 	for field in listOfNewFields:
-	    if field not in listOfActiveFields:
-		self.dictOfActiveFields[field] = dictOfNewFields[field]
+	    if field not in listOfAllFields:
+		self.dictOfAllFields[field] = dictOfNewFields[field]
 
 #                self.computedNights[field] = []
 #                self.computedVisibleNights[propID][field] = []
@@ -340,9 +372,12 @@ class SchedulingData (LSSTObject):
                     self.proposals[field].append(propID)
                     self.lsstDB.addProposalField(self.sessionID, propID, field)
 		    newprops += 1
+	    if field not in listOfActiveFields:
+		self.dictOfActiveFields[field] = dictOfNewFields[field]
 
-        listOfActiveFields = sorted(self.dictOfActiveFields.iterkeys())
-	for field in listOfActiveFields:
+        listOfAllFields    = sorted(self.dictOfAllFields.iterkeys())
+	listOfActiveFields = sorted(self.dictOfActiveFields.iterkeys())
+	for field in listOfAllFields:
 	    if field not in self.visibleTime.keys():
 	        self.visibleTime[field] = {}
 	    for filter in listOfFilters:
@@ -360,7 +395,7 @@ class SchedulingData (LSSTObject):
             computed = 0
             for field in listOfActiveFields:
 		if field not in self.computedFields[n]:
-		    (ra, dec) = self.dictOfActiveFields[field]
+		    (ra, dec) = self.dictOfAllFields[field]
 		    for t in self.lookAhead_times[n]:
 #		if t not in self.alt.keys():
 #		    self.alt[t]        = {}
