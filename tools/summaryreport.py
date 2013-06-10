@@ -178,7 +178,7 @@ def report(sessionID, notcs):
 #	reportMaxSpeed('TelAz' , sessionID)
 #	reportMaxSpeed('Rot'   , sessionID)
 
-#    reportWL(sessionID)
+    reportWL(sessionID)
 #    reportNEA(sessionID)
 #    reportSN(sessionID)
 #    reportSNSS(sessionID)
@@ -262,7 +262,7 @@ def reportSequences(label, propID):
 def reportWL(sessionID):
 
     label = 'ids_WL'
-    sql   = 'select propID,propConf from Proposal where sessionID=%d and propName="WL"' % (sessionID)
+    sql   = 'select propID,propConf from Proposal where Session_sessionID=%d and propName="WL"' % (sessionID)
     ids_WL   = getDbData(sql, label)
     if ids_WL == None:
         return
@@ -271,7 +271,7 @@ def reportWL(sessionID):
 	propID = ids_WL[q][0]
 	propConf = ids_WL[q][1]
 	label = 'Weak Lensing'
-        sql   = 'select paramName,paramValue from Config where sessionID=%d and moduleName="weakLensing" and propID=%d order by paramIndex' % (sessionID,propID)
+        sql   = 'select paramName,paramValue from Config where Session_sessionID=%d and moduleName="weakLensing" and nonPropID=%d order by paramIndex' % (sessionID,propID)
         config_WL   = getDbData(sql, label)
         dict_WL = {}
         for kv in config_WL:
@@ -285,9 +285,42 @@ def reportWL(sessionID):
         #print dict_WL
 
         Filter = dict_WL['Filter']
-        Filter_Visits = {}
+        Filter_GoalVisits = {}
         for ix in range(len(Filter)):
-            Filter_Visits[Filter[ix]] = eval(dict_WL['Filter_Visits'][ix])
+            Filter_GoalVisits[Filter[ix]] = eval(dict_WL['Filter_Visits'][ix])
+
+        label = 'Number of Fields'
+        sql   = 'select count(Field_fieldID) from Proposal_Field where Proposal_propID=%d;' % (propID)
+        ret = getDbData(sql, label)
+	numberFields = ret[0][0]
+
+        label = 'fields count for propID=%3d %s' % (propID, propConf)
+	print "%s: %d" % (label, numberFields)
+
+	prop_visits = 0
+	prop_goalVisits = 0
+	print "visits goals per filter"
+        print Filter_GoalVisits
+
+        for filter in ['u','g','r','i','z','y']:
+            label = 'progress for propID=%d filter %s' % (propID, filter)
+            sql   = 'select count(*) from ObsHistory oh INNER JOIN ObsHistory_Proposal ohp ON oh.obsHistID=ohp.ObsHistory_obsHistID where ohp.Proposal_propID=%d and oh.filter="%s" and oh.Session_sessionID=%d' % (propID, filter, sessionID)
+            ret   = getDbData(sql, label)
+            propfilter_visits = ret[0][0]
+	    prop_visits += propfilter_visits
+	    prop_goalVisits += Filter_GoalVisits[filter]
+	    progress = 100.0*propfilter_visits/(Filter_GoalVisits[filter]*numberFields)
+            print "%s: %6.2f%%" % (label, progress)
+	print "progress for propID=%d:          %6.2f%%" % (propID, 100.0*prop_visits/(prop_goalVisits*numberFields))
+        print sepline
+
+
+
+
+
+    return
+
+    while(False):
 
 #	f1 = dict_WL['Filter'][0]
 #        f2 = dict_WL['Filter'][1]
