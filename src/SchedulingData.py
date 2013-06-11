@@ -215,14 +215,20 @@ class SchedulingData (LSSTObject):
 	    last_sunSetTwil = sunSetTwil
 
 	len_alt      = 0
+	siz_alt      = sys.getsizeof(self.alt)
 	for t in self.alt.keys():
-	    len_alt += len(self.alt[t])
+	    len_alt  += len(self.alt[t])
+	    siz_alt  += sys.getsizeof(self.alt[t])
         len_visible  = 0
+	siz_visible  = sys.getsizeof(self.visible)
         for t in self.visible.keys():
+	    siz_visible += sys.getsizeof(self.visible[t])
 	    for field in self.visible[t].keys():
+		siz_visible += sys.getsizeof(self.visible[t][field])
 		for filter in self.visible[t][field].keys():
 		    len_visible += len(self.visible[t][field][filter])
-        print("CLEANING DATA alt=%i visible=%i " % (len_alt, len_visible))
+		    siz_visible += sys.getsizeof(self.visible[t][field][filter])
+        print("CLEANING DATA alt=%i size=%i  visible=%i size=%i" % (len_alt, siz_alt, len_visible, siz_visible))
 
 	for n in range(self.lookAhead_nights[0], self.currentNight):
             for t in self.lookAhead_times[n]:
@@ -258,14 +264,20 @@ class SchedulingData (LSSTObject):
                 print ("SchedulingData:: night %i removed %4i fields" % (n, removed))
 
         len_alt      = 0
+        siz_alt      = sys.getsizeof(self.alt)
         for t in self.alt.keys():
-            len_alt += len(self.alt[t])
+            len_alt  += len(self.alt[t])
+            siz_alt  += sys.getsizeof(self.alt[t])
         len_visible  = 0
+        siz_visible  = sys.getsizeof(self.visible)
         for t in self.visible.keys():
+            siz_visible += sys.getsizeof(self.visible[t])
             for field in self.visible[t].keys():
+                siz_visible += sys.getsizeof(self.visible[t][field])
                 for filter in self.visible[t][field].keys():
                     len_visible += len(self.visible[t][field][filter])
-        print("CLEANED  DATA alt=%i visible=%i " % (len_alt, len_visible))
+                    siz_visible += sys.getsizeof(self.visible[t][field][filter])
+        print("CLEANED  DATA alt=%i size=%i  visible=%i size=%i" % (len_alt, siz_alt, len_visible, siz_visible))
 
 	self.dictOfActiveFields = {}
 
@@ -453,14 +465,20 @@ class SchedulingData (LSSTObject):
 			self.computedVisible[n][propID].append(field)
 
         len_alt      = 0
+        siz_alt      = sys.getsizeof(self.alt)
         for t in self.alt.keys():
-            len_alt += len(self.alt[t])
+            len_alt  += len(self.alt[t])
+            siz_alt  += sys.getsizeof(self.alt[t])
         len_visible  = 0
+        siz_visible  = sys.getsizeof(self.visible)
         for t in self.visible.keys():
+            siz_visible += sys.getsizeof(self.visible[t])
             for field in self.visible[t].keys():
+                siz_visible += sys.getsizeof(self.visible[t][field])
                 for filter in self.visible[t][field].keys():
                     len_visible += len(self.visible[t][field][filter])
-        print("UPDATED  DATA alt=%i visible=%i " % (len_alt, len_visible))
+                    siz_visible += sys.getsizeof(self.visible[t][field][filter])
+        print("UPDATED  DATA alt=%i size=%i  visible=%i size=%i" % (len_alt, siz_alt, len_visible, siz_visible))
 
 	# Clean past calculations in look ahead window
 #	for n in range(self.lookAhead_nights[0], initNight):
