@@ -225,9 +225,9 @@ class SchedulingData (LSSTObject):
 	    siz_visible += sys.getsizeof(self.visible[t])
 	    for field in self.visible[t].keys():
 		siz_visible += sys.getsizeof(self.visible[t][field])
-		for filter in self.visible[t][field].keys():
-		    len_visible += len(self.visible[t][field][filter])
-		    siz_visible += sys.getsizeof(self.visible[t][field][filter])
+		for prop in self.visible[t][field].keys():
+		    len_visible += len(self.visible[t][field][prop])
+		    siz_visible += sys.getsizeof(self.visible[t][field][prop])
         print("CLEANING DATA alt=%i size=%i  visible=%i size=%i" % (len_alt, siz_alt, len_visible, siz_visible))
 
 	for n in range(self.lookAhead_nights[0], self.currentNight):
@@ -274,9 +274,9 @@ class SchedulingData (LSSTObject):
             siz_visible += sys.getsizeof(self.visible[t])
             for field in self.visible[t].keys():
                 siz_visible += sys.getsizeof(self.visible[t][field])
-                for filter in self.visible[t][field].keys():
-                    len_visible += len(self.visible[t][field][filter])
-                    siz_visible += sys.getsizeof(self.visible[t][field][filter])
+                for prop in self.visible[t][field].keys():
+                    len_visible += len(self.visible[t][field][prop])
+                    siz_visible += sys.getsizeof(self.visible[t][field][prop])
         print("CLEANED  DATA alt=%i size=%i  visible=%i size=%i" % (len_alt, siz_alt, len_visible, siz_visible))
 
 	self.dictOfActiveFields = {}
@@ -371,10 +371,6 @@ class SchedulingData (LSSTObject):
 	for field in listOfNewFields:
 	    if field not in listOfAllFields:
 		self.dictOfAllFields[field] = dictOfNewFields[field]
-
-#                self.computedNights[field] = []
-#                self.computedVisibleNights[propID][field] = []
-
                 self.proposals[field] = [propID]
                 self.lsstDB.addProposalField(self.sessionID, propID, field)
 		newfields += 1
@@ -404,21 +400,15 @@ class SchedulingData (LSSTObject):
         print ("night %i" % (initNight))
 	print self.lookAhead_nights
         for n in range(initNight, self.lookAhead_nights[-1]+1):
+#	    print("SchedulingData:: night=%i propID=%i" % (n, propID))
             computed = 0
+	    vis      = 0
+	    if propID not in self.computedVisible[n].keys():
+		self.computedVisible[n][propID] = []
             for field in listOfActiveFields:
 		if field not in self.computedFields[n]:
 		    (ra, dec) = self.dictOfAllFields[field]
 		    for t in self.lookAhead_times[n]:
-#		if t not in self.alt.keys():
-#		    self.alt[t]        = {}
-#                    self.az[t]         = {}
-#                    self.pa[t]         = {}
-#                    self.airmass[t]    = {}
-#                    self.brightness[t] = {}
-#                    self.dist2moon[t]  = {}
-#		    self.visible[t]    = {}
-
-#		    if field not in self.alt[t].keys():
 			(am, alt, az, pa) = self.sky.airmasst(t, ra, dec)
 			(br, dist2moon, moonAlt, brprofile) = \
                         	self.sky.getSkyBrightness(0, ra, dec, alt,
@@ -432,19 +422,17 @@ class SchedulingData (LSSTObject):
 			self.airmass[t][field]    = am
 			self.brightness[t][field] = br
 			self.dist2moon[t][field]  = dist2moon
+
 			self.visible[t][field]    = {}
 
 		    self.computedFields[n].append(field)
                     computed += 1
 
                 if propID in self.proposals[field]:
-		    if propID not in self.computedVisible[n].keys():
-			self.computedVisible[n][propID] = []
                     if field not in self.computedVisible[n][propID]:
                         for t in self.lookAhead_times[n]:
-                            for filter in listOfFilters:
-	                        if filter not in self.visible[t][field].keys():
-        	                    self.visible[t][field][filter] = {}
+			    self.visible[t][field][propID] = {}
+			    for filter in listOfFilters:
 				if (self.airmass[t][field] < maxAirmass):
 				    if (filter == "u") and (self.moonProfile[n][2] > self.newMoonThreshold):
                                         visible = False
@@ -455,14 +443,16 @@ class SchedulingData (LSSTObject):
 				    else:
 				        visible = False
 				        delta   = 0
-			        else:
+				else:
 				    visible = False
 				    delta   = 0
-
-			        self.visible[t][field][filter][propID] = visible
-			        self.visibleTime[field][filter][propID] += delta
+				self.visible[t][field][propID][filter] = visible
+				self.visibleTime[field][filter][propID] += delta
+				vis += 1
 
 			self.computedVisible[n][propID].append(field)
+	    print("SchedulingData:: night=%i propID=%i computed %i fields" % (n, propID, computed))
+	    print("SchedulingData:: night=%i propID=%i computed %i visibility ticks" % (n, propID, vis))
 
         len_alt      = 0
         siz_alt      = sys.getsizeof(self.alt)
@@ -475,84 +465,10 @@ class SchedulingData (LSSTObject):
             siz_visible += sys.getsizeof(self.visible[t])
             for field in self.visible[t].keys():
                 siz_visible += sys.getsizeof(self.visible[t][field])
-                for filter in self.visible[t][field].keys():
-                    len_visible += len(self.visible[t][field][filter])
-                    siz_visible += sys.getsizeof(self.visible[t][field][filter])
+                for prop in self.visible[t][field].keys():
+                    len_visible += len(self.visible[t][field][prop])
+                    siz_visible += sys.getsizeof(self.visible[t][field][prop])
         print("UPDATED  DATA alt=%i size=%i  visible=%i size=%i" % (len_alt, siz_alt, len_visible, siz_visible))
-
-	# Clean past calculations in look ahead window
-#	for n in range(self.lookAhead_nights[0], initNight):
-#	    removed = 0
-#	    for t in self.lookAhead_times[n]:
-#		ixt = self.ticks.index(t)
-#		print("t=%i ixt=%i" % (t, ixt))
-#		for field in listOfActiveFields:
-#                    if n in self.computedNights[field]:
-
-#                            del self.alt[field][t]
-#                            del self.az[field][t]
-#			    del self.pa[field][t]
-#                            del self.airmass[field][t]
-#                            del self.brightness[field][t]
-#			    del self.dist2moon[field][t]
-
-#			    for prop in self.listOfProposals:
-#				if field in self.computedVisibleNights[prop].keys():
-#				    if n in self.computedVisibleNights[prop][field]:
-#					for filter in self.visible[prop][field].keys():
-#					    print("prop=%i field=%i filter=%s" % (prop, field, filter))
-#					    if self.visible[prop][field][filter][ixt]:
-#					        self.visibleTime[prop][field][filter] -= self.dt
-#					    self.visible[prop][field][filter].pop(ixt)
-#					self.computedVisibleNights[prop][field].remove(n)
-#                            self.computedNights[field].remove(n)
-#                            removed += 1
-#		self.ticks.pop(ixt)
-
-#	    if (removed > 0):
-#		print ("SchedulingData:: night %i removed %4i fields" % (n, removed))
-
-#        size_alt = 0
-#	len_alt  = 0
-#        size_az = 0
-#        size_pa = 0
-#        size_airmass = 0
-#        size_brightness = 0
-#	size_dist2moon = 0
-#        size_visible = 0
-#	len_visible  = 0
-
-#        size_alt += sys.getsizeof(self.alt)
-#        size_az += sys.getsizeof(self.az)
-#        size_pa += sys.getsizeof(self.pa)
-#        size_airmass += sys.getsizeof(self.airmass)
-#       size_brightness += sys.getsizeof(self.brightness)
-#	size_dist2moon += sys.getsizeof(self.dist2moon)
-#        size_visible += sys.getsizeof(self.visible)
-#	for field in self.alt.keys():
-#                size_alt += sys.getsizeof(self.alt[field])
-#		len_alt += len(self.alt[field])
-#                size_az += sys.getsizeof(self.az[field])
-#                size_pa += sys.getsizeof(self.pa[field])
-#                size_airmass += sys.getsizeof(self.airmass[field])
-#                size_brightness += sys.getsizeof(self.brightness[field])
-#		size_dist2moon += sys.getsizeof(self.dist2moon[field])
-#	for prop in self.visible.keys():
-#                size_visible += sys.getsizeof(self.visible[prop])
-#		for field in self.visible[prop].keys():
-#			size_visible += sys.getsizeof(self.visible[prop][field])
-#			for filter in self.visible[prop][field].keys():
-#				size_visible += sys.getsizeof(self.visible[prop][field][filter])
-#				len_visible += len(self.visible[prop][field][filter])
-
-#        print("size of data alt        = %i length=%i" % (size_alt, len_alt))
-#        print("size of data az         = %i" % size_az)
-#        print("size of data pa         = %i" % size_pa)
-#        print("size of data airmass    = %i" % size_airmass)
-#        print("size of data brightness = %i" % size_brightness)
-#        print("size of data dist2moon  = %i" % size_dist2moon)
-#	print("size of data visible    = %i length=%i" % (size_visible, len_visible))
-
 
 	return
 
