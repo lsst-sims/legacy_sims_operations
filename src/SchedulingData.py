@@ -232,7 +232,7 @@ class SchedulingData (LSSTObject):
 
 	for n in range(self.lookAhead_nights[0], self.currentNight):
             for t in self.lookAhead_times[n]:
-		if t in self.alt.keys():
+#		if t in self.alt.keys():
 		    del self.alt[t]
 		    del self.az[t]
                     del self.pa[t]
@@ -240,10 +240,14 @@ class SchedulingData (LSSTObject):
                     del self.brightness[t]
                     del self.dist2moon[t]
 
-                if t in self.visible.keys():
+#                if t in self.visible.keys():
+		    for field in self.visible[t].keys():
+			for prop in self.visible[t][field].keys():
+			    for filter in self.visible[t][field][prop]:
+				self.visibleTime[field][filter][prop] -= self.dt
                     del self.visible[t]
 
-                del self.dateProfile[t]
+                    del self.dateProfile[t]
 
 	    del self.sunSetMJD[n]
             del self.sunSet[n]
@@ -431,23 +435,25 @@ class SchedulingData (LSSTObject):
                 if propID in self.proposals[field]:
                     if field not in self.computedVisible[n][propID]:
                         for t in self.lookAhead_times[n]:
-			    self.visible[t][field][propID] = {}
+			    self.visible[t][field][propID] = []
 			    for filter in listOfFilters:
 				if (self.airmass[t][field] < maxAirmass):
 				    if (filter == "u") and (self.moonProfile[n][2] > self.newMoonThreshold):
-                                        visible = False
+#                                        visible = False
                                         delta = 0
 				    elif (dictFilterMinBrig[filter] < self.brightness[t][field] < dictFilterMaxBrig[filter]):
-				        visible = True
-				        delta   = self.dt
+#				        visible = True
+#				        delta   = self.dt
+					self.visible[t][field][propID].append(filter)
+					self.visibleTime[field][filter][propID] += self.dt
 				    else:
-				        visible = False
+#				        visible = False
 				        delta   = 0
 				else:
-				    visible = False
+#				    visible = False
 				    delta   = 0
-				self.visible[t][field][propID][filter] = visible
-				self.visibleTime[field][filter][propID] += delta
+#				self.visible[t][field][propID][filter] = visible
+#				self.visibleTime[field][filter][propID] += delta
 				vis += 1
 
 			self.computedVisible[n][propID].append(field)

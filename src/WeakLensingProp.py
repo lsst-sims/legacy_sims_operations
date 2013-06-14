@@ -453,8 +453,9 @@ class WeakLensingProp (Proposal):
 		continue
 
             filterSeeingList = self.filters.computeFilterSeeing(seeing, airmass)
-	    for filter in self.FilterNames:
-		if self.schedulingData.visible[sdtime][field][self.propID][filter]:
+#	    for filter in self.FilterNames:
+	    for filter in self.schedulingData.visible[sdtime][field][self.propID]:
+#		if self.schedulingData.visible[sdtime][field][self.propID][filter]:
 		    if (filterSeeingList[filter] > self.FilterMaxSeeing[filter]):
 			ffilter_badseeing += 1
 			continue
