@@ -20,7 +20,8 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Session` (
   `runComment` VARCHAR(200) NULL DEFAULT NULL COMMENT 'user startup comment' ,
   PRIMARY KEY (`sessionID`) ,
   UNIQUE INDEX `s_host_user_date_idx` (`sessionUser` ASC, `sessionHost` ASC, `sessionDate` ASC) )
-ENGINE = MyISAM;
+ENGINE = MyISAM
+AUTO_INCREMENT = 1000;
 
 
 -- -----------------------------------------------------
