@@ -16,7 +16,7 @@ import binascii
 import urllib
 
 # globals
-USAGE_STR = '[--profile=yes] [--verbose=yes] [--config=./LSST.conf] [--startup_comment="comment"]'
+USAGE_STR = '[--profile=yes] [--verbose=yes] [--config=../survey/LSST.conf] [--startup_comment="comment"]'
 
 def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     """
