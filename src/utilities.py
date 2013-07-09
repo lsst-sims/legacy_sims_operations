@@ -341,7 +341,7 @@ def storeParam (lsstDB, sessionID, propID, moduleName, paramIndex, paramName,
 #    (n, dummy) = lsstDB.executeSQL(sql)
     lsstDB.addConfig(sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment)
 
-def computeDateProfile (obsProfile, date):
+#def computeDateProfile (obsProfile, date):
     """
     Convert Simulator seconds to an MJD and LST for observatory location
     and epoch.
@@ -355,12 +355,12 @@ def computeDateProfile (obsProfile, date):
                 mjd
                 lst_RAD
     """
-    (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = obsProfile
-    mjd = (float (date) / float (DAY)) + float(epoch_MJD)
-    lst_RAD = slalib.sla_gmst(mjd)  + lon_RAD
-    if lst_RAD < 0:
-        lst_RAD += TWOPI
-    return (date, mjd, lst_RAD)
+#    (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = obsProfile
+#    mjd = (float (date) / float (DAY)) + float(epoch_MJD)
+#    lst_RAD = slalib.sla_gmst(mjd)  + lon_RAD
+#    if lst_RAD < 0:
+#        lst_RAD += TWOPI
+#    return (date, mjd, lst_RAD)
 
 _secmap = {
     's' : 1,
