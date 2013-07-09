@@ -430,6 +430,7 @@ class WeakLensingProp (Proposal):
 
         fields_received   = len(listOfFieldsToEvaluate)
         fields_invisible  = 0
+	fields_complete   = 0
         fields_moon       = 0
         ffilter_allowed   = 0
         ffilter_badseeing = 0
@@ -440,30 +441,31 @@ class WeakLensingProp (Proposal):
 	maxTargetNeed = 0.0
 	listOfProposedTargets = []
 	for field in listOfFieldsToEvaluate:
-
-            if (field==self.last_observed_fieldID) and (self.last_observed_wasForThisProposal) and (not self.AcceptConsecutiveObs):
-                continue
+            fieldNeed = 0
+            fieldTime = 0
 
 	    airmass = self.schedulingData.airmass[sdtime][field]
 	    distance2moon = self.schedulingData.dist2moon[sdtime][field]
 	    if (distance2moon < self.minDistance2Moon):
                 fields_moon += 1
-                # remove the target for the rest of the night if it is too close to the moon
-                del self.targets[field]
 		continue
 
+            if (field==self.last_observed_fieldID) and (self.last_observed_wasForThisProposal) and (not self.AcceptConsecutiveObs):
+		fieldNeed = -1
+		fieldTime = -1
+                continue
+
             filterSeeingList = self.filters.computeFilterSeeing(seeing, airmass)
-#	    for filter in self.FilterNames:
 	    for filter in self.schedulingData.visible[sdtime][field][self.propID]:
-#		if self.schedulingData.visible[sdtime][field][self.propID][filter]:
+                    availableTime = self.schedulingData.visibleTime[field][filter][self.propID]
+                    if (availableTime <= 0):
+                        ffilter_notime += 1
+                        continue
+                    fieldTime += availableTime
+
 		    if (filterSeeingList[filter] > self.FilterMaxSeeing[filter]):
 			ffilter_badseeing += 1
-			continue
-
-		    availableTime = self.schedulingData.visibleTime[field][filter][self.propID]
-		    if (availableTime <= 0):
-			ffilter_notime += 1
-	                #del self.targets[field]
+			fieldNeed = -1
 			continue
 
 		    if field not in self.visits[filter].keys():
@@ -471,8 +473,8 @@ class WeakLensingProp (Proposal):
 		    targetNeed = (self.GoalVisitsFieldFilter[filter] - self.visits[filter][field]) / availableTime
 		    if (targetNeed <= 0.0):
 			ffilter_noneed += 1
-	                #del self.targets[field]
 			continue
+		    fieldNeed += targetNeed
 
 		    maxTargetNeed = max(targetNeed, maxTargetNeed)
                     ffilter_proposed += 1
@@ -498,12 +500,23 @@ class WeakLensingProp (Proposal):
 
 		    listOfProposedTargets.append(recordFieldFilter)
 
+	    if fieldTime == 0:
+		# the field is invisible for all its filters during the look ahead window
+		fields_invisible += 1
+		del self.targets[field]
+		self.log.info('%s: rankAreaDistributionWithLookAhead propID=%d field=%d removed invisible' % (self.propConf, self.propID, field)) 
+	    elif fieldNeed == 0:
+		# the field for all its filters is no longer needed
+		fields_complete += 1
+		del self.targets[field]
+                self.log.info('%s: rankAreaDistributionWithLookAhead propID=%d field=%d removed complete' % (self.propConf, self.propID, field))
+
 	for target in listOfProposedTargets:
 	    target.propRank = target.propRank/maxTargetNeed
             self.addToSuggestList(target)
 
         if self.log and self.verbose>0:
-            self.log.info('%s: rankAreaDistributionWithLookAhead propID=%d : Fields received=%i moon=%i badseeing=%i notime=%i noneed=%i proposed=%i' % (self.propConf, self.propID, fields_received, fields_moon, ffilter_badseeing, ffilter_notime, ffilter_noneed, ffilter_proposed))
+            self.log.info('%s: rankAreaDistributionWithLookAhead propID=%d : Fields received=%i complete=%i invisible=%i moon=%i badseeing=%i notime=%i noneed=%i proposed=%i' % (self.propConf, self.propID, fields_received, fields_complete, fields_invisible, fields_moon, ffilter_badseeing, ffilter_notime, ffilter_noneed, ffilter_proposed))
 
 	return
 
