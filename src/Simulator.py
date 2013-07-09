@@ -482,7 +482,7 @@ class Simulator(object):
 
                     # Observe next field
                     else:
-                        self.dateProfile = computeDateProfile (self.obsProfile, t)
+                        self.dateProfile = self.sky.computeDateProfile(t)
 #                        (oRank, oExp, oSlew) = \
                         winner_obs = self.obsScheduler.suggestObservation (self.dateProfile,
                                         self.moonProfile, self.twilightProfile,
@@ -518,8 +518,7 @@ class Simulator(object):
 
                     # Check for end of sunrise/start of darktime - MM
                     if (t >tonightSunsetTwil) and (lastEvent <tonightSunsetTwil):
-                        self.dateProfile = computeDateProfile (self.obsProfile, 
-                                                      tonightSunsetTwil)
+                        self.dateProfile = self.sky.computeDateProfile(tonightSunsetTwil)
 			(date, MJD, lst_RAD) = self.dateProfile
 			self.lsstDB.addTimeHistory(self.sessionID, date, MJD, self.nightCnt, END_DUSK)
 #                        self.timeHist.add (self.sessionID, self.nightCnt,
@@ -528,8 +527,7 @@ class Simulator(object):
 
                     # Check for dawn - MM
                     elif (t > sunRiseTwil) and (lastEvent < sunRiseTwil):
-                        self.dateProfile = computeDateProfile (self.obsProfile, 
-                                                      sunRiseTwil)
+                        self.dateProfile = self.sky.computeDateProfile(sunRiseTwil)
                         (date, MJD, lst_RAD) = self.dateProfile
                         self.lsstDB.addTimeHistory(self.sessionID, date, MJD, self.nightCnt, START_DAWN)
 #                        self.timeHist.add (self.sessionID, self.nightCnt,
@@ -697,7 +695,7 @@ class Simulator(object):
 	Perform any necessary setup for the end of the night,
 	triggering filters swap for now.
 	"""
-        self.dateProfile = computeDateProfile (self.obsProfile, date)
+        self.dateProfile = self.sky.computeDateProfile(date)
         (date, MJD, lst_RAD) = self.dateProfile
         self.lsstDB.addTimeHistory(self.sessionID, date, MJD, self.nightCnt, END_NIGHT)
 #        self.timeHist.add (self.sessionID, self.nightCnt, self.dateProfile,
