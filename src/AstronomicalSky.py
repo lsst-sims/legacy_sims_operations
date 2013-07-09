@@ -767,7 +767,7 @@ class AstronomicalSky (LSSTObject):
 
     def airmasst (self, date, ra, dec):
 
-        dateProfile = computeDateProfile(self.obsProfile, date)
+        dateProfile = self.computeDateProfile(date)
 
         return self.airmass(dateProfile, ra, dec)
 
