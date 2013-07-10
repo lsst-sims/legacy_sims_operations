@@ -155,28 +155,28 @@ def report(sessionID, notcs):
 #    count_stoppedinitial = ret[0][0]
 #    print "%s: %s" % (label, count_stoppedinitial)
 
-#    if notcs == False:
-#	reportAngleStats('TelAlt', sessionID)
-#	reportAngleStats('TelAz' , sessionID)
-#	reportAngleStats('RotPos', sessionID)
+    if notcs == False:
+	reportAngleStats('telAlt', sessionID)
+	reportAngleStats('telAz' , sessionID)
+	reportAngleStats('rotTelPos', sessionID)
 
-#	reportActivity('DomAlt'     , sessionID, count_visits)
-#	reportActivity('DomAz'      , sessionID, count_visits)
-#	reportActivity('TelAlt'     , sessionID, count_visits)
-#	reportActivity('TelAz'      , sessionID, count_visits)
-#	reportActivity('Rotator'    , sessionID, count_visits)
-#	reportActivity('Filter'     , sessionID, count_visits)
-#	reportActivity('TelOpticsOL', sessionID, count_visits)
-#	reportActivity('Readout'    , sessionID, count_visits)
-#	reportActivity('Settle'     , sessionID, count_visits)
-#	reportActivity('DomSettle'  , sessionID, count_visits)
-#	reportActivity('TelOpticsCL', sessionID, count_visits)
+	reportActivity('DomAlt'     , sessionID, count_visits)
+	reportActivity('DomAz'      , sessionID, count_visits)
+	reportActivity('TelAlt'     , sessionID, count_visits)
+	reportActivity('TelAz'      , sessionID, count_visits)
+	reportActivity('Rotator'    , sessionID, count_visits)
+	reportActivity('Filter'     , sessionID, count_visits)
+	reportActivity('TelOpticsOL', sessionID, count_visits)
+	reportActivity('Readout'    , sessionID, count_visits)
+	reportActivity('Settle'     , sessionID, count_visits)
+	reportActivity('DomSettle'  , sessionID, count_visits)
+	reportActivity('TelOpticsCL', sessionID, count_visits)
 
-#	reportMaxSpeed('DomAlt', sessionID)
-#	reportMaxSpeed('DomAz' , sessionID)
-#	reportMaxSpeed('TelAlt', sessionID)
-#	reportMaxSpeed('TelAz' , sessionID)
-#	reportMaxSpeed('Rot'   , sessionID)
+	reportMaxSpeed('DomAlt', sessionID)
+	reportMaxSpeed('DomAz' , sessionID)
+	reportMaxSpeed('TelAlt', sessionID)
+	reportMaxSpeed('TelAz' , sessionID)
+	reportMaxSpeed('Rot'   , sessionID)
 
     reportWL(sessionID)
 #    reportNEA(sessionID)
@@ -188,19 +188,19 @@ def report(sessionID, notcs):
 def reportAngleStats(name, sessionID):
 
     label = 'statistics for angle %9s' % (name)
-    sql   = 'select min(%s),max(%s),avg(%s),std(%s) from SlewFinalState where sessionID=%d' % (name, name, name, name, sessionID)
+    sql   = 'select min(%s),max(%s),avg(%s),std(%s) from SlewState join SlewHistory where SlewState.SlewHistory_slewID=SlewHistory.slewID and ObsHistory_Session_sessionID=%d' % (name, name, name, name, sessionID)
     ret   = getDbData(sql, label)
     print "%s: min=%6.1fd max=%6.1fd avg=%6.1fd std=%5.1fd" % (label, ret[0][0]*RAD2DEG, ret[0][1]*RAD2DEG, ret[0][2]*RAD2DEG, ret[0][3]*RAD2DEG)
     
 def reportActivity(name, sessionID, total):
 
     label = 'slew activity for %12s' % (name)
-    sql   = 'select avg(delay),max(delay),count(delay) from SlewActivities where sessionID=%d and activity="%s" and delay>0' % (sessionID, name)
+    sql   = 'select avg(actDelay),max(actDelay),count(actDelay) from SlewActivities join SlewHistory where SlewActivities.SlewHistory_slewID=SlewHistory.slewID and ObsHistory_Session_sessionID=%d and activity="%s" and actDelay>0' % (sessionID, name)
     ret   = getDbData(sql, label)
     A     = ret[0][0]
     M     = ret[0][1]
     N     = ret[0][2]
-    sql   = 'select count(*),avg(delay) from SlewActivities where sessionID=%d and activity="%s" and inCriticalPath="True" and delay>0' % (sessionID, name)
+    sql   = 'select count(*),avg(actDelay) from SlewActivities join SlewHistory where SlewActivities.SlewHistory_slewID=SlewHistory.slewID and ObsHistory_Session_sessionID=%d and activity="%s" and inCriticalPath="True" and actDelay>0' % (sessionID, name)
     ret   = getDbData(sql, label)
     C     = ret[0][0]
     CA    = ret[0][1]
@@ -212,12 +212,12 @@ def reportActivity(name, sessionID, total):
 def reportMaxSpeed(name, sessionID):
 
     label = 'slew maximum speed for %8s' % (name)
-    sql   = 'select avg(abs(%sSpd)),max(abs(%sSpd)),max(slewCount) from SlewMaxSpeeds where sessionID=%d' % (name, name, sessionID)
+    sql   = 'select avg(abs(%sSpd)),max(abs(%sSpd)),max(slewCount) from SlewMaxSpeeds join SlewHistory where SlewMaxSpeeds.SlewHistory_slewID=SlewHistory.slewID and ObsHistory_Session_sessionID=%d' % (name, name, sessionID)
     ret   = getDbData(sql, label)
     A     = ret[0][0]
     M     = ret[0][1]
     T     = ret[0][2]
-    sql   = 'select count(*) from SlewMaxSpeeds where sessionID=%d and abs(%sSpd)>=%f' % (sessionID, name, 0.99*M)
+    sql   = 'select count(*) from SlewMaxSpeeds join SlewHistory where SlewMaxSpeeds.SlewHistory_slewID=SlewHistory.slewID and ObsHistory_Session_sessionID=%d and abs(%sSpd)>=%f' % (sessionID, name, 0.99*M)
     ret   = getDbData(sql, label)
     C     = ret[0][0]
     print "%s: avg=%.2fd/s, max=%.2fd/s in %5.1f%% of slews" % (label, A*RAD2DEG, M*RAD2DEG, 100.0*C/T)
