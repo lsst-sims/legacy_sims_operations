@@ -5,7 +5,7 @@
 #except:
 #    pass
 
-OPSIM_VERSION = '3.0beta2'
+OPSIM_VERSION = '3.0beta3'
 
 from utilities import *
 from Simulator import *
@@ -278,9 +278,7 @@ def startLsst( args ):
 
     if (not isinstance(weakLensConf,list)):
         # turn it into a list with one entry
-        saveConf = weakLensConf
-        weakLensConf = []
-        weakLensConf.append(saveConf)
+        weakLensConf = [weakLensConf]
 
     if ( configDict.has_key ('WLpropConf')) :
         WLpropConf =  configDict["WLpropConf"]
