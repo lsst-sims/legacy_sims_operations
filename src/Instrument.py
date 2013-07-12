@@ -1218,6 +1218,7 @@ class Instrument (object):
         (date,mjd,lst_RAD) = dateProfile
 
         self.current_state.UpdateState(date)
+	init_state = copy.deepcopy(self.current_state)
         slewInitState = self.DBrecordState(self.current_state, SLEWINITSTATE)
 
         ha_RAD = lst_RAD - ra_RAD
@@ -1227,7 +1228,8 @@ class Instrument (object):
             angle_RAD = 0.0
         else:
             angle_RAD = pa_RAD - self.current_state.Rotator_Pos_RAD
-            self.targetposition.Set(ra_RAD,	dec_RAD, angle_RAD, filter, exposureTime, date, alt_RAD, az_RAD, pa_RAD)
+
+        self.targetposition.Set(ra_RAD,	dec_RAD, angle_RAD, filter, exposureTime, date, alt_RAD, az_RAD, pa_RAD)
 
         delay = self.Slew(self.targetposition)
 
@@ -1238,8 +1240,7 @@ class Instrument (object):
         rotator_telpos = self.current_state.GetRotatorTelPos()
         altitude = self.current_state.ALT_RAD
         azimuth = self.current_state.AZ_RAD
-	slewDistance = slalib.sla_dsep(ra_RAD, dec_RAD, self.current_state.RA_RAD, self.current_state.DEC_RAD)
-
+	slewDistance = slalib.sla_dsep(ra_RAD, dec_RAD, init_state.RA_RAD, init_state.DEC_RAD)
 	slewdata = dataSlew(self.slewCount, date, date+delay, delay, slewDistance)
 
 #        sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewHistory')
