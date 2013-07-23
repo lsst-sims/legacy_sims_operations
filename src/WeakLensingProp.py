@@ -97,23 +97,31 @@ class WeakLensingProp (Proposal):
         except:
             pass
 
+#        try:
+#            self.goalNVisits = config['NVisits']
+#        except:
+#            self.goalNVisits = 30.
+
         try:
-            self.goalNVisits = config['NVisits']
+            filterNames = config["Filter"]
         except:
-            self.goalNVisits = 30.
+            filterNames = []
+        if not isinstance (filterNames, list):
+            filterNames = [filterNames]
+
         try:
             filterVisits = config["Filter_Visits"]
         except:
             filterVisits = []
-            for filter in self.FilterNames:
-                filterVisits.append(self.goalNVisits)
+#            for filter in self.FilterNames:
+#                filterVisits.append(self.goalNVisits)
         # if singleton, make into a list of one
         if not isinstance (filterVisits, list):
             filterVisits = [filterVisits]
 
-        for ix in range(len(self.FilterNames)):
-            self.GoalVisitsFieldFilter[self.FilterNames[ix]] = filterVisits[ix]
-#        print 'GoalVisitsFieldFilter for propID=%d %s = %s' % (self.propID, self.propFullName, str(self.GoalVisitsFieldFilter))
+        for ix in range(len(filterNames)):
+            self.GoalVisitsFieldFilter[filterNames[ix]] = filterVisits[ix]
+        print 'GoalVisitsFieldFilter for propID=%d %s = %s' % (self.propID, self.propFullName, str(self.GoalVisitsFieldFilter))
         
         try:
             self.maxNeedAfterOverflow = config['MaxNeedAfterOverflow']
@@ -183,8 +191,8 @@ class WeakLensingProp (Proposal):
 
         self.dbField = dbTableDict['field']
 
-        if (self.goalNVisits <= 0):
-            self.goalNVisits = 1.
+#        if (self.goalNVisits <= 0):
+#            self.goalNVisits = 1.
 
         # Setup FieldFilter visit history for later ObsHistory DB  ingest
         self.fieldVisits = {}
@@ -619,13 +627,13 @@ class WeakLensingProp (Proposal):
  
 	    progress = self.visits[obs.filter][obs.fieldID]/self.GoalVisitsFieldFilter[obs.filter]
 
-#            if (self.log and self.verbose>0):
-#                t_secs = obs.date%60
-#                t_mins = (obs.date%3600)/60
-#                t_hour = (obs.date%86400)/3600
-#                t_days = (obs.date)/86400
+            if (self.log and self.verbose>0):
+                t_secs = obs.date%60
+                t_mins = (obs.date%3600)/60
+                t_hour = (obs.date%86400)/3600
+                t_days = (obs.date)/86400
 
-#                self.log.info('WeakLensingProp: closeObservation() propID=%d field=%d filter=%s propRank=%.4f finRank=%.4f t=%dd%02dh%02dm%02ds progress=%d%%' % (self.propID, obs.fieldID, obs.filter, obs.propRank, obs.finRank, t_days, t_hour, t_mins, t_secs, int(100*progress)))
+                self.log.info('WeakLensingProp: closeObservation() propID=%d field=%d filter=%s propRank=%.4f finRank=%.4f t=%dd%02dh%02dm%02ds progress=%d%%' % (self.propID, obs.fieldID, obs.filter, obs.propRank, obs.finRank, t_days, t_hour, t_mins, t_secs, int(100*progress)))
 
             #print ('%i %i' % (self.visits[obs.filter][obs.fieldID], self.VisitsTonight))
         return obs
