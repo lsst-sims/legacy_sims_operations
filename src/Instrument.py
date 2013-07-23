@@ -856,8 +856,9 @@ class Instrument (object):
     # Assume dome is crawling in correct direction for next exposure. MM
     def GetDelayFor_DomAz(self, target_state, prev_state):
 
-        buffer_RAD = self.GetSlitBuffer (target_state.DomAlt_Pos_RAD,
-                                         prev_state.DomAlt_Pos_RAD)
+#        buffer_RAD = self.GetSlitBuffer (target_state.DomAlt_Pos_RAD,
+#                                         prev_state.DomAlt_Pos_RAD)
+	buffer_RAD = 0.0
 
         distance_RAD = math.fabs(target_state.DomAz_Pos_RAD - prev_state.DomAz_Pos_RAD) - buffer_RAD
 
