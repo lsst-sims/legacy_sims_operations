@@ -26,6 +26,10 @@ class SchedulingData (LSSTObject):
 
 	self.initSurvey(surveyStartTime, surveyEndTime)
 
+        for line in pairs:
+            storeParam (lsstDB, sessionID, 0, 'schedulingData', line['index'],
+                            line['key'], line['val'])
+
 	return
 
 
