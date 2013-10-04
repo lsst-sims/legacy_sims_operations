@@ -12,7 +12,14 @@ Contents:
    :maxdepth: 2
 
    overview.rst
+   release_notes.rst
+   architecture.rst
+   features.rst
    installation.rst
+   execution.rst
+   configuration.rst
+   simulator_output.rst
+   analysis_tools.rst
 
 Indices and tables
 ==================

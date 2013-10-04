@@ -1,7 +1,7 @@
-.. _installation:
+.. _installation.rst:
 
-************
-Installation
-************
+********
+Installing the Simulator Code
+********
 
-Installation of the opsim
+Under Construction
