@@ -33,15 +33,14 @@ There are two classes of observing mode - weakLensConf (or WLProp), and WLpropCo
 The following configuration files should not be modified without great caution::
 
     instrumentConf = ../conf/system/Instrument.conf
-    schedDownConf = ../conf/system/schedDown.conf
+    schedDownConf = ../conf/system/schedDown.confi
     unschedDownConf = ../conf/system/unschedDown.conf
     filtersConf = ../conf/survey/Filters.conf
 
 The configuration files in ``../conf/scheduler/`` can be used to fine tune simulations, but should only be modified with care.  The default values have been derived over years and hundreds of simulations.
 
-
-::
-      
+.. code-block:: python
+     
     ######################################################################
     ########### Configuration for   LSST   ############################
     ######################################################################
@@ -184,8 +183,8 @@ Filters.conf
 
 This configuration file is likely to be significantly changed in the future.  It provides default filter usage rules with respect to sky brightness, but these rules have been moved to each proposal for better control.  It also defines filter wavelengths and relative exposure time (for all proposals), and these parameters will eventually be moved to Instrument.conf.  It is possible you may want to change relative exposure times for a simulation and that is about all you should change here.
 
-::
-
+.. code-block:: python
+     
     ######################################################################
     ########### Configuration for   Filters   ############################
     ######################################################################
@@ -266,8 +265,8 @@ Selection of the fields to be observed can be done in two ways: 1) define limits
 
 The conditions which allow observations to be taken are set by airmass limits, seeing limits and sky brightness limits.  Seeing is calculated from 500nm zenith seeing values corrected for airmass and wavelength.  Sky brightness is calculated using the Krisciunus and Schafer algoritm for V band brightness and corrected to LSST bands.  A single value for z and y sky brightness is used for twilight observations.  In a postprocessing step, the LSST ETC sky brightness is calculated and added to the output table and used for all calculations in the SSTAR output.  Clearly, this is inconsistent and we are working to fix this.
  
-::
-
+.. code-block:: python
+    
     WLtype = True
     
     # -----------------------------------------------------------------------
@@ -582,8 +581,8 @@ NorthEclipticSpur-18.conf
 
 This proposal collects pairs of observations north of the limits for the WFD observing area and along the ecliptic north of the WFD area primarily for the purpose of detecting NEOs.  As such, it does not collect u or y data.  It is a variant of the Universal proposal.  Note the necessity to allow observations at higher airmass and larger seeing.
 
-::
-
+.. code-block:: python
+     
     WLtype = True
     
     # -----------------------------------------------------------------------
@@ -889,7 +888,7 @@ This proposal collects pairs of observations north of the limits for the WFD obs
 GalacticPlaneProp.conf
 ----------------------
 
-::
+.. code-block:: python
 
     ######################################################################
     ########### Configuration for Galactic Plane Survey  #################
@@ -1094,7 +1093,7 @@ GalacticPlaneProp.conf
 SuperNovaSubSeqdeep.conf
 ------------------------
     
-::
+.. code-block:: python
 
     ######################################################################
     ########### Configuration for Proposals with SubSequences   #################
@@ -1458,7 +1457,7 @@ DO NOT alter these parameters as many of them are under change control.
 Instrument.conf
 ---------------
 
-::
+.. code-block:: python
     
     ######################################################################
     ########### Configuration for   Instrument   #########################
@@ -1612,7 +1611,7 @@ Instrument.conf
 SiteCP.conf
 -----------
 
-::
+.. code-block:: python
 
     ######################################################################
     ########### Configuration for   Cerro Pachon   #######################
@@ -1668,7 +1667,7 @@ SiteCP.conf
 AstronomicalSky.conf
 --------------------
 
-::
+.. code-block:: python
     
     ######################################################################
     ########### Configuration for   AstronomicalSky   ####################
@@ -1731,7 +1730,7 @@ AstronomicalSky.conf
 schedDown.conf
 --------------
 
-::
+.. code-block:: python
     
     ######################################################################
     ########### Configuration for  Scheduled Downtime     ################
@@ -1783,7 +1782,7 @@ schedDown.conf
 unschedDown.conf
 ----------------
 
-::
+.. code-block:: python
 
     activity = intermediate event
     startNight = 3
@@ -2116,7 +2115,7 @@ The directory /lsst/opsim/conf/scheduler contains the configuration files which 
 Scheduler.conf
 --------------
 
-::
+.. code-block:: python
 
     ######################################################################
     ########### Configuration for   Scheduler   ##########################
@@ -2166,7 +2165,7 @@ Scheduler.conf
 SchedulingData.conf
 -------------------
 
-::
+.. code-block:: python
 
     ######################################################################
     ########### Configuration for SchedulingData #########################
