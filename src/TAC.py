@@ -22,10 +22,10 @@ from utilities import *
 from LSSTObject import *
 from Proposal import *
 from WeakLensingProp import *
-from NearEarthProp import *
-from SuperNovaProp import *
+#from NearEarthProp import *
+#from SuperNovaProp import *
 from SuperNovaSubSeqProp import *
-from KuiperBeltProp import *
+#from KuiperBeltProp import *
 from WLprop import *
 
 
