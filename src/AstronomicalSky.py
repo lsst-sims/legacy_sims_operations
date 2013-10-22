@@ -732,19 +732,19 @@ class AstronomicalSky (LSSTObject):
         """
         (date, mjd, lst_RAD) = dateProfile
         # Calculate the low resolution input values
-        ra_RND = round (ra / self.aRAScale) * self.aRAScale
-        dec_RND = round (dec / self.aDecScale) * self.aDecScale
-        t = int (round (date / self.aDateScale)) * self.aDateScale
+#        ra_RND = round (ra / self.aRAScale) * self.aRAScale
+#        dec_RND = round (dec / self.aDecScale) * self.aDecScale
+#        t = int (round (date / self.aDateScale)) * self.aDateScale
         
         # Do we have the answer in the cache?
-        key = '%.02f_%.02f_%d' % (ra_RND, dec_RND, t)
-        try:
-            (airmass,alt_RAD,az_RAD) = self.airmassCache[key]
+#        key = '%.02f_%.02f_%d' % (ra_RND, dec_RND, t)
+#        try:
+#            (airmass,alt_RAD,az_RAD) = self.airmassCache[key]
             # print 'AstronomicalSky::airmass() cache hit: %s ra:%f dec:%f date:%f am:%f' % ( key,ra,dec,date,airmass)
-            return (airmass,alt_RAD,az_RAD)
-        except:
+#            return (airmass,alt_RAD,az_RAD)
+#        except:
             # print ('AstronomicalSky::airmass() cache miss')
-            pass
+#            pass
         
         # Compute local Hour angle  (radian)
         lha_RAD = lst_RAD - ra * DEG2RAD
@@ -762,7 +762,7 @@ class AstronomicalSky (LSSTObject):
         #print "t: %d raDEG:%f decDEG:%f mjd:%f lstRAD:%f lhaDEG:%f lha_RAD:%f altRAD:%f zdRAD:%f am:%f" % (date,ra,dec,mjd,lst_RAD,lha,lha_RAD,alt_RAD,zd_RAD,am)
         
         # Update the cache
-        self.airmassCache[key] = (am,alt_RAD,az_RAD)
+#        self.airmassCache[key] = (am,alt_RAD,az_RAD)
         return (am,alt_RAD,az_RAD,pa_RAD)
 
     def airmasst (self, date, ra, dec):
