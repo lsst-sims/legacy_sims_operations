@@ -351,7 +351,7 @@ class SubSequence (LSSTObject):
     def MissEvent(self, date, misHistID):
 
 	if self.nestedSubSequence != None:
-	    self.nestedSubSequence.MissEvent(date)
+	    self.nestedSubSequence.MissEvent(date, misHistID)
 	    if self.nestedSubSequence.IsLost() == False:
 		return
 
