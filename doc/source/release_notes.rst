@@ -4,4 +4,4 @@
 Release Notes
 *************
 
-Under Construction
+.. literalinclude:: ../../release_note

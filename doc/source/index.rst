@@ -12,7 +12,6 @@ Contents:
    :maxdepth: 2
 
    overview.rst
-   release_notes.rst
    architecture.rst
    features.rst
    installation.rst
@@ -20,6 +19,7 @@ Contents:
    configuration.rst
    simulator_output.rst
    analysis_tools.rst
+   release_notes.rst
 
 Indices and tables
 ==================

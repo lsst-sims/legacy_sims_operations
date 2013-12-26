@@ -185,7 +185,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'OperationsSimulator.tex', u'Operations Simulator Documentation',
-   u'Operations Simulation Team', 'manual'),
+   u'Operations Simulation Team', 'manual', 'true'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
