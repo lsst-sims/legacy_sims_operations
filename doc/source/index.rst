@@ -13,6 +13,7 @@ Contents:
 
    overview.rst
    installation.rst
+   directory.rst
    architecture.rst
    execution.rst
    configuration.rst
