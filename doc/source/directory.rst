@@ -6,7 +6,7 @@ Directory Structure
 
 The following table shows the directory structure from ``/lsst/opsim``.
 
-.. code ::
+.. code::
 
 	+-----------------+--------------------------------------------------------------------+
 	| Directory Name  | Description                                                        |

@@ -17,7 +17,7 @@ Contents:
    architecture.rst
    execution.rst
    configuration.rst
-   simulator_output.rst
+   output.rst
    release_notes.rst
 
 Indices and tables
