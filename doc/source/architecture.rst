@@ -1,6 +1,6 @@
 .. _architecture.rst:
 
-**********************
-Simulator Architecture
-**********************
+*********************
+Database Architecture
+*********************
 
