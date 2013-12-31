@@ -73,7 +73,7 @@ Following table shows the columns of the Field table. This table stores the enti
 	| fieldEB  | double           | NO   |     | NULL    |                |
 	+----------+------------------+------+-----+---------+----------------+
 
-Output tables in OpSim
+Output Tables in OpSim
 ----------------------
 
 Following table shows the columns of the Session table. This is the driver table of an OpSim run. A new table entry is created for every OpSim run and is stored in this table. All output tables have a foreign key relationship with this table and output data is identified primarily using the sessionID column of this table. ::
