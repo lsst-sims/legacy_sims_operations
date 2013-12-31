@@ -4,7 +4,7 @@
 Database Architecture
 *********************
 
-The OpSim runs with the help of the following tables ::
+The OpSim runs in python which uses a MySQL database schema which consists of the following tables ::
 
 	+--------------------------+
 	| Tables names             |
@@ -89,7 +89,7 @@ Following table shows the columns of the Session table. This is the driver table
 	| runComment  | varchar(200)     | YES  |     | NULL    |                |
 	+-------------+------------------+------+-----+---------+----------------+
 
-Following table shows the columns of the Config table. This table keeps track of the various different parameters used to drive the OpSim. Configuration file parameters are kept in this table. ::
+Following table shows the columns of the Config table. This table keeps track of the various parameters used to drive the OpSim. Configuration file parameters are kept in this table. ::
 
 	+-------------------+------------------+------+-----+---------+----------------+
 	| Field             | Type             | Null | Key | Default | Extra          |
@@ -104,7 +104,7 @@ Following table shows the columns of the Config table. This table keeps track of
 	| nonPropID         | int(10)          | YES  |     | NULL    |                |
 	+-------------------+------------------+------+-----+---------+----------------+
 
-Following table shows the columns of the Proposal table. This table keeps track of the various different proposals that were used to drive the OpSim. ::
+Following table shows the columns of the Proposal table. This table keeps track of the various proposals that were used to drive the OpSim. ::
 
 	+-------------------+------------------+------+-----+---------+----------------+
 	| Field             | Type             | Null | Key | Default | Extra          |
@@ -221,7 +221,7 @@ Following table shows the columns of the Proposal_Field table. This is a many-to
 	| Field_fieldID     | int(10) unsigned | NO   | MUL | NULL    |                |
 	+-------------------+------------------+------+-----+---------+----------------+
 
-Following table shows the columns of the SeqHistory table. This table keeps track of the heirarchical information of the various different sequences requested for a proposal, for a field for an OpSim run. ::
+Following table shows the columns of the SeqHistory table. This table keeps track of the heirarchical information of the various sequences requested for a proposal, for a field for an OpSim run. ::
 
 	+-------------------+------------------+------+-----+---------+----------------+
 	| Field             | Type             | Null | Key | Default | Extra          |
@@ -290,7 +290,7 @@ Following table shows the columns of the SlewHistory table. This table is a one-
 	| ObsHistory_Session_sessionID | int(10) unsigned | NO   |     | NULL    |                |
 	+------------------------------+------------------+------+-----+---------+----------------+
 
-Following table shows the columns of the SlewActivities table. This table keeps track of the various different slew activities for a slew. ::
+Following table shows the columns of the SlewActivities table. This table keeps track of the various slew activities for a slew. ::
 
 	+--------------------+-------------+------+-----+---------+----------------+
 	| Field              | Type        | Null | Key | Default | Extra          |

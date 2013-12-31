@@ -4,9 +4,9 @@
 Working with OpSim Output
 *************************
 
-The `DB architecture <architecture.html>`_ section describes the input and output tables of the OpSim. For a more comprehensive set of metrics please take a look at the SSTAR & MAF documentation.
+The `DB Architecture <architecture.html>`_ section describes the input and output tables of the OpSim database. For a more comprehensive set of metrics please take a look at the SSTAR & MAF documentation.
 
-Following are a few sample SQL queries that one could use to query the OpSim output tables.
+Following are a few sample SQL queries that you can use to query the OpSim output tables.
 
 Sample SQLs
 -----------
@@ -26,7 +26,7 @@ To get all fields requested by a proposal identified by propID and an Opsim run 
 Sample Metric
 -------------
 
-Following is an example to show how one can create quick plots from the data of OpSim using python, matplotlib & numpy. In this example we shall create histograms for each filter for airmass for the WFD proposals. Attached is the code and output.
+Following is an example to show how you can create quick plots from the data of OpSim using python, matplotlib & numpy. In this example we shall create histograms for each filter for airmass for the WFD proposals. Attached is the code and output.
 
 .. literalinclude :: _static/airmass.py
 

@@ -3,22 +3,22 @@
 *************************
 Installing the OpSim Code
 *************************
-The current source code repository is in a CVS server located internally to the NOAO network. In future releases OpSim will be available through the LSST git repository. Assuming that you have access to the NOAO network and have a CVS account on ``opsimcvs.tuc.noao.edu`` (If you dont have one please contact ``igoodenow@lsst.org``) follow the instructions.
+The current source code repository is in a CVS server located internally to the NOAO network. In future releases OpSim will be available through the LSST git repository. Assuming that you have access to the NOAO network and have a CVS account on ``opsimcvs.tuc.noao.edu`` (If you don't have one please contact ``igoodenow@lsst.org``) follow the instructions.
 
 Assumptions
 -----------
-* You have gcc, g77 installed
+* You have gcc and g77 installed
 * You have python v2.7 installed
 
 Getting the source
 ------------------
 
-* Setup the following environment parameters. ::
+* Setup the following environment parameters ::
 
 	setenv CVSROOT :ext:<your_cvs_username>@opsimcvs.tuc.noao.edu:/usr/local/cvsroot
 	setenv CVS_RSH ssh
 
-* Check out the following repositories in a designated LSST directory. For the purpose of this documentation we shall use ``/lsst``. ::
+* Check out the following repositories in a designated LSST directory. For the purpose of this documentation we shall use ``/lsst`` ::
 
 	cvs co opsim
 	cvs co opsim-install
@@ -43,7 +43,7 @@ Installation Instructions
 
 * Python setup and install packages from ``/lsst/opsim-install/TableIO`` and ``/lsst/opsim-install/pysla``
 
-* MySQL server should have been installed in the previous ``yum install`` statements. Please setup MySQL with an account with username ``www`` and password ``zxcvbnm``. Please refer to MySQL documentation on installation, startup scripts, mysqladmin and starting MySQL. Start the MySQL server ::
+* MySQL server should have been installed in the previous ``yum install`` statements. Setup MySQL with an account with username ``www`` and password ``zxcvbnm``. Refer to MySQL documentation for installation, startup scripts, mysqladmin and starting MySQL. Start the MySQL server ::
 
 	mysqladmin -u root password 'some-password'
 
