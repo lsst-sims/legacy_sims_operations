@@ -1,8 +1,8 @@
 .. _simulator_output.rst:
 
-****************
-Simulator Output
-****************
+*************************
+Working with OpSim Output
+*************************
 
 The `DB architecture <architecture.html>`_ section describes the input and output tables of the OpSim. 
 
