@@ -4,7 +4,9 @@
 Working with OpSim Output
 *************************
 
-The `DB architecture <architecture.html>`_ section describes the input and output tables of the OpSim. Following are a few sample SQL queries that one could use to query the OpSim output tables.
+The `DB architecture <architecture.html>`_ section describes the input and output tables of the OpSim. For a more comprehensive set of metrics please take a look at the SSTAR & MAF documentation.
+
+Following are a few sample SQL queries that one could use to query the OpSim output tables.
 
 Sample SQLs
 -----------
@@ -34,5 +36,6 @@ Output on stdout is as follows
 
 .. image :: _static/hewelhog_1008_airmass_allfilters.png
    :width: 700 px
+
 
 
