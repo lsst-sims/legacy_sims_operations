@@ -1,0 +1,62 @@
+# select sessionHost from Session where sessionID=1008
+# select airmass from ObsHistory where Session_sessionID=1008
+# select airmass from ObsHistory where filter='u' and Session_sessionID=1008
+In filter u
+Maximum airmass is 2.190943
+Minimum airmass is 1.001896
+Median airmass  is 1.500753
+Airmass at 25 percentile 1.646777
+Airmass at 75 percentile 1.487343
+Mean airmass is 1.525834
+Standard deviation of airmass is 0.282146
+Total number of airmass measurements: 16267
+# select airmass from ObsHistory where filter='g' and Session_sessionID=1008
+In filter g
+Maximum airmass is 2.200350
+Minimum airmass is 1.001880
+Median airmass  is 1.391438
+Airmass at 25 percentile 1.089647
+Airmass at 75 percentile 1.484433
+Mean airmass is 1.393920
+Standard deviation of airmass is 0.228081
+Total number of airmass measurements: 27039
+# select airmass from ObsHistory where filter='r' and Session_sessionID=1008
+In filter r
+Maximum airmass is 2.676237
+Minimum airmass is 1.001873
+Median airmass  is 1.444514
+Airmass at 25 percentile 1.780907
+Airmass at 75 percentile 1.105535
+Mean airmass is 1.520965
+Standard deviation of airmass is 0.361505
+Total number of airmass measurements: 39488
+# select airmass from ObsHistory where filter='i' and Session_sessionID=1008
+In filter i
+Maximum airmass is 2.664865
+Minimum airmass is 1.001875
+Median airmass  is 1.403896
+Airmass at 25 percentile 1.832324
+Airmass at 75 percentile 1.516597
+Mean airmass is 1.480226
+Standard deviation of airmass is 0.345466
+Total number of airmass measurements: 47515
+# select airmass from ObsHistory where filter='z' and Session_sessionID=1008
+In filter z
+Maximum airmass is 2.718254
+Minimum airmass is 1.001882
+Median airmass  is 1.377253
+Airmass at 25 percentile 1.967387
+Airmass at 75 percentile 1.930538
+Mean airmass is 1.487501
+Standard deviation of airmass is 0.387229
+Total number of airmass measurements: 81219
+# select airmass from ObsHistory where filter='y' and Session_sessionID=1008
+In filter y
+Maximum airmass is 3.086516
+Minimum airmass is 1.001898
+Median airmass  is 1.357187
+Airmass at 25 percentile 1.410337
+Airmass at 75 percentile 1.137339
+Mean airmass is 1.397903
+Standard deviation of airmass is 0.293728
+Total number of airmass measurements: 63310
