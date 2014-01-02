@@ -13,7 +13,7 @@ Assumptions
 Getting the Source
 ------------------
 
-* Setup the following environment parameters ::
+* Set up the following environment parameters ::
 
 	setenv CVSROOT :ext:<your_cvs_username>@opsimcvs.tuc.noao.edu:/usr/local/cvsroot
 	setenv CVS_RSH ssh
