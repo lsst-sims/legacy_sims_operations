@@ -10,7 +10,7 @@ Assumptions
 * You have gcc and g77 installed
 * You have python v2.7 installed
 
-Getting the source
+Getting the Source
 ------------------
 
 * Setup the following environment parameters ::
