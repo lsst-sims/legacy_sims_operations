@@ -1,3 +1,33 @@
+Release Notes for Opsim3.0                               Jan 15, 2014
+==================================
+
+Version 3 release
+
+New architecture:
+  * Central component SchedulingData for targets and look ahead info.
+  * Better data flow for targets info, separating ranking data from
+    observing data.
+  * Cleaner SkyBrightness API
+
+Code factorization:
+  * Now only 2 classes for proposals, incorporating all previous
+    functionality
+
+New database:
+  * Cleaner and more powerful DB API and methods.
+  * Better indexing handling for the DB tables.
+
+New functionality:
+  * Look ahead information available for scheduling
+  * New ranking equations for look ahead prototyped
+  * Grid for sky and time for CPU time saving instead of caching
+
+Fixes:
+  * Seeing overwitten bug fixed
+  * Dome crawl bug disabled
+  * Nested subsequences bug fixed
+
+
 Release Notes for Opsim3.alpha.0                        Aug. 31, 2012
 ==================================
 New deployment structure:
