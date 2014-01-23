@@ -11,12 +11,11 @@ The following table shows the directory structure from ``/lsst/opsim``.
 	+-----------------+--------------------------------------------------------------------+
 	| Directory Name  | Description                                                        |
 	+=================+====================================================================+
-	| conf            | Contains the object files, executables are in the script directory |       
-	| doc             | Contains default images used in SSTAR                              |
-	| install         | Contains output of SSTAR once make_report.sh is executed           |	
-	| lib             | Contains the executables and python scripts                        |
-	| log             | Sphinx documentation for SSTAR                                     |
-	| src             | Contains header files used                                         |
-	| test            | Contains source files used                                         |
-	| tools           | Contains source files used                                         |
+	| conf            | Contains the configuration files				       |       
+	| doc             | Contains the sphinx documentation for the OpSim                    |
+	| install         | Contains the installation scripts for the OpSim                    |	
+	| log             | Contains the log files generated during the OpSim execution        |
+	| src             | Contains all the python source files and the driver main.py        |
+	| test            | Contains the Unit Tests for the OpSim i.e. DatabaseTest.py etc.    |
+	| tools           | Contains debuggging scripts used during the development of OpSim   |
 	+-----------------+--------------------------------------------------------------------+
