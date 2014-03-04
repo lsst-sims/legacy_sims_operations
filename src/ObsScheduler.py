@@ -139,7 +139,9 @@ class ObsScheduler (LSSTObject):
         config_dict, pairs = readConfFile(schedulerConf)
         self.maxSlewTimeBonus  = eval(str(config_dict['MaxSlewTimeBonus']))
         self.numSuggObsPerProp = int(config_dict['NumSuggestedObsPerProposal'])
-        self.recalcSkyCount = int(config_dict['recalcSkyCount'])
+        # recalcSkyCount is not being used .. removed from Config files therefore removing it here
+	# 3/4/2014 Srinivasan Chandrasekharan
+	# self.recalcSkyCount = int(config_dict['recalcSkyCount'])
         self.reuseRankingCount = int(config_dict['reuseRankingCount'])
         self.log.info("reuseRankingCount=%d" % self.reuseRankingCount)
         self.tooGoodSeeingLimit = float(config_dict['tooGoodSeeingLimit'])
