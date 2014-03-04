@@ -142,7 +142,8 @@ class ObsScheduler (LSSTObject):
         # recalcSkyCount is not being used .. removed from Config files therefore removing it here
 	# 3/4/2014 Srinivasan Chandrasekharan
 	# self.recalcSkyCount = int(config_dict['recalcSkyCount'])
-        self.reuseRankingCount = int(config_dict['reuseRankingCount'])
+        self.recalcSkyCount = 0
+	self.reuseRankingCount = int(config_dict['reuseRankingCount'])
         self.log.info("reuseRankingCount=%d" % self.reuseRankingCount)
         self.tooGoodSeeingLimit = float(config_dict['tooGoodSeeingLimit'])
 	self.randomizeSequencesSelection = eval(str(config_dict['randomizeSequencesSelection']))
