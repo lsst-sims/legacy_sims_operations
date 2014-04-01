@@ -110,9 +110,6 @@ def startLsst( args ):
     Raise
         exit if there are errors 
     """
-    # Instantiate DB Object
-    # lsstDB = LSSTDatabase()
-    lsstDB = Database()
 
     # Startup comment
     if (args.has_key ('startup_comment')):
@@ -136,6 +133,14 @@ def startLsst( args ):
     # Fetch the DB table names so Session DB can be accessed immediately
     configDict, pairs =  readConfFile(confLSST)
 
+    if ( configDict.has_key ('dbWrite')) :
+	if configDict["dbWrite"] == 'True':
+	    dbWrite = True
+	else:
+	    dbWrite = False
+    else:
+	dbWrite = True
+
     if ( configDict.has_key ('sessionTbl')) :
         sessionTbl =  configDict["sessionTbl"]
         print("    sessionTbl:%s" % (sessionTbl))
@@ -150,6 +155,11 @@ def startLsst( args ):
     else :
     	code_test = '1'
     	print("    code_test:%s" % (code_test))
+
+    # Instantiate DB Object
+    # lsstDB = LSSTDatabase()
+    lsstDB = Database(dbWrite)
+
     # Get a Session ID
     try:
         SID = getSessionID (lsstDB, sessionTbl, code_test, startup_comment)
