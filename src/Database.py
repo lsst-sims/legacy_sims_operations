@@ -85,6 +85,8 @@ class Database :
             self.DBPORT   = os.environ['DBPORT']
             if self.DBPORT == 'None':
                 self.DBPORT = None
+            else:
+            	self.DBPORT = int(self.DBPORT)
         except:
             self.DBPORT   = None
         
