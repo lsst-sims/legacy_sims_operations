@@ -244,6 +244,7 @@ class ObsScheduler (LSSTObject):
 
     def startDay(self, moonProfile):
 
+	self.moonProfile = moonProfile
 	(moonRA_RAD, moonDec_RAD, moonPhase_PERCENT) = self.moonProfile
 
 	if (self.log):
