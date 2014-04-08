@@ -111,6 +111,11 @@ class AstronomicalSky (LSSTObject):
         
         # Read the configuration file
         config, pairs = readConfFile (configFile)
+
+        # store config in DB
+        for line in pairs:
+            storeParam (lsstDB, sessionID, 0, 'AstronomicalSky', line['index'], line['key'], line['val'])
+
         try:
             self.wave = config['Wavelength']
         except:
