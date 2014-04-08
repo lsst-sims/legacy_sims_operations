@@ -169,6 +169,9 @@ def startLsst( args ):
     
     print ('Session ID: %d' % (SID))
 
+	# Adding lsstConf
+    storeParam(lsstDB, SID, 0, 'File', 0, "lsstConf", confLSST)
+
     # store config in DB
     for line in pairs:
         storeParam (lsstDB, SID, 0, 'LSST', line['index'], line['key'], line['val'])
