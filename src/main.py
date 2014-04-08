@@ -172,6 +172,9 @@ def startLsst( args ):
 	# Adding lsstConf
     storeParam(lsstDB, SID, 0, 'File', 0, "lsstConf", confLSST)
 
+	# Adding startupComment
+    storeParam(lsstDB, SID, 0, 'Comment', 0, "startupComment", startup_comment)
+
     # store config in DB
     for line in pairs:
         storeParam (lsstDB, SID, 0, 'LSST', line['index'], line['key'], line['val'])
