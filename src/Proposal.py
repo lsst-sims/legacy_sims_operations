@@ -397,42 +397,46 @@ class Proposal (object):
         olapTable = self.lsstDB.createOlapTable(overlappingField)
 
         # Load entire FieldDB in-core
-        sql = 'select fieldID,fieldFov,fieldRA,fieldDec,fieldGL,fieldGB,fieldEL,fieldEB from %s;' %(fieldTable)
+        sql = 'select fieldID,fieldFov,fieldRA,fieldDec,fieldGL,fieldGB,fieldEL,fieldEB from %s order by fieldID;' %(fieldTable)
         # Send the SQL commmand to the DB
         (n, res) = self.lsstDB.executeSQL (sql)
 
         # for each entry in regions:
         #       parse into components,
-        ra_rad = []
-        dec_rad = []
-        diameter_div2_rad = []
+        #ra_rad = []
+        #dec_rad = []
+        #diameter_div2_rad = []
         for k in  range(len(regions)):
             ra_deg,dec_deg,diameter_deg = regions[k].split(',',3)
 
-            ra_rad.append(float(ra_deg) * DEG2RAD)
-            dec_rad.append(float(dec_deg) * DEG2RAD)
-            diameter_div2_rad.append(float(diameter_deg) * DEG2RAD/2)
+            ra_rad = float(ra_deg) * DEG2RAD
+            dec_rad = float(dec_deg) * DEG2RAD
+            diameter_div2_rad = float(diameter_deg) * DEG2RAD/2
 
-        # for each entry in FieldDB
-        for (id,fov,ra,dec,gl,gb,el,eb) in res:
-            # convert (ra,dec) to radians
-            ofRa = ra*DEG2RAD
-            ofDec = dec*DEG2RAD
-            # Create distance measure to determine overlapping region&field
-            ofFov_div2 = fov*DEG2RAD/2
+            # for each entry in FieldDB
+	    closestField = None
+	    closestDistance = None
+	    for (id,fov,ra,dec,gl,gb,el,eb) in res:
+                # convert (ra,dec) to radians
+        	ofRa = ra*DEG2RAD
+            	ofDec = dec*DEG2RAD
+                # Create distance measure to determine overlapping region&field
+            	ofFov_div2 = fov*DEG2RAD/2
 
-            # for each entry in regions
-            for k in range(len(regions)):
-                # is dist(regionCenter,fieldCenter) < fieldFov/2
-                if (dist(ra_rad[k],dec_rad[k],ofRa,ofDec) < (ofFov_div2 + diameter_div2_rad[k])) :
-                      # ingest field into overlappingField
-                      # sql = 'insert into %s values (%d,%f,%f,%f,%f,%f,%f,%f)' %(overlappingField,id,fov,ra,dec,gl,gb,el,eb)
-                      #(n, dummy) = self.lsstDB.executeSQL (sql)
-                      self.lsstDB.addOlap(olapTable, id,fov,ra,dec,gl,gb,el,eb)
-                      # if field loaded, skip rest of regions wrt this field
-                      break
+		distance = dist(ra_rad,dec_rad,ofRa,ofDec)
+                if (distance < (ofFov_div2 + diameter_div2_rad)) :
+		    if (closestDistance == None):
+			closestDistance = distance
+			closestField = (id,fov,ra,dec,gl,gb,el,eb)
+		    else:
+			if (distance < closestDistance):
+			    closestDistance = distance
+			    closestField = (id,fov,ra,dec,gl,gb,el,eb)
+	    if (closestField != None):
+		(id,fov,ra,dec,gl,gb,el,eb) = closestField
+		self.lsstDB.addOlap(olapTable, id,fov,ra,dec,gl,gb,el,eb)
+		self.log.info('Proposal: buildUserRegionDB(): Field=%i, RA=%f DEC=%f' % (id, ra, dec))
 
-        #return(overlappingField)
         return (olapTable)
 
     def getPropID (self):
