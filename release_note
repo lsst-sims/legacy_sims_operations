@@ -1,6 +1,13 @@
+Release Notes for Opsim3.1                               Apr 9, 2014
+==================================
+Bug Fixes:
+  * recalcSkyCount bug fixed
+  * startDay bug fixed
+  * overlapping fields issue fixed
+  * AstronomicalSky configuration parameters are now stored in DB
+
 Release Notes for Opsim3.0                               Jan 15, 2014
 ==================================
-Version 3 release
 
 New architecture:
   * Central component SchedulingData for targets and look ahead info.
