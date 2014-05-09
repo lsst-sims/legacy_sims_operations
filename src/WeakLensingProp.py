@@ -742,11 +742,9 @@ class WeakLensingProp (Proposal):
         else:
             sql += '%s BETWEEN 0.0 AND 360.0 AND ' % (dbRA)
 
-        DecLimit = math.acos(1./float(self.maxAirmass)) * RAD2DEG
-        sql += '%s BETWEEN %f AND %f  and %f < %s < %f order by FieldRA,FieldDec' % (dbDec,
-                                         (lat_RAD*RAD2DEG)-DecLimit,
-                                         (lat_RAD*RAD2DEG)+DecLimit,
-                                         -abs(self.maxReach),dbDec,abs(self.maxReach))
+        sql += '%s BETWEEN %f AND %f order by FieldRA,FieldDec' % (dbDec,
+                                         (lat_RAD*RAD2DEG)-abs(self.maxReach),
+                                         (lat_RAD*RAD2DEG)+abs(self.maxReach))
 
         # Send the query to the DB
         (n, res) = self.lsstDB.executeSQL (sql)
