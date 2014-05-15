@@ -159,6 +159,16 @@ class WeakLensingProp (Proposal):
             self.deltaLST = config['deltaLST']
         except:
             self.deltaLST = 60.
+
+        try:
+            self.minAbsRA = config_dict['minAbsRA']
+        except:
+            self.minAbsRA = 0.
+        try:
+            self.maxAbsRA = config_dict['maxAbsRA']
+        except:
+            self.maxAbsRA = 360.
+
         try:
             self.maxReach = config['maxReach']
         except:
@@ -701,6 +711,8 @@ class WeakLensingProp (Proposal):
         # Make sure that both raMin and raMax are in the [0; 360] range
         raMin = normalize (angle=raMin, min=0., max=360, degrees=True)
         raMax = normalize (angle=raMax, min=0., max=360, degrees=True)
+        raAbsMin = normalize (angle=self.minAbsRA, min=0., max=360, degrees=True)
+        raAbsMax = normalize (angle=self.maxAbsRA, min=0., max=360, degrees=True)
 
         # self.targets is a convenience dictionary. Its keys are
         # fieldIDs, its values are the corresponding RA and Dec.
@@ -741,6 +753,16 @@ class WeakLensingProp (Proposal):
                                                     raMax)
         else:
             sql += '%s BETWEEN 0.0 AND 360.0 AND ' % (dbRA)
+
+        if (raAbsMax >= raAbsMax):
+            sql += '%s BETWEEN %f AND %f AND ' % (dbRA,
+                                                raAbsMin,
+                                                raAbsMax)
+        else:
+            sql += '(%s BETWEEN %f AND 360.0 OR ' % (dbRA,
+                                                     raAbsMin)
+            sql += '%s BETWEEN 0.0 AND %f) AND ' % (dbRA,
+                                                    raAbsMax)
 
         sql += '%s BETWEEN %f AND %f order by FieldRA,FieldDec' % (dbDec,
                                          (lat_RAD*RAD2DEG)-abs(self.maxReach),
