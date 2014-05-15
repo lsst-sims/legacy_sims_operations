@@ -186,8 +186,7 @@ def startLsst( args ):
         nRun =  configDict["nRun"]
         print("    nRun:%f" % (nRun))
     else :
-        nRun =  1.
-        print("    nRun:%f default" % (nRun))
+	fatalError('no nRun parameter defined for length of simulation run')
 
     if ( configDict.has_key ('fov')) :
         fov =  configDict["fov"]
