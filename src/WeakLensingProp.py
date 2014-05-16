@@ -754,7 +754,7 @@ class WeakLensingProp (Proposal):
         else:
             sql += '%s BETWEEN 0.0 AND 360.0 AND ' % (dbRA)
 
-        if (raAbsMax >= raAbsMax):
+        if (raAbsMax >= raAbsMin):
             sql += '%s BETWEEN %f AND %f AND ' % (dbRA,
                                                 raAbsMin,
                                                 raAbsMax)
