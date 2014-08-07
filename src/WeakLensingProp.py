@@ -161,11 +161,11 @@ class WeakLensingProp (Proposal):
             self.deltaLST = 60.
 
         try:
-            self.minAbsRA = config_dict['minAbsRA']
+            self.minAbsRA = config['minAbsRA']
         except:
             self.minAbsRA = 0.
         try:
-            self.maxAbsRA = config_dict['maxAbsRA']
+            self.maxAbsRA = config['maxAbsRA']
         except:
             self.maxAbsRA = 360.
 
@@ -609,12 +609,13 @@ class WeakLensingProp (Proposal):
 
         self.clearSuggestList()
 
-	if self.useLookAhead:
-	    self.rankAreaDistributionWithLookAhead(listOfFieldsToEvaluate, sdnight, sdtime,
-				dateProfile, rawSeeing, seeing, transparency)
-	else:
-	    self.rankAreaDistribution(listOfFieldsToEvaluate, sdnight, sdtime,
-				dateProfile, rawSeeing, seeing, transparency)
+	if (len(listOfFieldsToEvaluate) > 0):
+	    if self.useLookAhead:
+	        self.rankAreaDistributionWithLookAhead(listOfFieldsToEvaluate, sdnight, sdtime,
+						dateProfile, rawSeeing, seeing, transparency)
+	    else:
+	        self.rankAreaDistribution(listOfFieldsToEvaluate, sdnight, sdtime,
+						dateProfile, rawSeeing, seeing, transparency)
 
         # Chose the n highest ranking observations
 #        self.reuseRanking = self.reuseRankingCount
