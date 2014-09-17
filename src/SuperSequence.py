@@ -149,7 +149,7 @@ class SubSequence (LSSTObject):
         elif ((self.nAllEvents >= self.subEvents) and not self.WLtype) or ((self.nObsEvents >= self.subEvents) and self.WLtype):
             self.state = SEQ_COMPLETE
 
-        elif self.nAllEvents == 0:
+        elif ((self.nAllEvents == 0) and not self.IsEventInProgress()):
             self.state = SEQ_IDLE
 
         else:
@@ -167,7 +167,7 @@ class SubSequence (LSSTObject):
 
     def IsIdle(self):
 
-        if self.state == SEQ_IDLE:
+        if (self.state == SEQ_IDLE):
             return True
         else:
             return False
@@ -340,7 +340,7 @@ class SubSequence (LSSTObject):
 	#print ("subseq=%s history=%s" % (self.subName, str(self.allHistory)))
         self.obsHistory.append(date)
 
-        if self.state == SEQ_IDLE:
+        if len(self.allHistory) == 1:
             self.distribution.date = date
 	    self.date = date
             
@@ -547,8 +547,6 @@ class SuperSequence (LSSTObject):
 
         if self.aborted == True:
             self.state = SEQ_LOST
-        elif self.nAllEvents == 0:
-            self.state = SEQ_IDLE
         else:
             anylost     = False
             allcomplete = True
@@ -567,7 +565,6 @@ class SuperSequence (LSSTObject):
             elif allcomplete == True:
                 self.state = SEQ_COMPLETE
             elif allidle == True:
-		#print 'all idle but events='+str(self.nAllEvents)
                 self.state = SEQ_IDLE
             else:
                 self.state = SEQ_ACTIVE
@@ -713,14 +710,14 @@ class SuperSequence (LSSTObject):
 	    self.allHistory.append((date, name))
             self.obsHistory.append((date, name))
 
-            if self.state == SEQ_IDLE:
+            if len(self.allHistory) == 1:
                 self.date = date
 	        if self.masterSubSequence != None:
 	            for name in self.subSeqName:
 		        if name != self.masterSubSequence:
 	                    self.subSequence[name].date = date
 	
-            self.UpdateState()
+        self.UpdateState()
         
         return
 
