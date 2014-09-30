@@ -401,13 +401,17 @@ class WLprop (TransSubSeqProp):
                                                                                                                             
         # Compute RA min (at twilight)
         date_MJD = int (mjd) + (sunSet / 24.)
-        raMin = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.deltaLST
-        raMinNewSeq = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG)  + self.newFieldsLimitEast_afterLSTatSunset
+        #raMin = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.deltaLST
+        raMin = ((pal.gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.deltaLST
+        #raMinNewSeq = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG)  + self.newFieldsLimitEast_afterLSTatSunset
+        raMinNewSeq = ((pal.gmst(date_MJD) + lon_RAD) * RAD2DEG)  + self.newFieldsLimitEast_afterLSTatSunset
                                                                                                                             
         # Compute RA max (at twilight)
         date_MJD = int (mjd) + (sunRise / 24.)
-        raMax = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) + self.deltaLST
-        raMaxNewSeq = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.newFieldsLimitWest_beforeLSTatSunrise
+        #raMax = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) + self.deltaLST
+        raMax = ((pal.gmst(date_MJD) + lon_RAD) * RAD2DEG) + self.deltaLST
+        #raMaxNewSeq = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.newFieldsLimitWest_beforeLSTatSunrise
+        raMaxNewSeq = ((pal.gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.newFieldsLimitWest_beforeLSTatSunrise
                                                                                                                             
         # Make sure that both raMin and raMax are in the [0; 360] range
         raMin = normalize (angle=raMin, min=0., max=360, degrees=True)

@@ -703,11 +703,13 @@ class WeakLensingProp (Proposal):
 
         # Compute RA min (at twilight)
         date_MJD = int (mjd) + (sunSet / 24.)
-        raMin = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.deltaLST
+        #raMin = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.deltaLST
+        raMin = ((pal.gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.deltaLST
                                                                                 
         # Compute RA max (at twilight)
         date_MJD = int (mjd) + (sunRise / 24.)
-        raMax = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) + self.deltaLST
+        #raMax = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) + self.deltaLST
+        raMax = ((pal.gmst(date_MJD) + lon_RAD) * RAD2DEG) + self.deltaLST
 
         # Make sure that both raMin and raMax are in the [0; 360] range
         raMin = normalize (angle=raMin, min=0., max=360, degrees=True)
