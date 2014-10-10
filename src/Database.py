@@ -79,7 +79,7 @@ class Database :
         try:
             self.DBHOST  = os.environ['DBHOST']
         except:
-            self.DBHOST = 'localhost'
+             self.DBHOST = 'localhost'
         
         try:
             self.DBPORT   = os.environ['DBPORT']

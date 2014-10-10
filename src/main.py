@@ -13,7 +13,7 @@ from Simulator import *
 from Database import *
 import binascii
 
-import urllib
+import requests
 
 # globals
 USAGE_STR = '[--profile=yes] [--verbose=yes] [--config=../survey/LSST.conf] [--startup_comment="comment"]'
@@ -33,11 +33,13 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     Exception if there are errors in the SQL.
     """
     # Get the short hostname
-    host = socket.gethostname ().split ('.', 1)[0]
-    user = os.environ['USER']
+    #host = socket.gethostname ().split ('.', 1)[0]
+    #host = os.getenv['HOST']
+    #user = os.getenv['USER']
+    host = ''
+    user = ''
     (yy, mm, dd, h, m, s, wday, yday, dst) = time.gmtime ()
     date = '%d-%d-%d %02d:%02d:%02d' % (yy, mm, dd, h, m, s)
-    
     # Remove data from the previous run where user, host and date are
     # the same. This would only happen is the same user restarts the 
     # simulatiomn on the same machine within a second...
@@ -64,7 +66,6 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
 #    sql += 'sessionDate="%s"' % (date)
 #    (n, res) = lsstDB.executeSQL (sql)
 #    sessionID = res[0][0]
-    
     oSession = lsstDB.newSession(user, host, date, OPSIM_VERSION, startup_comment)
     sessionID = oSession.sessionID
     
@@ -79,16 +80,18 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
 
 def track(sessionID, hostname, user, startup_comment, code_test, status_id):
 	url = "http://opsimcvs.tuc.noao.edu/tracking/tracking.php";
-	params = urllib.urlencode({'sessionID': sessionID,
-                               'hostname': hostname,
-                               'user': user,
-                               'startup_comment': startup_comment,
-                               'code_test': code_test,
-                               'status_id': status_id,
-                               'run_version': OPSIM_VERSION})
-	url = "%s?%s" % (url, params);
-	result = urllib.urlopen(url).read();
-	print("    Tracking:%s" % (result))
+	#params = urllib.urlencode({'sessionID': sessionID,
+        #                       'hostname': hostname,
+        #                       'user': user,
+        #                       'startup_comment': startup_comment,
+        #                       'code_test': code_test,
+        #                       'status_id': status_id,
+        #                       'run_version': OPSIM_VERSION})
+	#url = "%s?%s" % (url, params);
+	#result = urllib.urlopen(url).read();
+        payload = {'sessionID': sessionID,'hostname': hostname,'user': user,'startup_comment': startup_comment,'code_test': code_test,'status_id': status_id,'run_version': OPSIM_VERSION}	
+        result = requests.get(url, params=payload, timeout=3.0)
+        print("    Tracking:%s" % (result))
 
 
 def startLsst( args ):
