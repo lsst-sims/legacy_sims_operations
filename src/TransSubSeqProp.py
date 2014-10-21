@@ -160,7 +160,7 @@ class TransSubSeqProp (Proposal):
         for fieldID in self.sequences.keys():
 	    if not fieldID in self.targetsNewSeq.keys():
 		if self.sequences[fieldID].IsIdle():
-		    #self.log.info('%sProp: startNight() deleted sequence field=%d at progress=%.3f%% state=%d nevents=%d' % (self.propFullName, fieldID, 100*self.sequences[fieldID].GetProgress(), self.sequences[fieldID].state, self.sequences[fieldID].nAllEvents))
+		    self.log.info('%sProp: startNight() deleted sequence field=%d at progress=%.3f%% state=%d nevents=%d' % (self.propFullName, fieldID, 100*self.sequences[fieldID].GetProgress(), self.sequences[fieldID].state, self.sequences[fieldID].nAllEvents))
 		    notstarted+=1
 		    del self.sequences[fieldID]
 
