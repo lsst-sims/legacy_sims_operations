@@ -510,7 +510,8 @@ class InstrumentState (InstrumentPosition):
         LST_RAD  = self.Date2LSTrad(DATE)
         HA_RAD   = LST_RAD - RA_RAD
 
-        result = slalib.sla_altaz(HA_RAD, DEC_RAD, self.latitude_RAD)
+        #result = slalib.sla_altaz(HA_RAD, DEC_RAD, self.latitude_RAD)
+        result = pal.altaz(HA_RAD, DEC_RAD, self.latitude_RAD) 
 
         AZ_RAD  = result[0]
         ALT_RAD = result[3]
@@ -535,7 +536,9 @@ class InstrumentState (InstrumentPosition):
         """
         LST_RAD  = self.Date2LSTrad(DATE)
                                                                                                                                         
-        (HA_RAD,DEC_RAD) = slalib.sla_dh2e(AZ_RAD, ALT_RAD, self.latitude_RAD)
+        #(HA_RAD,DEC_RAD) = slalib.sla_dh2e(AZ_RAD, ALT_RAD, self.latitude_RAD)
+        (HA_RAD, DEC_RAD) = pal.dh2e(AZ_RAD, ALT_RAD, self.latitude_RAD)
+        
         RA_RAD  = LST_RAD - HA_RAD
                                                                                                                                         
         return (RA_RAD, DEC_RAD)
@@ -551,7 +554,8 @@ class InstrumentState (InstrumentPosition):
                                                                                             
         UT_day   = self.simEpoch + DATE/86400.0
         #RAA  changed to conform to LSST convention of West=negative, East=pos
-        LST_RAD  = slalib.sla_gmst(UT_day) + self.longitude_RAD
+        #LST_RAD  = slalib.sla_gmst(UT_day) + self.longitude_RAD
+        LST_RAD = pal.gmst(UT_day) + self.longitude_RAD
                                                                                             
         return LST_RAD
 
@@ -1158,7 +1162,10 @@ class Instrument (object):
         (date,mjd,lst_RAD) = dateProfile
 
         ha_RAD = lst_RAD - ra_RAD 
-        (az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (ha_RAD,
+        #(az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (ha_RAD,
+        #                                   dec_RAD,
+        #                                   self.params.latitude_RAD)
+        (az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = pal.altaz (ha_RAD,
                                            dec_RAD,
                                            self.params.latitude_RAD)
 
@@ -1223,7 +1230,8 @@ class Instrument (object):
         slewInitState = self.DBrecordState(self.current_state, SLEWINITSTATE)
 
         ha_RAD = lst_RAD - ra_RAD
-        (az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (ha_RAD, dec_RAD, self.params.latitude_RAD)
+        #(az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (ha_RAD, dec_RAD, self.params.latitude_RAD)
+        (az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = pal.altaz (ha_RAD, dec_RAD, self.params.latitude_RAD)
 
         if self.slew_params.Rotator_FollowSky:
             angle_RAD = 0.0
@@ -1241,8 +1249,10 @@ class Instrument (object):
         rotator_telpos = self.current_state.GetRotatorTelPos()
         altitude = self.current_state.ALT_RAD
         azimuth = self.current_state.AZ_RAD
-	slewDistance = slalib.sla_dsep(ra_RAD, dec_RAD, init_state.RA_RAD, init_state.DEC_RAD)
-	slewdata = dataSlew(self.slewCount, date, date+delay, delay, slewDistance)
+	#slewDistance = slalib.sla_dsep(ra_RAD, dec_RAD, init_state.RA_RAD, init_state.DEC_RAD)
+        slewDistance = pal.dsep(ra_RAD, dec_RAD, init_state.RA_RAD, init_state.DEC_RAD)
+	
+        slewdata = dataSlew(self.slewCount, date, date+delay, delay, slewDistance)
 
 #        sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewHistory')
 #        sql += '%d, ' % (self.sessionID)

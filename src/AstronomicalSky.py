@@ -209,8 +209,9 @@ class AstronomicalSky (LSSTObject):
         """
         (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = self.obsProfile
         mjd = (float (date) / float (DAY)) + float(epoch_MJD)
-        lst_RAD = slalib.sla_gmst(mjd)  + lon_RAD
-        if lst_RAD < 0:
+        #lst_RAD = slalib.sla_gmst(mjd)  + lon_RAD
+        lst_RAD = pal.gmst(mjd) + lon_RAD
+	if lst_RAD < 0:
             lst_RAD += TWOPI
         return (date, mjd, lst_RAD)
 
@@ -239,10 +240,8 @@ class AstronomicalSky (LSSTObject):
         mjd = (float (date) / float (DAY)) + epoch_MJD
 
         # Get the Moon RA/Dec  in radians
-        (moonRA_RAD,moonDec_RAD,moonDiam) =  slalib.sla_rdplan(mjd,
-                                                    3,
-                                                    lon_RAD,
-                                                    lat_RAD)
+        #(moonRA_RAD,moonDec_RAD,moonDiam) =  slalib.sla_rdplan(mjd, 3, lon_RAD, lat_RAD)
+        (moonRA_RAD,moonDec_RAD,moonDiam) =  pal.rdplan(mjd, 3, lon_RAD, lat_RAD)
         moonPhase_PERCENT = self.getMoonPhase(mjd)
 
         return(moonRA_RAD,moonDec_RAD,moonPhase_PERCENT)
@@ -390,19 +389,28 @@ class AstronomicalSky (LSSTObject):
         Return
             Phase of the Moon at date in percent (i.e. in the range [0, 100]).
         """
-        v6moon =  slalib.sla_dmoon(mjd)
-        Rmatrix =  slalib.sla_prenut(2000.0, mjd)
-        xyzMoon2000 =  slalib.sla_dmxv(Rmatrix, v6moon)
-        (moonra, moondec)  =  slalib.sla_dcc2s(xyzMoon2000)
-        moonra =  slalib.sla_dranrm(2.0*math.pi + moonra)
-        sun12 =  slalib.sla_evp(mjd, 2000.0)
+        #v6moon =  slalib.sla_dmoon(mjd)
+        v6moon = pal.dmoon(mjd)
+        #Rmatrix =  slalib.sla_prenut(2000.0, mjd)
+        Rmatrix = pal.prenut(2000.0, mjd)
+        #xyzMoon2000 =  slalib.sla_dmxv(Rmatrix, v6moon)
+        xyzMoon2000 = pal.dmxv(Rmatrix, v6moon)
+        #(moonra, moondec)  =  slalib.sla_dcc2s(xyzMoon2000)
+        (moonra, moondec)  =  pal.dcc2s(xyzMoon2000)
+        #moonra =  slalib.sla_dranrm(2.0*math.pi + moonra)
+        moonra =  pal.dranrm(2.0*math.pi + moonra)
+        #sun12 =  slalib.sla_evp(mjd, 2000.0)
+        sun12 = pal.evp(mjd, 2000.0)
         #sun3heliocentric = (-sun12[3]) 
         sun3heliocentric = sun12[3] 
         for i in range(3) :
             sun3heliocentric[i] *= -1
-        (sunra, sundec) =  slalib.sla_dcc2s(sun3heliocentric)
-        sunra =  slalib.sla_dranrm(2.0*math.pi + sunra)
-        moonsunsep =  slalib.sla_dsep(sunra, sundec, moonra, moondec)
+        #(sunra, sundec) =  slalib.sla_dcc2s(sun3heliocentric)
+        (sunra, sundec) =  pal.dcc2s(sun3heliocentric)
+        #sunra =  slalib.sla_dranrm(2.0*math.pi + sunra)
+        sunra =  pal.dranrm(2.0*math.pi + sunra)
+        #moonsunsep =  slalib.sla_dsep(sunra, sundec, moonra, moondec)
+        moonsunsep =  pal.dsep(sunra, sundec, moonra, moondec)
         phase = ((1.0 - math.cos(moonsunsep))/2.0) * 100
 
         return (phase)
@@ -427,10 +435,8 @@ class AstronomicalSky (LSSTObject):
         # Convert date in MJD
         mjd = (float (date) / float (DAY)) + self.simEpoch
         
-        (ra_RAD, dec_RAD, diam) = slalib.sla_rdplan (mjd, 
-                                             self.PLANETS[planet],
-                                             self.longitude_RAD,
-                                             self.latitude_RAD)
+        #(ra_RAD, dec_RAD, diam) = slalib.sla_rdplan (mjd, self.PLANETS[planet], self.longitude_RAD, self.latitude_RAD)
+        (ra_RAD, dec_RAD, diam) = pal.rdplan (mjd, self.PLANETS[planet], self.longitude_RAD, self.latitude_RAD)
         return ((ra_RAD, dec_RAD))
    
     def  getSunAltAz(self, dateProfile):
@@ -439,8 +445,8 @@ class AstronomicalSky (LSSTObject):
                 
         (ra_RAD, dec_RAD) = self.getPlanetPosition('Sun',date)
         lha_RAD = lst_RAD - ra_RAD
-        (az_RAD,d1,d2,alt_RAD,d4,d5,d6,d7,d8) = slalib.sla_altaz (lha_RAD,dec_RAD,self.latitude_RAD)
-
+        #(az_RAD,d1,d2,alt_RAD,d4,d5,d6,d7,d8) = slalib.sla_altaz (lha_RAD,dec_RAD,self.latitude_RAD)
+        (az_RAD,d1,d2,alt_RAD,d4,d5,d6,d7,d8) = pal.altaz (lha_RAD,dec_RAD,self.latitude_RAD)
         return (alt_RAD,az_RAD)
         
     def getPlanetDistance (self, planet, target, date):
@@ -462,12 +468,17 @@ class AstronomicalSky (LSSTObject):
         mjd = (float (date) / float (DAY)) + self.simEpoch
         
         # planet RA/Dec in radian
-        (planetRA_RAD, planetDec_RAD, diam) = slalib.sla_rdplan (mjd, 
+        #(planetRA_RAD, planetDec_RAD, diam) = slalib.sla_rdplan (mjd, 
+        #                                     self.PLANETS[planet],
+        #                                     self.longitude_RAD,
+        #                                     self.latitude_RAD)
+        (planetRA_RAD, planetDec_RAD, diam) = pal.rdplan (mjd,
                                              self.PLANETS[planet],
                                              self.longitude_RAD,
                                              self.latitude_RAD)
-        slaDist_RAD = slalib.sla_dsep(target[0],target[1],
-                                  planetRA_RAD,planetDec_RAD)
+        #slaDist_RAD = slalib.sla_dsep(target[0],target[1],
+        #                          planetRA_RAD,planetDec_RAD)
+        slaDist_RAD = pal.dsep(target[0], target[1], planetRA_RAD,planetDec_RAD)
         #print "getPlanetDistance: slaDist_RAD:%f" % (slaDist_RAD)
         return (slaDist_RAD)
     
@@ -488,8 +499,11 @@ class AstronomicalSky (LSSTObject):
             target1[1] == target2[1]):
             return (0.)
         
-        slaDist_RAD = slalib.sla_dsep(target1[0],target1[1],
+        #slaDist_RAD = slalib.sla_dsep(target1[0],target1[1],
+        #                              target2[0],target2[1])
+        slaDist_RAD = pal.dsep(target1[0],target1[1],
                                       target2[0],target2[1])
+
         return (slaDist_RAD)
     
     
@@ -612,8 +626,10 @@ class AstronomicalSky (LSSTObject):
 
         # Compute moon altitude in radians
         moonha_RAD = lst_RAD - moonRA_RAD
+        #(moonAz_RAD,d1,d2,moonAlt_RAD,d4,d5,d6,d7,d8) = \
+        #        slalib.sla_altaz(moonha_RAD, moonDec_RAD, self.latitude_RAD)
         (moonAz_RAD,d1,d2,moonAlt_RAD,d4,d5,d6,d7,d8) = \
-                slalib.sla_altaz(moonha_RAD, moonDec_RAD, self.latitude_RAD)
+                pal.altaz(moonha_RAD, moonDec_RAD, self.latitude_RAD)
         moonAlt_DEG = moonAlt_RAD * RAD2DEG
 
         # compute moon's zenith distance
@@ -631,8 +647,11 @@ class AstronomicalSky (LSSTObject):
         alpha = math.acos ( 2. * moonPhase_PERCENT/100. - 1.) * RAD2DEG
         alpha = normalize (alpha, min=0., max=180., degrees=True)
         
-        distance2moon_RAD = slalib.sla_dsep (moonRA_RAD, moonDec_RAD,
+        #distance2moon_RAD = slalib.sla_dsep (moonRA_RAD, moonDec_RAD,
+        #                                     ra*DEG2RAD,dec*DEG2RAD)
+        distance2moon_RAD = pal.dsep (moonRA_RAD, moonDec_RAD,
                                              ra*DEG2RAD,dec*DEG2RAD)
+
         distance2moon_DEG = distance2moon_RAD * RAD2DEG
         
         # Altitude -> Zenith distance (degrees)
@@ -755,14 +774,18 @@ class AstronomicalSky (LSSTObject):
         lha_RAD = lst_RAD - ra * DEG2RAD
         
         # Compute altitude 
-        (az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (lha_RAD,
+        #(az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (lha_RAD,
+        #                           dec * DEG2RAD,
+        #                           self.latitude_RAD)
+        (az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = pal.altaz (lha_RAD,
                                    dec * DEG2RAD,
                                    self.latitude_RAD)
 
         # Altitude -> Zenith distance (radian)
         zd_RAD = 1.5707963 - alt_RAD
         # Airmass
-        am = slalib.sla_airmas (zd_RAD)
+        #am = slalib.sla_airmas (zd_RAD)
+        am = pal.airmas(zd_RAD)
 
         #print "t: %d raDEG:%f decDEG:%f mjd:%f lstRAD:%f lhaDEG:%f lha_RAD:%f altRAD:%f zdRAD:%f am:%f" % (date,ra,dec,mjd,lst_RAD,lha,lha_RAD,alt_RAD,zd_RAD,am)
         
@@ -796,10 +819,15 @@ class AstronomicalSky (LSSTObject):
         mjd = (float (date) / float (DAY)) + epoch_MJD
 
         # Get the Moon RA/Dec  in radians
-        (moonRA_RAD,moonDec_RAD,moonDiam) =  slalib.sla_rdplan(mjd,
+        #(moonRA_RAD,moonDec_RAD,moonDiam) =  slalib.sla_rdplan(mjd,
+        #                                            3,
+        #                                            lon_RAD,
+        #                                            lat_RAD)
+        (moonRA_RAD,moonDec_RAD,moonDiam) = pal.rdplan(mjd,
                                                     3,
                                                     lon_RAD,
                                                     lat_RAD)
+
         moonPhase_PERCENT = self.getMoonPhase(mjd)
 
         return(moonRA_RAD,moonDec_RAD,moonPhase_PERCENT)
@@ -822,14 +850,18 @@ class AstronomicalSky (LSSTObject):
         """
         (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = self.obsProfile
         mjd = (float (date) / float (DAY)) + epoch_MJD
-        lst_RAD = slalib.sla_gmst(mjd)  + lon_RAD
+        #lst_RAD = slalib.sla_gmst(mjd)  + lon_RAD
+        lst_RAD = pal.gmst(mjd) + lon_RAD
 
         (moonRA_RAD, moonDec_RAD, moonPhase_PERCENT) = self.computeMoonProfile(date)
 
         # Compute moon altitude in radians
         moonha_RAD = lst_RAD - moonRA_RAD
+        #(moonAz_RAD,d1,d2,moonAlt_RAD,d4,d5,d6,d7,d8) = \
+        #        slalib.sla_altaz(moonha_RAD, moonDec_RAD, self.latitude_RAD)
         (moonAz_RAD,d1,d2,moonAlt_RAD,d4,d5,d6,d7,d8) = \
-                slalib.sla_altaz(moonha_RAD, moonDec_RAD, self.latitude_RAD)
+                 pal.altaz(moonha_RAD, moonDec_RAD, self.latitude_RAD)
+
 
 	return (moonRA_RAD, moonDec_RAD, moonPhase_PERCENT, moonAlt_RAD, moonAz_RAD)
     
@@ -840,7 +872,8 @@ class AstronomicalSky (LSSTObject):
 	"""
 
         zd_airmass = math.acos(1.0/airmass)
-        (ha_RAD, dec_RAD)=slalib.sla_dh2e(-math.pi/2, math.pi/2-zd_airmass, self.latitude_RAD)
+        #(ha_RAD, dec_RAD)=slalib.sla_dh2e(-math.pi/2, math.pi/2-zd_airmass, self.latitude_RAD)
+        (ha_RAD, decRAD) = pal.dh2e(-math.pi/2, math.pi/2-zd_airmass, self.latitude_RAD)
 
         return 12.0*ha_RAD/math.pi
     
@@ -857,8 +890,9 @@ class AstronomicalSky (LSSTObject):
         local Sidereal Time (float) in radians
         """
         ## LSST convention is W is negative, East is positive
-        lst_RAD = slalib.sla_gmst(mjd)  + longitude_RAD
-        
+        #lst_RAD = slalib.sla_gmst(mjd)  + longitude_RAD
+        lst_RAD = pal.gmst(mjd) + longitude_RAD       
+ 
         return (lst_RAD)
     
     
@@ -876,9 +910,13 @@ class AstronomicalSky (LSSTObject):
         Altitude in radians (float)
         """
         # Compute azimuth and altitude
-        (az_RAD,d1,d2,alt_RAD,d4,d5,d6,d7,d8) = slalib.sla_altaz (hourAngle_RAD, 
+        #(az_RAD,d1,d2,alt_RAD,d4,d5,d6,d7,d8) = slalib.sla_altaz (hourAngle_RAD, 
+        #                           dec_RAD, 
+        #                           latitude_RAD)
+        (az_RAD,d1,d2,alt_RAD,d4,d5,d6,d7,d8) = pal.altaz (hourAngle_RAD, 
                                    dec_RAD, 
                                    latitude_RAD)
+
         # Fetch altitude from result (radians)
         return (alt_RAD )
     
@@ -897,9 +935,13 @@ class AstronomicalSky (LSSTObject):
         Azimuth in radians (float)
         """
         # Compute azimuth and altitude
-        (az_RAD,d1,d2,alt_RAD,d4,d5,d6,d7,d8) = slalib.sla_altaz (hourAngle_RAD, 
+        #(az_RAD,d1,d2,alt_RAD,d4,d5,d6,d7,d8) = slalib.sla_altaz (hourAngle_RAD, 
+        #                           dec_RAD, 
+        #                           latitude_RAD)
+        (az_RAD,d1,d2,alt_RAD,d4,d5,d6,d7,d8) = pal.altaz (hourAngle_RAD, 
                                    dec_RAD, 
                                    latitude_RAD)
+
         # Fetch azimuth from result (radians) 
         return (az_RAD )
     

@@ -19,12 +19,13 @@ import logging
 # from SimPy.Monitor import Monitor
 
 # Third-party includes
-try:
-    import slalib
-except:
-    import pysla as slalib
-import Sun
+#try:
+#    import slalib
+#except:
+#    import pysla as slalib
+import palpy as pal
 
+import Sun
 
 try:
     from lsstUtil import distance
@@ -49,8 +50,8 @@ except:
         3. This is a fallback solution in case an optimized version of this 
            routine does not exist.
         """
-        return([slalib.sla_dsep(field0[0], field0[1], 
-                                field[0], field[1]) for field in fields])
+        #return([slalib.sla_dsep(field0[0], field0[1], field[0], field[1]) for field in fields])
+        return([pal.dsep(field0[0], field0[1], field[0], field[1]) for field in fields])
 
 # Simulator specific includes
 from dateutils import *
@@ -357,7 +358,8 @@ def storeParam (lsstDB, sessionID, propID, moduleName, paramIndex, paramName,
     """
 #    (lon_RAD,lat_RAD,elev_M,epoch_MJD,d1,d2,d3) = obsProfile
 #    mjd = (float (date) / float (DAY)) + float(epoch_MJD)
-#    lst_RAD = slalib.sla_gmst(mjd)  + lon_RAD
+##    lst_RAD = slalib.sla_gmst(mjd)  + lon_RAD
+#    lst_RAD = pal.gmst(mjd) + lon_RAD
 #    if lst_RAD < 0:
 #        lst_RAD += TWOPI
 #    return (date, mjd, lst_RAD)

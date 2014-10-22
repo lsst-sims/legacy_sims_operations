@@ -11,11 +11,12 @@
 
 
 import sys, string, math
-try:
-    import slalib
-except:
-    import pysla as slalib
+#try:
+#    import slalib
+#except:
+#    import pysla as slalib
 
+import palpy as pal
 
 # globals
 TWOPI = 2 * math.pi
@@ -105,7 +106,9 @@ def gre2mjd (date):
         raise (SyntaxError, msg)
     
     # Use SLALIB to convert from (year, month, day) to MJD
-    (mjd, error) = slalib.sla_cldj (year, month, day)
+    #(mjd, error) = slalib.sla_cldj (year, month, day)
+    mjd = pal.cldj(year, month, day)    
+
     if (error):
         msg = 'Fatal error: YYYY has to be hreater or equal to 1600,'
         msg += '             MM has to be positive and less or equal to 12,'
@@ -120,10 +123,12 @@ def gre2mjd (date):
 
 def mjd2gre (mjd):
     # Use SLALIB to convert from MJD to (year, month, day)
-    (year, month, day, fraction, error) = slalib.sla_djcl (mjd)
-    if (error):
-        msg = 'Fatal error: MJD must correspond to a date later than 4701BC March 1'
-        raise (SyntaxError, msg)
+    #(year, month, day, fraction, error) = slalib.sla_djcl (mjd)
+    (year, month, day, fraction) = pal.djcl(mjd)
+
+    #if (error):
+    #    msg = 'Fatal error: MJD must correspond to a date later than 4701BC March 1'
+    #    raise (SyntaxError, msg)
     
     # Now take care of the fraction of day
     hh = math.floor (24. * fraction)
