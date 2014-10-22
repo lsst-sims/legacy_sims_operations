@@ -107,7 +107,7 @@ def gre2mjd (date):
     
     # Use SLALIB to convert from (year, month, day) to MJD
     #(mjd, error) = slalib.sla_cldj (year, month, day)
-    (mjd, error) = pal.cldj(year, month, day)    
+    mjd = pal.cldj(year, month, day)    
 
     if (error):
         msg = 'Fatal error: YYYY has to be hreater or equal to 1600,'

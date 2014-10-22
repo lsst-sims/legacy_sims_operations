@@ -51,7 +51,7 @@ except:
            routine does not exist.
         """
         #return([slalib.sla_dsep(field0[0], field0[1], field[0], field[1]) for field in fields])
-	return([pal.dsep(field0[0], field0[1], field[0], field[1]) for field in fields])
+        return([pal.dsep(field0[0], field0[1], field[0], field[1]) for field in fields])
 
 # Simulator specific includes
 from dateutils import *

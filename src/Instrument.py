@@ -511,7 +511,7 @@ class InstrumentState (InstrumentPosition):
         HA_RAD   = LST_RAD - RA_RAD
 
         #result = slalib.sla_altaz(HA_RAD, DEC_RAD, self.latitude_RAD)
-	result = pal.altaz(HA_RAD, DEC_RAD, self.latitude_RAD) 
+        result = pal.altaz(HA_RAD, DEC_RAD, self.latitude_RAD) 
 
         AZ_RAD  = result[0]
         ALT_RAD = result[3]
