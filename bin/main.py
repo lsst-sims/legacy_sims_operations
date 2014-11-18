@@ -7,10 +7,10 @@
 
 OPSIM_VERSION = '3.1'
 
-from utilities import *
-from Simulator import *
+from lsst.sims.operations.utilities import *
+from lsst.sims.operations.Simulator import *
 #from LSSTDatabase import *
-from Database import *
+from lsst.sims.operations.Database import *
 import binascii
 
 import requests
