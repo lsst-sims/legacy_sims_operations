@@ -72,8 +72,8 @@ echo "####################################################################"
 echo "[Fixing visitTime & visitExpTime]"
 $mysql -u www -pzxcvbnm -e "update $database.tObsHistory_${host}_$1 set visitTime=visitExpTime"
 $mysql -u www -pzxcvbnm -e "update $database.tObsHistory_${host}_$1 set visitExpTime=visitTime-4.00"
-$mysql -u www -pzxcvbnm -e "update $database.output_${host}_$1 set visitTime=visitExpTime"
-$mysql -u www -pzxcvbnm -e "update $database.output_${host}_$1 set visitExpTime=visitTime-4.00"
+$mysql -u www -pzxcvbnm -e "update $database.summary_${host}_$1 set visitTime=visitExpTime"
+$mysql -u www -pzxcvbnm -e "update $database.summary_${host}_$1 set visitExpTime=visitTime-4.00"
 echo "####################################################################"
 
 # Adding wfd tag to Proposal table for propID
