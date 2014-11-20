@@ -96,15 +96,15 @@ def add_nights(database, simname):
 def remove_dither(simname, dropdatacol = False):
     print "Removing existing dithering indexes and columns."
     cursor = connect_db()
-    sqlquery = "drop index hexdithra_idx on %s" %(simname)
+    sqlquery = "drop index ditheredRA_idx on %s" %(simname)
     cursor.execute(sqlquery)
-    sqlquery = "drop index hexdithdec_idx on %s" %(simname)
+    sqlquery = "drop index ditheredDec_idx on %s" %(simname)
     cursor.execute(sqlquery)
-    sqlquery = "drop index hexdithradec_idx on %s" %(simname)
+    sqlquery = "drop index ditheredRADec_idx on %s" %(simname)
     cursor.execute(sqlquery)
     if dropdatacol:
-        print "Removed indexes - now will remove columns hexdithra/dec & vertex."
-        sqlquery = "alter table %s drop column hexdithra, drop column hexdithdec, drop column vertex" %(simname)
+        print "Removed indexes - now will remove columns ditheredRA/dec & vertex."
+        sqlquery = "alter table %s drop column ditheredRA, drop column ditheredDec, drop column vertex" %(simname)
         cursor.execute(sqlquery)
     cursor.close()
     return
@@ -143,16 +143,16 @@ def offsetHex():
 
 def add_dither(database, simname, overwrite=True):
     ## Add the Krughoff-Jones dithering pattern to the opsim output
-    ## adds three columns (hexdithra, hexdithdec, and vertex) and indexes
+    ## adds three columns (ditheredRA, ditheredDec, and vertex) and indexes
     #connect to the database
     cursor =  connect_db(dbname=database)
     # check if dithering columns exist
     sqlquery = "describe %s"%(simname)
     cursor.execute(sqlquery)
-    newcols = ['hexdithra', 'hexdithdec', 'vertex']
+    newcols = ['ditheredRA', 'ditheredDec', 'vertex']
     sqlresults = cursor.fetchall()
-    for result in sqlresults:        
-        if (result[0]=='hexdithra' or result[0] == 'hexdithdec' or result[0]=='vertex'):
+    for result in sqlresults:
+        if (result[0]=='ditheredRA' or result[0] == 'ditheredDec' or result[0]=='vertex'):
             newcols.remove(result[0])
             if overwrite:
                 print '%s column already exists, but will overwrite.' %(result[0])
@@ -172,41 +172,41 @@ def add_dither(database, simname, overwrite=True):
     sqlquery = "select distinct(night) from %s"%(simname)
     #print sqlquery
     cursor.execute(sqlquery)
-    sqlresults = cursor.fetchall()    
-    # go through each night individually 
+    sqlresults = cursor.fetchall()
+    # go through each night individually
     offsets = offsetHex()
     for result in sqlresults:
         night = int(result[0])
         vertex = night%len(offsets)
         x_off, y_off = offsets[vertex]
-        #It doesn't make a ton of sense, but see http://bugs.mysql.com/bug.php?id=1665 for a discussion of the mysql modulus convention. 
+        #It doesn't make a ton of sense, but see http://bugs.mysql.com/bug.php?id=1665 for a discussion of the mysql modulus convention.
         #In the case where a mod can return a negative value (((N%M)+M)%M) will return what one would expect.
-        sqlquery = "update %s set hexdithra = ((((fieldra+(%f/cos(fielddec)))%%(2*PI()))+(2*PI()))%%(2*PI())), hexdithdec = if(abs(fielddec + %f) > 90, fielddec  - %f, fielddec + %f), vertex = %i where night = %i"%(simname,x_off, y_off, y_off, y_off, vertex, night)
+        sqlquery = "update %s set ditheredRA = ((((fieldra+(%f/cos(fielddec)))%%(2*PI()))+(2*PI()))%%(2*PI())), ditheredDec = if(abs(fielddec + %f) > 90, fielddec  - %f, fielddec + %f), vertex = %i where night = %i"%(simname,x_off, y_off, y_off, y_off, vertex, night)
         #Sometimes when the offset is 0 the above may still produce dec centers < -90 deg because fielddec can be < -pi/2. because of rounding issues.
         #it would make for a very complicated query string.
         cursor.execute(sqlquery)
         #print "Night %d done ....:" % (night)
     #This shouldn't really happen, but if outside -PI/2 -- PI/2 reflect to the proper bounds.  This does happen sometimes due to rounding issues.
-    sqlquery = "update %s set hexdithdec = -PI()/2. - (((hexdithdec%%(-PI()/2)) + (-PI()/2.))%%(-PI()/2.)) where hexdithdec < -PI()/2;"%(simname)
+    sqlquery = "update %s set ditheredDec = -PI()/2. - (((ditheredDec%%(-PI()/2)) + (-PI()/2.))%%(-PI()/2.)) where ditheredDec < -PI()/2;"%(simname)
     cursor.execute(sqlquery)
-    sqlquery = "update %s set hexdithdec = PI()/2. - (((hexdithdec%%(PI()/2)) + (PI()/2.))%%(PI()/2.)) where hexdithdec > PI()/2;"%(simname)
+    sqlquery = "update %s set ditheredDec = PI()/2. - (((ditheredDec%%(PI()/2)) + (PI()/2.))%%(PI()/2.)) where ditheredDec > PI()/2;"%(simname)
     cursor.execute(sqlquery)
     # add indexes
     print "Adding dithering indexes"
-    sqlquery = "create index hexdithRA_idx on %s(hexdithRA)" %(simname)
+    sqlquery = "create index ditheredRA_idx on %s(ditheredRA)" %(simname)
     cursor.execute(sqlquery)
-    sqlquery = "create index hexdithDec_idx on %s(hexdithDec)" %(simname)
+    sqlquery = "create index ditheredDec_idx on %s(ditheredDec)" %(simname)
     cursor.execute(sqlquery)
-    sqlquery = "create index hexdithradec_idx on %s(hexdithRA, hexdithDec)" %(simname)
+    sqlquery = "create index ditheredRADec_idx on %s(ditheredRA, ditheredDec)" %(simname)
     cursor.execute(sqlquery)
     cursor.close()
-                      
+
 if __name__ == "__main__":
 
     # Give this the opsim name, then will update opsim to add useful information & indexes
 
     import sys
-    
+
     if len(sys.argv)<3:
         print "Usage : './prep_opsim.py <realhostname> <databasename> <sessionID>'"
         sys.exit(1)
