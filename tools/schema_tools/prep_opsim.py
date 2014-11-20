@@ -178,7 +178,7 @@ def add_dither(database, simname, overwrite=True):
         x_off, y_off = offsets[vertex]
         #It doesn't make a ton of sense, but see http://bugs.mysql.com/bug.php?id=1665 for a discussion of the mysql modulus convention.
         #In the case where a mod can return a negative value (((N%M)+M)%M) will return what one would expect.
-        sqlquery = "update %s set ditheredRA = ((((fieldra+(%f/cos(fielddec)))%%(2*PI()))+(2*PI()))%%(2*PI())), ditheredDec = if(abs(fielddec + %f) > 90, fielddec  - %f, fielddec + %f) = %i where night = %i"%(simname,x_off, y_off, y_off, y_off, night)
+        sqlquery = "update %s set ditheredRA = ((((fieldra+(%f/cos(fielddec)))%%(2*PI()))+(2*PI()))%%(2*PI())), ditheredDec = if(abs(fielddec + %f) > 90, fielddec  - %f, fielddec + %f) where night = %i"%(simname, x_off, y_off, y_off, y_off, night)
         #Sometimes when the offset is 0 the above may still produce dec centers < -90 deg because fielddec can be < -pi/2. because of rounding issues.
         #it would make for a very complicated query string.
         cursor.execute(sqlquery)
