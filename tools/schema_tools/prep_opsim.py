@@ -213,7 +213,7 @@ if __name__ == "__main__":
     hname = sys.argv[1]
     database = sys.argv[2]
     sessionID = sys.argv[3]
-    opsimname = "output_" + hname + "_" + sessionID
+    opsimname = "summary" + hname + "_" + sessionID
     #print "Updating %s" %(opsimname)
     add_indexes(database, opsimname)
     #add_nights(database, opsimname)
