@@ -62,7 +62,7 @@ def check_columns_if_they_exist(hname, database, sessionID):
 	return columnsexistbool;
 
 def create_output_table(hname, database, sessionID):
-	# print 'Creating/Recreating Output Table ...'
+	# print 'Creating/Recreating Summary Table ...'
 	sql = 'use %s' % (database)
 	ret = getDbData(database, sql)
 	sql = 'create table summary_%s_%d (obsHistID int(10) unsigned not null, sessionID int(10) unsigned not null, propID int(10), fieldID int(10) unsigned not null, fieldRA double, fieldDec double, filter varchar(8), expDate int(10) unsigned, expMJD double, night int(10) unsigned, visitTime double, visitExpTime double, finRank double, finSeeing double, transparency double, airmass double, vSkyBright double, filtSkyBright double, rotSkyPos double, lst double, altitude double, azimuth double, dist2Moon double, solarElong double, moonRA double, moonDec double, moonAlt double, moonAZ double, moonPhase double, sunAlt double, sunAz double, phaseAngle double, rScatter double, mieScatter double, moonIllum double, moonBright double, darkBright double, rawSeeing double, wind double, humidity double, slewDist double, slewTime double, fiveSigmaDepth double);' % (hname, sessionID)
