@@ -93,7 +93,7 @@ if ($table == "") then
 else
 	if ($RECREATE_OUTPUT_TABLE) then
 		echo "[Dropping output table and recreating]"
-		time $mysql -u www --password=zxcvbnm -e "drop table ${database}.output_${host}_$1"
+		time $mysql -u www --password=zxcvbnm -e "drop table ${database}.summary_${host}_$1"
 	endif
 endif
 echo "####################################################################"
