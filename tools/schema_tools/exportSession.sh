@@ -30,7 +30,7 @@ $mysql -u www -pzxcvbnm -e "select * from $1.tSlewHistory_$2_$3" > SlewHistory_$
 $mysql -u www -pzxcvbnm -e "select * from $1.tSlewMaxSpeeds_$2_$3" > SlewMaxSpeeds_$2_$3.dat
 $mysql -u www -pzxcvbnm -e "select * from $1.tSlewState_$2_$3" > SlewState_$2_$3.dat
 $mysql -u www -pzxcvbnm -e "select * from $1.tTimeHistory_$2_$3" > TimeHistory_$2_$3.dat
-$mysql -u www -pzxcvbnm -e "select obsHistID, sessionID, propID, fieldID, fieldRA, fieldDec, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBright as filtSkyBrightness, rotSkyPos, lst, altitude, azimuth, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAz, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind, humidity, slewDist, slewTime, fiveSigmaDepth, ditheredRA, ditheredDec from $1.summary_$2_$3" > Summary_$2_$3.dat
+$mysql -u www -pzxcvbnm -e "select * from $1.summary_$2_$3" > Summary_$2_$3.dat
 
 # Gzipping
 tar zcvf $2_$3_datexport.tar.gz Cloud.dat Seeing.dat Field.dat *_$2_$3.dat
