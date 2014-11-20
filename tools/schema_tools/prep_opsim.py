@@ -103,8 +103,8 @@ def remove_dither(simname, dropdatacol = False):
     sqlquery = "drop index ditheredRADec_idx on %s" %(simname)
     cursor.execute(sqlquery)
     if dropdatacol:
-        print "Removed indexes - now will remove columns ditheredRA/dec & vertex."
-        sqlquery = "alter table %s drop column ditheredRA, drop column ditheredDec, drop column vertex" %(simname)
+        print "Removed indexes - now will remove columns ditheredRA/dec."
+        sqlquery = "alter table %s drop column ditheredRA, drop column ditheredDec" %(simname)
         cursor.execute(sqlquery)
     cursor.close()
     return
@@ -149,10 +149,10 @@ def add_dither(database, simname, overwrite=True):
     # check if dithering columns exist
     sqlquery = "describe %s"%(simname)
     cursor.execute(sqlquery)
-    newcols = ['ditheredRA', 'ditheredDec', 'vertex']
+    newcols = ['ditheredRA', 'ditheredDec']
     sqlresults = cursor.fetchall()
     for result in sqlresults:
-        if (result[0]=='ditheredRA' or result[0] == 'ditheredDec' or result[0]=='vertex'):
+        if (result[0]=='ditheredRA' or result[0] == 'ditheredDec'):
             newcols.remove(result[0])
             if overwrite:
                 print '%s column already exists, but will overwrite.' %(result[0])
@@ -162,11 +162,8 @@ def add_dither(database, simname, overwrite=True):
     if len(newcols)>0:
         print 'Adding dithering columns'
         for n in newcols:
-            if n == 'vertex':
-                sqlquery = 'alter table %s add %s int' %(simname, n)
-            else:
-                # add columns for dithering
-                sqlquery = 'alter table %s add %s double' %(simname, n)
+            # add columns for dithering
+            sqlquery = 'alter table %s add %s double' %(simname, n)
             cursor.execute(sqlquery)
     # want to change vertex on night/night basis, so pull all night values from db
     sqlquery = "select distinct(night) from %s"%(simname)
@@ -181,7 +178,7 @@ def add_dither(database, simname, overwrite=True):
         x_off, y_off = offsets[vertex]
         #It doesn't make a ton of sense, but see http://bugs.mysql.com/bug.php?id=1665 for a discussion of the mysql modulus convention.
         #In the case where a mod can return a negative value (((N%M)+M)%M) will return what one would expect.
-        sqlquery = "update %s set ditheredRA = ((((fieldra+(%f/cos(fielddec)))%%(2*PI()))+(2*PI()))%%(2*PI())), ditheredDec = if(abs(fielddec + %f) > 90, fielddec  - %f, fielddec + %f), vertex = %i where night = %i"%(simname,x_off, y_off, y_off, y_off, vertex, night)
+        sqlquery = "update %s set ditheredRA = ((((fieldra+(%f/cos(fielddec)))%%(2*PI()))+(2*PI()))%%(2*PI())), ditheredDec = if(abs(fielddec + %f) > 90, fielddec  - %f, fielddec + %f) = %i where night = %i"%(simname,x_off, y_off, y_off, y_off, night)
         #Sometimes when the offset is 0 the above may still produce dec centers < -90 deg because fielddec can be < -pi/2. because of rounding issues.
         #it would make for a very complicated query string.
         cursor.execute(sqlquery)
