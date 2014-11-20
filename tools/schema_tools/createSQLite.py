@@ -13,9 +13,9 @@ def import_table(conn, tableName, hname, sessionID):
 	else :
 #		fname = "%s/%s_%s_%s.dat" % (foldername, tableName, hname, sessionID)
 		fname = "%s_%s_%s.dat" % (tableName, hname, sessionID)
-	
+
 	f = open(fname, "r")
-	
+
 	i = 0
 	for line in f:
 		if i == 0:
@@ -44,11 +44,11 @@ if __name__ == '__main__':
 	hname = sys.argv[1]
 	sessionID = sys.argv[2]
 	sql_fname = "%s_%s_sqlite.db" % (hname, sessionID)
-	conn = sqlite3.connect(sql_fname)	
+	conn = sqlite3.connect(sql_fname)
 	cursor = conn.cursor()
-	
-	command_string = "sqlite3 %s_%s_sqlite.db < v3_0-sqlite.sql" % (hname, sessionID)
-	os.system(command_string) 
+
+	command_string = "sqlite3 %s_%s_sqlite.db < schema_tools/v3_0-sqlite.sql" % (hname, sessionID)
+	os.system(command_string)
 
 	import_table(cursor, "Cloud", "", "")
 	import_table(cursor, "Field", "", "")
