@@ -10,7 +10,7 @@ def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbnam
     db = mysqldb.connect(host=hostname, user=username, passwd=passwdname, db=dbname)
     cursor = db.cursor()
     return cursor
-    
+
 def add_indexes(database, simname):
     ## adds some useful indexes for calculating values from opsim
     # set up a dictionary to hold the index info

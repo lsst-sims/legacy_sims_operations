@@ -1,18 +1,23 @@
 #! /bin/tcsh
 
+# Note: this calls gen_output.py, prep_opsim.py, move_data_output_obshistory.py,
+#    createSQLite.py, exportSession.sh, createSubSetTables.sh and dropSubSetTables.sh
+
+# On non-opsim Darwin machines, it seems likely that you will have to update the paths to python/mysql.
+
 echo "####################################################################"
 echo "[Checking Linux/Darwin]"
 set machine = `uname`
 if ( $machine == "Linux" ) then
-        set python = "python"
+    set python = "python"
     set mysql = "mysql"
     set mysqldump = "mysqldump"
-        echo "Detected Linux machine ..."
+    echo "Detected Linux machine ..."
 else if ( $machine == "Darwin" ) then
-        set python = "/opt/local/bin/python2.7"
+    set python = "/opt/local/bin/python2.7"
     set mysql = "/opt/local/lib/mysql5/bin/mysql"
     set mysqldump = "/opt/local/lib/mysql5/bin/mysqldump"
-        echo "Detected Darwin machine ..."
+    echo "Detected Darwin machine ..."
 endif
 echo "####################################################################"
 
@@ -33,15 +38,15 @@ echo "####################################################################"
 # Making the Output table
 echo "####################################################################"
 echo "[gen_output.py]"
-time $python gen_output.py $host $database $1
+time $python schema_tools/gen_output.py $host $database $1
 echo "####################################################################"
 
 # Make subset of all tables
 echo "####################################################################"
 echo "[dropSubsetTables.sh]"
-time ./dropSubsetTables.sh $database $host $1
+time schema_tools/dropSubsetTables.sh $database $host $1
 echo "[createSubsetTables.sh]"
-time ./createSubsetTables.sh $database $host $1
+time schema_tools/createSubsetTables.sh $database $host $1
 echo "####################################################################"
 
 # Update the names
@@ -53,13 +58,13 @@ $mysql -u www -pzxcvbnm -e "alter table $database.tObsHistory_${host}_$1 change 
 $mysql -u www -pzxcvbnm -e "alter table $database.tObsHistory_${host}_$1 add ditheredRA double"
 $mysql -u www -pzxcvbnm -e "alter table $database.tObsHistory_${host}_$1 add ditheredDec double"
 $mysql -u www -pzxcvbnm -e "alter table $database.tObsHistory_${host}_$1 add fiveSigmaDepth double"
-$mysql -u www -pzxcvbnm -e "alter table $database.tProposal_${host}_$1 add tag varchar(256)"
+#$mysql -u www -pzxcvbnm -e "alter table $database.tProposal_${host}_$1 add tag varchar(256)"
 echo "####################################################################"
 
 # Add dithering (ra, dec, night, vertex) columns & Adding indexes
 echo "####################################################################"
 echo "[Add dithering (ra, dec, night, vertex) columns -> prep_opsim]"
-time $python prep_opsim.py $host $database $1
+time $python schema_tools/prep_opsim.py $host $database $1
 echo "####################################################################"
 
 # Fixing visitTime & visitExpTime for tObsHistory and output tables
@@ -72,27 +77,27 @@ $mysql -u www -pzxcvbnm -e "update $database.output_${host}_$1 set visitExpTime=
 echo "####################################################################"
 
 # Adding wfd tag to Proposal table for propID
-echo "####################################################################"
-echo "[Adding WFD tag]"
-$mysql -u www -pzxcvbnm -e "update $database.tProposal_${host}_$1 set tag='wfd' where propID=$2"
-echo "####################################################################"
+#echo "####################################################################"
+#echo "[Adding WFD tag]"
+#$mysql -u www -pzxcvbnm -e "update $database.tProposal_${host}_$1 set tag='wfd' where propID=$2"
+#echo "####################################################################"
 
 # Copying over fiveSigmaDepth, ditheredRA, ditheredDec values from output to ObsHistory
 echo "####################################################################"
 echo "[Fixing fiveSigmaDepth, ditheredRA, ditheredDec values from output to ObsHistory]"
-time $python move_data_output_obshistory.py $host $database $1
+time $python schema_tools/move_data_output_obshistory.py $host $database $1
 echo "####################################################################"
 
 # Exporting session
 echo "####################################################################"
 echo "[Exporting session data]"
 #if ($RECREATE_OUTPUT_TABLE) then
-time ./exportSession.sh $database $host $1
+time schema_tools/exportSession.sh $database $host $1
 echo "[Creating SQLite file]"
-time $python createSQLite.py $host $1
+time $python schema_tools/createSQLite.py $host $1
 mv ${host}_$1_* ../output
 #endif
 echo "[dropSubsetTables.sh]"
-time ./dropSubsetTables.sh $database $host $1
+time schema_tools/dropSubsetTables.sh $database $host $1
 echo "####################################################################"
 
