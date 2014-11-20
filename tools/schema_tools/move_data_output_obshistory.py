@@ -4,12 +4,7 @@ import sys, re, time, socket
 import math
 import MySQLdb as mysqldb
 import os
-from ETC import ETC
 from socket import gethostname
-try:
-	import slalib
-except:
-    import pysla as slalib
 
 def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbname='OpsimDB'):   
     # connect to lsst_pointings (or other) mysql db, using account that has 'alter table' privileges
@@ -49,9 +44,9 @@ def copy_data_over(hname, database, sessionID):
 	# print 'Copying data over'
 	sql = 'use %s' % (database)
         ret = getDbData(database, sql)
-	sql = 'select obsHistID, fivesigma, hexdithRA, hexdithDec from output_%s_%d' % (hname, sessionID)
+	sql = 'select obsHistID, fiveSigmaDepth, ditheredRA, ditheredDec from summary_%s_%d' % (hname, sessionID)
 	ret = getDbData(database, sql)
-	
+
 	for k in range(len(ret)):
 		obsHistID = ret[k][0]
 		fiveSigmaDepth = ret[k][1]
