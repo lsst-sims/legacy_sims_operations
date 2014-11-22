@@ -11,7 +11,7 @@ CREATE INDEX oh_field_filter_idx ON ObsHistory(filter);
 CREATE INDEX fk_ObsHistory_Session_idx ON ObsHistory(Session_sessionID);
 CREATE INDEX fk_ObsHistory_field_idx ON ObsHistory(Field_fieldID);
 
-CREATE TABLE Proposal (propID INTEGER PRIMARY KEY, propConf TEXT, propName TEXT, objectID INTEGER, objectHost TEXT, tag TEXT, Session_sessionID INTEGER);
+CREATE TABLE Proposal (propID INTEGER PRIMARY KEY, propConf TEXT, propName TEXT, objectID INTEGER, objectHost TEXT, Session_sessionID INTEGER);
 CREATE INDEX fk_Proposal_Session_idx ON Proposal(Session_sessionID);
 
 CREATE TABLE SeqHistory (sequenceID INTEGER PRIMARY KEY, startDate INTEGER, expDate INTEGER, seqnNum INTEGER, completion REAL, reqEvents INTEGER, actualEvents INTEGER, endStatus INTEGER, parent_sequenceID INTEGER, Field_fieldID INTEGER, Session_sessionID INTEGER, Proposal_propID INTEGER);
