@@ -1,0 +1,132 @@
+Release Notes for SSTAR 4.0				Jan. 15, 2014
+===============================
+Bug
+  * [OPSIM-2] - Permissions
+  * [OPSIM-6] - Remove newreport and add summaryreport instead
+  * [OPSIM-11] - Hourglass plot showing dots instead of lines.
+  * [OPSIM-15] - In make_report.sh, always create "export" even for RECREATE_OUTPUT_TABLE=0
+  * [OPSIM-49] - Alter second tier html page for Run Log to reflect OpSim v3.0 changes
+  * [OPSIM-52] - summaryReport.txt is not created (see opsimblitz2.1004)
+General Issue/Concern
+  * [OPSIM-14] - Tables 1, 4, 9, 11,  12 & 13 are too wide for the page; suggest truncating "./conf/survey" for the proposal name
+Improvement
+  * [OPSIM-5] - List of improvements for SSTAR v4 beta3
+  * [OPSIM-8] - Add Scheduler.conf and SchedulingData.conf parameters into the SSTAR
+  * [OPSIM-16] - In make_report.sh, create top-level html file, when COPY_TO_OPSIMCVS=0
+  * [OPSIM-19] - Include the Proposal_Field table for this Session_sessionID in the *export* file
+  * [OPSIM-20] - Include tables in Standard Report for parameters from Scheduler.conf and SchedulingData.conf
+  * [OPSIM-21] - Include tables in Standard Report for parameters from conf/survey/LSST.conf and conf/survey/Filters.conf
+  * [OPSIM-30] - Add back the slew statistics block as in the SSTAR for v2.6.1
+  * [OPSIM-58] - Permissions
+  * [OPSIM-63] - Main HTML to omit timesummary, newreport & timereport and add summaryreport
+  * [OPSIM-64] - Corrections during validation phase of SSTAR v4.0
+  * [OPSIM-65] - Change 0/1 to True/False in Table 1
+
+Release Notes for SSTAR 4.0beta                         Apr. 22, 2013
+===============================
+Major changes, bug fixes
+  * Renamed project to sstar
+  * Major rework of DB access to OpsimDB instead of LSST
+  * Minor bug fixes
+
+Release Notes for SSTAR 3.9.2				Mar. 15, 2013
+=============================
+Major changes, bug fixes
+  * Modified to create files in appropriate directories for later moving to stretch or design directories
+  * Expanded website.c to create appropriate directories
+  * Inserted detail in output comment
+  * Fixed slow SSTAR, prep_opsim was running slow
+  * Caption Changes
+
+Release Notes for SSTAR 3.9.1				Oct. 22, 2012
+=============================
+Major changes, bug fixes
+  * Bug fixes in histograms.py
+  * NEA type proposals visit plot were not showing before
+  * No data shows no aitoff grid now
+  * Suppress printouts from SQL queries
+  * Time for each SSTAR step is now reported
+  * Clean up make_report.sh
+  * Removed dependency to LSSTDBInit
+  * 64 bit compilation now works
+  * Runs on a Mac 
+
+Release Notes for SSTAR 3.9                             Aug. 24, 2012
+===========================
+Major changes, bug fixes and additional plots have been added to this release
+  * Bug fixes in histograms.py pertaining to min, max for x axis
+  * NEA type proposals are showing up correctly
+  * Reorganized the make_report.sh script to get faster execution
+  * Now SSTAR knows where to find data, whether Prod_2_3_2 DB or Prod_2_4
+  * Timereport issues were fixed
+  * Newreport issues were fixed
+  * 5sigma calculation now uses the total effective exposure time and is not hardcoded
+  * Created a better make_report.sh script with the following flags
+    - Design or Stretch 
+    - Drop Output Table
+    - Copy to opsimcvs
+
+Release Notes for SSTAR 3.8				July 29, 2011
+===========================
+Bug fixes have been made.
+  * Various formatting and caption changes in plots
+  * Auto correction of x limits for airmass were removed
+  * Code crash for SSTAR report was fixed in the case there was no UniversalProp.conf
+
+Release Notes for SSTAR 3.7				Aug. 2, 2010
+===========================
+Bug fixes have been made.
+  * UniversalProp values in tables and histograms were not matching
+  * Formatting changes in plots, output files & captions
+  * Changes in x limits for histogram plots
+
+Release Notes for SSTAR 3.6				Jan. 29, 2010
+===========================
+Major Changes, work around and bug fixes have been made.
+  * Update Latex file with new SSTAR being presented at AAS
+  * Add Coadded table
+  * Added Histograms
+    - Frequency distribution for sky brightness
+    - Frequency distribution for seeing
+    - Frequency distribution for airmass
+    - Frequency distribution for single visit depth
+    - Various formats of Frequency distribution for visits
+  * All plots and tables now compare to SRD Design values and not Stretch values
+  * Incorporated ETC calculations for sky brightness into output tables
+  * Caption edits 
+  * Add indexes to the post-processing output table for faster DB access
+  * Add dithering columns to post-processing output table
+  * Drop temporary table created during SSTAR pipeline
+  * Remove special purpose timereport DB to increase performance.
+
+  + Introduced workaround 
+    - The 5 sigma limiting magnitude calculation needs to use the real exposure time, not visit time. 
+      Currently there is a hardcoded number for expTime (30.00) seconds
+
+Release Notes for SSTAR 3.2.2				May 4, 2009
+=============================
+Minor changes and bug fixes have been made.
+  * Removed executables from the code repository
+  * Removed extra code directories not in use
+  * Edits to captions, titles and look of the standard report
+  * Edits to scales of plots
+  * Addition of reference numbers from Zeljko's paper 
+  * Addition of new plots and tables
+    - Number of visits table
+    - Coadded Depth plot and table
+    - Median Sky brightness plot and table
+    - Revisit Time table
+    - Quick Fire Statistics table
+
+Release Notes for SSTAR 3.1				Jan. 23, 2009
+===========================
+Includes initial commit, minor change and bug fixes
+  * Update of libraries used
+  * Added website code generator
+  * All compiled utilities will now goto the utils directory
+  * Added new stylesheet for the standard report
+  * All outputs generated will now goto the output directory
+  * Addition of per proposal graphs for for Avg Airmass, Max Airmass and SixVisit
+  * Edits to titles, captions, headers in graphs were made
+  * Scale changes were incorporated
+

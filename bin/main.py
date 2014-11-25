@@ -5,7 +5,7 @@
 #except:
 #    pass
 
-OPSIM_VERSION = '3.1'
+OPSIM_VERSION = '3.2'
 
 from lsst.sims.operations.utilities import *
 from lsst.sims.operations.Simulator import *
@@ -116,9 +116,9 @@ def startLsst( args ):
 
     # Startup comment
     if (args.has_key ('startup_comment')):
-	startup_comment = args['startup_comment'];
+        startup_comment = args['startup_comment'];
     else:
-	startup_comment = "No comment was entered";
+        startup_comment = "No comment was entered";
 
     # Verbose?
     if (args.has_key ('verbose') and 
