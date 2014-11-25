@@ -16,3 +16,4 @@ tests/.tests
 version.py
 .project
 .pydevproject
+_eupspkg
