@@ -17,3 +17,7 @@ version.py
 .project
 .pydevproject
 _eupspkg
+bin/opsim-configure.py
+bin/opsim-connect-mysql-sock.sh
+cfg/
+lib/

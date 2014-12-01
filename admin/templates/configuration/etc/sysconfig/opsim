@@ -1,0 +1,27 @@
+# Configuration file for OpSim services
+# Automatically generated using meta-configuration file:
+# {{OPSIM_META_CONFIG_FILE}}
+
+# Configuration variables
+# used by OpSim and dependencies
+################################
+
+# used by all
+OPSIM_RUN_DIR={{OPSIM_RUN_DIR}}
+# used by mysqld
+OPSIM_UNIX_USER={{OPSIM_UNIX_USER}}
+
+# Paths to OpSim and dependencies
+# installation directories
+###################################
+
+# used by mysqld
+MYSQL_DIR={{MYSQL_DIR}}
+# used by mysql-proxy
+OPSIM_DIR={{OPSIM_DIR}}
+
+# Environment variables
+########################
+
+# used by all
+export PATH={{PATH}}
