@@ -26,7 +26,7 @@ class Opsim_Log(object):
 
 class Opsim_ObsHistory(object):
     pass
-    
+
 class Opsim_MissedHistory(object):
     pass
 
@@ -80,7 +80,7 @@ class Database :
             self.DBHOST  = os.environ['DBHOST']
         except:
              self.DBHOST = 'localhost'
-        
+
         try:
             self.DBPORT   = os.environ['DBPORT']
             if self.DBPORT == 'None':
@@ -89,28 +89,30 @@ class Database :
             	self.DBPORT = int(self.DBPORT)
         except:
             self.DBPORT   = None
-        
+
         try:
             self.DBDB     = os.environ['DBDB']
         except:
             self.DBDB     = 'OpsimDB'
-        
+
         try:
             self.DBUSER   = os.environ['DBUSER']
         except:
             self.DBUSER   = 'www'
-        
+
         try:
             self.DBPASSWD = os.environ['DBPASSWD']
         except:
             self.DBPASSWD = 'zxcvbnm'
-        
+
         done = False
         t0 = time.time ()
         timeout=10
         #print "We are going to connect to DB"
         #self.openConnection()
         while (not done):
+            # Here until handling exceptions better is done.
+            #self.connection = self.openConnection ()
             try:
                 self.connection = self.openConnection ()
                 done = True
@@ -125,20 +127,25 @@ class Database :
         """
             Open a connection to DBDB running on DBHOST:DBPORT as user DBUSER
             and return the connection.
-            
+
             Raise exception in case of error.
             """
-        if (self.DBPORT):
-            self.conn = MySQLdb.connect (user=self.DBUSER, passwd=self.DBPASSWD, db=self.DBDB, host=self.DBHOST, port=self.DBPORT)
+        # Use configuration file with EUPS install otherwise use old way.
+        conf_file = os.path.join(os.getenv("HOME"), ".my.cnf")
+        if os.path.isfile(conf_file):
+            self.conn = MySQLdb.connect(read_default_file=conf_file, db=self.DBDB)
         else:
-            self.conn = MySQLdb.connect (user=self.DBUSER, passwd=self.DBPASSWD, db=self.DBDB, host=self.DBHOST)
+            if (self.DBPORT):
+                self.conn = MySQLdb.connect (user=self.DBUSER, passwd=self.DBPASSWD, db=self.DBDB, host=self.DBHOST, port=self.DBPORT)
+            else:
+                self.conn = MySQLdb.connect (user=self.DBUSER, passwd=self.DBPASSWD, db=self.DBDB, host=self.DBHOST)
         self.getCursor()
 
     def getCursor (self):
         """
             If connection is still valid, return a cursor. Otherwise
             open a new connection and return a cursor from it.
-            
+
             Return a two element array with the connection and the
             cursor
             """
@@ -150,43 +157,43 @@ class Database :
                 self.cur = self.conn.cursor ()
             except:
                 raise (IOException, 'Connection to the DB failed.')
-    
+
     def executeSQL (self, query):
         """
-            Execute any given query and return both the number of rows that 
-            were affected and the results of the query. 
-            
+            Execute any given query and return both the number of rows that
+            were affected and the results of the query.
+
             Input
             query       A string containing the SQL query to be sent to the
             database.
-            
+
             Return
             A two element array of the form [n, res] where:
             n       number of affected rows
             res     result array: [[col1, col2, ..], [col1, col2, ...], ...]
             If the query returns no data, res is empty.
-            
+
             Raise
-            Exception if either the connection to the DB failed or the 
+            Exception if either the connection to the DB failed or the
             execution of the query failed.
             """
-        
+
         n = self.cur.execute (query)
         try:
             res = self.cur.fetchall ()
         except:
             res = []
-        
+
         # Return the results
         return (n, res)
-    
+
     def closeConnection(self) :
         # Close the cursor
         self.cur.close()
         del (self.cur)
         self.conn.close()
         del (self.conn)
-                
+
     def newSession(self, sessionUser, sessionHost, sessionDate, version, runComment) :
         try:
             oSession = Opsim_Session()
@@ -221,7 +228,7 @@ class Database :
             (n, res) = self.executeSQL (sql)
         except:
             raise
-    
+
     def addTimeHistory(self, sessionID, date, mjd, nightCnt, event) :
         try:
             oTimeHistory = Opsim_TimeHistory()
@@ -268,7 +275,7 @@ class Database :
         sql = 'drop table if exists %s; ' %(tableName)
         (n, res) = self.executeSQL(sql)
         return res
-	
+
     def addConfigFile(self, filename, data, sessionID):
         try:
             oConfigFile = Opsim_Config_File()
@@ -442,7 +449,7 @@ class Database :
             oObs.darkBright = darkBright
             oObs.rawSeeing = rawSeeing
             oObs.wind = wind
-            oObs.humidity = humidity            
+            oObs.humidity = humidity
             oObs.Session_sessionID = sessionID
             oObs.Field_fieldID = fieldID
             if self.dbWrite:

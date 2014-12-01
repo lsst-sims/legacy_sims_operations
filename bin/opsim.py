@@ -22,13 +22,13 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     """
     Create an entry in the the Session table and fetch the key which
     have been assigned to us.
-    
+
     Input
     sessionTbl     name of DB Session Table
-    
+
     Return
     SessionID
-    
+
     Raise
     Exception if there are errors in the SQL.
     """
@@ -41,7 +41,7 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     (yy, mm, dd, h, m, s, wday, yday, dst) = time.gmtime ()
     date = '%d-%d-%d %02d:%02d:%02d' % (yy, mm, dd, h, m, s)
     # Remove data from the previous run where user, host and date are
-    # the same. This would only happen is the same user restarts the 
+    # the same. This would only happen is the same user restarts the
     # simulatiomn on the same machine within a second...
 
 #    sql = 'DELETE FROM %s WHERE ' % (sessionTbl)
@@ -49,7 +49,7 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
 #    sql += 'sessionHost="%s" AND ' % (host)
 #    sql += 'sessionDate="%s"' % (date)
 #    (n, dummy) = lsstDB.executeSQL (sql)
-#    
+#
 #    # Create a new entry
 #    sql = 'INSERT INTO %s VALUES (NULL, '  % (sessionTbl)
 #    sql += '"%s", ' % (user)
@@ -58,8 +58,8 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
 #    sql += '"%s",' % (OPSIM_VERSION)
 #    sql += '"%s")' % (startup_comment)
 #    (n, dummy) = lsstDB.executeSQL (sql)
-#    
-#    # Now fetch the assigned sessionID 
+#
+#    # Now fetch the assigned sessionID
 #    sql = 'SELECT sessionID FROM %s WHERE '  % (sessionTbl)
 #    sql += 'sessionUser="%s" AND ' % (user)
 #    sql += 'sessionHost="%s" AND ' % (host)
@@ -68,8 +68,8 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
 #    sessionID = res[0][0]
     oSession = lsstDB.newSession(user, host, date, OPSIM_VERSION, startup_comment)
     sessionID = oSession.sessionID
-    
-    # the last argument = 1 is the status_id 
+
+    # the last argument = 1 is the status_id
     try:
     	track(sessionID, host, user, startup_comment, code_test, 1.0)
     except:
@@ -89,7 +89,7 @@ def track(sessionID, hostname, user, startup_comment, code_test, status_id):
         #                       'run_version': OPSIM_VERSION})
 	#url = "%s?%s" % (url, params);
 	#result = urllib.urlopen(url).read();
-        payload = {'sessionID': sessionID,'hostname': hostname,'user': user,'startup_comment': startup_comment,'code_test': code_test,'status_id': status_id,'run_version': OPSIM_VERSION}	
+        payload = {'sessionID': sessionID,'hostname': hostname,'user': user,'startup_comment': startup_comment,'code_test': code_test,'status_id': status_id,'run_version': OPSIM_VERSION}
         result = requests.get(url, params=payload, timeout=3.0)
         print("    Tracking:%s" % (result))
 
@@ -99,19 +99,19 @@ def startLsst( args ):
     Begin LSST telescope observing simulation.
 
     Command line input
-        [--verbose=yes] 
-        
+        [--verbose=yes]
+
         [--config=./LSST.conf]'
 
         [--profile=yes]
 
 	[--startup_comment="blah"]
-    
+
     Return
         None
-    
+
     Raise
-        exit if there are errors 
+        exit if there are errors
     """
 
     # Startup comment
@@ -121,7 +121,7 @@ def startLsst( args ):
         startup_comment = "No comment was entered";
 
     # Verbose?
-    if (args.has_key ('verbose') and 
+    if (args.has_key ('verbose') and
         args['verbose'].lower () == 'yes'):
         VERBOSE = 1
     else:
@@ -169,7 +169,7 @@ def startLsst( args ):
     except:
         fatalError ('Unable to acquire a Session ID. Please check ',
                     'that the DB is up and running on the localhost.')
-    
+
     print ('Session ID: %d' % (SID))
 
 	# Adding lsstConf
@@ -232,7 +232,7 @@ def startLsst( args ):
     else :
         print "telSeeing has no setting"
         sys.exit (1)
-    
+
     if ( configDict.has_key ('opticalDesSeeing')) :
         opticalDesSeeing =  configDict["opticalDesSeeing"]
         print("    opticalDesSeeing:%f" % (opticalDesSeeing))
@@ -253,7 +253,7 @@ def startLsst( args ):
     else :
         filtersConf = DefaultFiltersConfigFile
         print("    filtersConf:%s default" % (filtersConf))
-    
+
     if ( configDict.has_key ('schedulerConf')) :
         schedulerConf =  configDict["schedulerConf"]
         print("    schedulerConf:%s" % (schedulerConf))
@@ -366,7 +366,7 @@ def startLsst( args ):
         logfile =  configDict["logfile"]
         print("    logfile:%s" % (logfile))
     else :
-        logfile =  '../log/lsst.log_%s' % (SID)
+        logfile =  'log/lsst.log_%s' % (SID)
         print("    logfile:%s default" % (logfile))
 
     if ( configDict.has_key ('verbose')) :
@@ -495,7 +495,7 @@ def startLsst( args ):
     else :
         weatherSeeingFudge =  1.
         print("    weatherSeeingFudge:%f default" % (weatherSeeingFudge))
-    
+
     if ( configDict.has_key ('seeingTbl')) :
         seeingTbl =  configDict["seeingTbl"]
         print("    seeingTbl:%s" % (seeingTbl))
@@ -516,7 +516,7 @@ def startLsst( args ):
     else :
         misHistTbl =  "MissedHistory"
         print("    misHistTbl:%s default" % (misHistTbl))
-                                        
+
 
     dbTables =  '{"obsHist":"%s","timeHist":"%s","proposal":"%s","session":"%s","seqHistory":"%s","field":"%s","userRegion":"%s","seeing":"%s","cloud":"%s","misHist":"%s", "downHist":"%s"}' %(obsHistTbl,timeHistTbl,proposalTbl,sessionTbl,seqHistoryTbl,fieldTbl,userRegionTbl,seeingTbl,cloudTbl,misHistTbl,downHistTbl)
     print "dbTables: %s" %(dbTables)
@@ -530,11 +530,11 @@ def startLsst( args ):
 	 (kuiperBeltConf == None) & (WLpropConf == None)):
         fatalError("At least one proposal type must be defined")
 
-    # rename in order someday 
-    runSeeingFudge = weatherSeeingFudge 
+    # rename in order someday
+    runSeeingFudge = weatherSeeingFudge
 
     simEpoch = seeingEpoch + simStartDay;
-    
+
     print ('Session ID: %d' % (SID))
 
 
@@ -552,18 +552,18 @@ def startLsst( args ):
 
     if ( log ):
         log.info('main:  SessionID:%d' % (SID))
-    
+
     # init SimPy.
     if (VERBOSE):
         t0 = time.time ()
 #    Simulation.initialize ()
-    
+
     obsProfile = (longitude *DEG2RAD, latitude *DEG2RAD, height, simEpoch,pressure,temperature,relativeHumidity)
     # Create a Simulator instance
     sim = Simulator (lsstDB=lsstDB,
 		     obsProfile=obsProfile,
-                     sessionID=SID, 
-                     nRun=nRun, 
+                     sessionID=SID,
+                     nRun=nRun,
                      seeingEpoch=seeingEpoch,
                      simStartDay=simStartDay,
                      fov=fov,
@@ -575,22 +575,22 @@ def startLsst( args ):
                      opticalDesSeeing=opticalDesSeeing,
                      cameraSeeing=cameraSeeing,
                      filtersConf=filtersConf,
-                     schedDownConf=schedDownConf, 
-                     unschedDownConf=unschedDownConf, 
-                     nearEarthConf=nearEarthConf, 
-                     weakLensConf=weakLensConf, 
-                     superNovaConf=superNovaConf, 
-                     superNovaSubSeqConf=superNovaSubSeqConf, 
+                     schedDownConf=schedDownConf,
+                     unschedDownConf=unschedDownConf,
+                     nearEarthConf=nearEarthConf,
+                     weakLensConf=weakLensConf,
+                     superNovaConf=superNovaConf,
+                     superNovaSubSeqConf=superNovaSubSeqConf,
 		     kuiperBeltConf=kuiperBeltConf,
 		     WLpropConf=WLpropConf,
                      instrumentConf=instrumentConf,
-                     schedulerConf=schedulerConf, 
+                     schedulerConf=schedulerConf,
 		     schedulingDataConf=schedulingDataConf,
                      dbTableDict=dbTableDict,
-                     log=log, 
-                     logfile=logfile, 
+                     log=log,
+                     logfile=logfile,
                      verbose=verbose)
-    
+
     # Activate the Simulator
 #    Simulation.activate (sim, sim.start (), 0.0)
     sim.start()
@@ -612,7 +612,7 @@ def startLsst( args ):
     #lsstDB.closeConnection()
 
     return
-    
+
 if (__name__ == '__main__'):
     # Parse the command line args
     try:
