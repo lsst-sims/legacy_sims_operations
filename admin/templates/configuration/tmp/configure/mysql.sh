@@ -8,6 +8,8 @@ MYSQLD_SOCK={{MYSQLD_SOCK}}
 MYSQLD_DATA_DIR={{MYSQLD_DATA_DIR}}
 MYSQLD_HOST={{MYSQLD_HOST}}
 MYSQLD_PORT={{MYSQLD_PORT}}
+MYSQLD_PASS={{MYSQLD_PASS}}
+OPSIM_PASS={{OPSIM_PASS}}
 
 SQL_DIR=${OPSIM_RUN_DIR}/tmp/configure/sql
 
@@ -55,10 +57,14 @@ sleep 5 &&
 echo "-- Changing mysql root password." &&
 mysql --no-defaults -S ${MYSQLD_SOCK} -u root < ${SQL_DIR}/mysql-password.sql &&
 rm ${SQL_DIR}/mysql-password.sql &&
+echo "-- Setting up OpSim DB." &&
+mysql --no-defaults --sock="${MYSQLD_SOCK}" --user="root" --password="${MYSQLD_PASS}" < ${SQL_DIR}/create_opsim_db.sql &&
+echo "-- Loading user tables in OpSim DB." &&
+mysql --no-defaults --sock="${MYSQLD_SOCK}" --user="www" --password="${OPSIM_PASS}" < ${SQL_DIR}/load_opsim_db.sql &&
 echo "-- Shutting down mysql server." &&
 ${OPSIM_RUN_DIR}/etc/init.d/mysqld stop ||
 {
-    echo -n "ERROR : Failed to set mysql root user password."
+    echo -n "ERROR : Failed to set mysql root user password. "
     echo "Please set the mysql root user password with : "
     echo "mysqladmin -S ${OPSIM_RUN_DIR}/var/lib/mysql/mysql.sock -u root password <password>"
     echo "mysqladmin -u root -h ${MYSQLD_HOST} -P${MYSQLD_PASS} password <password>"

@@ -162,6 +162,7 @@ def _get_template_params():
         'OPSIM_META_CONFIG_FILE': config['opsim']['meta_config_file'],
         'OPSIM_PID_DIR': os.path.join(config['opsim']['run_base_dir'], "var", "run"),
         'OPSIM_USER': config['opsim']['user'],
+        'OPSIM_PASS': config['opsim']['pass'],
         'OPSIM_SCRATCH_DIR': config['opsim']['scratch_dir'],
         'MYSQL_DIR': config['mysqld']['base_dir'],
         'MYSQLD_DATA_DIR': config['mysqld']['data_dir'],
