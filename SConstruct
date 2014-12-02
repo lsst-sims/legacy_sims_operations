@@ -78,26 +78,23 @@ else:
         env.RecursiveInstall(target, direc)
         return target
 
-    bin_target = rec_install("bin")
-    conf_target = rec_install("conf")
-    data_target = rec_install("DataForInstall")
-    doc_target = rec_install("doc")
-    log_target = rec_install("log")
-    tests_target = rec_install("tests")
-    tools_target = rec_install("tools")
+    cwd = os.getcwd()
+    target_list = []
+    # Below is not true if doing scons install
+    if cwd != env['prefix']:
+        target_list.append(rec_install("bin"))
+        target_list.append(rec_install("conf"))
+        target_list.append(rec_install("DataForInstall"))
+        target_list.append(rec_install("doc"))
+        target_list.append(rec_install("log"))
+        target_list.append(rec_install("tests"))
+        target_list.append(rec_install("tools"))
 
-    opsimpy_target = env.InstallPythonModule(target=os.path.join(env['prefix'], "python"),
-                                             source="python")
+        opsimpy_target = env.InstallPythonModule(target=os.path.join(env['prefix'], "python"),
+                                                source="python")
+        target_list.append(opsimpy_target)
 
-    env.Alias("opsim",
-              [bin_target,
-               conf_target,
-               data_target,
-               doc_target,
-               log_target,
-               opsimpy_target,
-               tests_target,
-               tools_target])
+    env.Alias("opsim", target_list)
 
 #########################################
 #
