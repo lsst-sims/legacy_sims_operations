@@ -32,11 +32,19 @@ Installation Instructions
 
   Where <tag> is the name of an EUPS package tag.
 
+* Change Database Passwords
+
+  The above step adds a environmental variable $SIMS_OPERATIONS_DIR. Use this to
+  navigate to the ``opsim-meta.conf`` file in ``$SIMS_OPERATIONS_DIR/cfg``. In
+  the ``[opsim]`` and ``[mysqld]`` sections change the passwords on the ``pass``
+  configuration options. Please note the warnings about using special characters
+  in the passwords.
+
 * Run the OpSim Configuration
 
   The OpSim database is installed in a directory separate from the binary files.
-  This directory ($OPSIM_RUN_DIR) is by default $HOME/opsim-run, but can be changed via the
-  configuration script.
+  This directory ($OPSIM_RUN_DIR) is by default ``$HOME/opsim-run``, but can be
+  changed via the configuration script.
 
   To setup the OpSim database, run the following command::
 
