@@ -85,11 +85,12 @@ designated LSST directory. For the purpose of this documentation we shall use
 
   git clone https://<your_stash_username>@stash.lsstcorp.org/scm/sim/sims_operations.git
 
-If you need to only obtain a readonly copy, omit the <your_stash_username>@ from
-the clone command.
+If you need to only obtain a readonly copy, omit the ``<your_stash_username>@``
+from the clone command.
 
 To setup the OpSim code locally, run the following commands::
 
-  eupspkg -e install; setup -k -r .
+  scons install; setup -k -r .
 
-The configuration step is the same is in the above section.
+Finish the setup by following the third and fourth steps in the Installation
+Instructions section above.
