@@ -24,6 +24,7 @@ env.Depends("install", env.Alias("build"))
 
 env.Alias("install",
           [env.Alias("admin"),
+           env.Alias("opsim"),
            env.Alias("templates")])
 
 ################################
@@ -71,6 +72,32 @@ else:
 # Install OPSIM code
 #
 #############################
+
+    def rec_install(direc):
+        target = os.path.join(env['prefix'], direc)
+        env.RecursiveInstall(target, direc)
+        return target
+
+    bin_target = rec_install("bin")
+    conf_target = rec_install("conf")
+    data_target = rec_install("DataForInstall")
+    doc_target = rec_install("doc")
+    log_target = rec_install("log")
+    tests_target = rec_install("tests")
+    tools_target = rec_install("tools")
+
+    opsimpy_target = env.InstallPythonModule(target=os.path.join(env['prefix'], "python"),
+                                             source="python")
+
+    env.Alias("opsim",
+              [bin_target,
+               conf_target,
+               data_target,
+               doc_target,
+               log_target,
+               opsimpy_target,
+               tests_target,
+               tools_target])
 
 #########################################
 #
