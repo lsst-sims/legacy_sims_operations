@@ -54,9 +54,11 @@ class _unitTest(object):
     def __call__(self, target, source, env):
         """Both target and source should be a single file"""
         if len(target) != 1:
-            raise StopError("unexpected number of targets for unitTest: " + str(target))
+            raise StopError("unexpected number of targets for unitTest: " +
+                            str(target))
         if len(source) != 1:
-            raise StopError("unexpected number of sources for unitTest: " + str(source))
+            raise StopError("unexpected number of sources for unitTest: " +
+                            str(source))
 
         out = str(target[0])
         exe = str(source[0])
@@ -68,7 +70,8 @@ class _unitTest(object):
 
             if ret != 0:
                 shutil.move(out, out + '.failed')
-                msg = '*** Unit test failed, check log file ' + out + '.failed ***'
+                msg = '*** Unit test failed, check log file ' + out + \
+                    '.failed ***'
                 sep = '*' * len(msg)
                 print sep + '\n' + msg + '\n' + sep
                 # save failed target in UNIT_TESTS_FAILED list in env,
@@ -91,14 +94,15 @@ class _unitTestCheck(object):
 
     def __call__(self, target, source, env):
         # SCons works better when there is an actual file produced as the result
-        # of builder call, so we just create an empty file if the builder succeeds
-        # or remove that file if it fails.
+        # of builder call, so we just create an empty file if the builder
+        # succeeds or remove that file if it fails.
         fpath = str(target[0])
 
         # all failures are recorded in UNIT_TESTS_FAILED list in the environment
         failures = env.Flatten(env.get('UNIT_TESTS_FAILED', []))
         if failures:
-            print "Following UnitTest failed: %s" % ' '.join(str(x) for x in failures)
+            print "Following UnitTest failed: %s" % ' '.join(str(x)
+                                                             for x in failures)
             try:
                 os.unlink(fpath)
             except:
@@ -118,7 +122,8 @@ def generate(env):
         # it may be defined already
         builder = env['BUILDERS']['UnitTest']
     except KeyError:
-        env['BUILDERS']['UnitTest'] = Builder(action=_unitTest(), suffix='.utest')
+        env['BUILDERS']['UnitTest'] = Builder(action=_unitTest(),
+                                              suffix='.utest')
         env['BUILDERS']['UnitTestCheck'] = Builder(action=_unitTestCheck())
         env['UNIT_TESTS_FAILED'] = []
 
