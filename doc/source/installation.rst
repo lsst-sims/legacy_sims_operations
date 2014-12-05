@@ -88,7 +88,25 @@ designated LSST directory. For the purpose of this documentation we shall use
 If you need to only obtain a readonly copy, omit the ``<your_stash_username>@``
 from the clone command.
 
-To setup the OpSim code locally, run the following commands::
+The LSST Stack needs to be setup according to the first step in the Installation
+Instructions section above. There are a few dependencies that need to be
+installed so that the setup commands below won't fail. If theses are not
+already installed, here are the required packages::
+
+  eups distrib install mysql -t qserv
+  eups distrib install mysqlpython
+  eups distrib install twisted -t qserv
+  eups distrib install palpy -t sims
+
+Then run::
+
+  setup mysql -t qserv
+  setup mysqlpython
+  setup twisted -t qserv
+  setup palpy -t sims
+
+Once this is done the OpSim code can be setup locally by running the following
+commands::
 
   scons install; setup -k -r .
 
