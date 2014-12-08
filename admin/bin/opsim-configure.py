@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+##########################################################################
+# This script and all of the supporting infrastructure is taken from the 
+# qserv package with much appreciation! It was modified to fit the needs 
+# of this package.
+##########################################################################
+
 import argparse
 import ConfigParser
 import fileinput
