@@ -1,36 +1,42 @@
 #! /bin/tcsh
 
 # Note: this calls gen_output.py, prep_opsim.py, move_data_output_obshistory.py,
-#    createSQLite.py, exportSession.sh, createSubSetTables.sh and dropSubSetTables.sh
+#    createSQLite.py, exportSession.sh, createSubSetTables.sh and
+#    dropSubSetTables.sh
 
-# On non-opsim Darwin machines, it seems likely that you will have to update the paths to python/mysql.
-
-echo "####################################################################"
-echo "[Checking Linux/Darwin]"
-set machine = `uname`
-if ( $machine == "Linux" ) then
-    set python = "python"
-    set mysql = "mysql"
-    set mysqldump = "mysqldump"
-    echo "Detected Linux machine ..."
-else if ( $machine == "Darwin" ) then
-    set python = "/opt/local/bin/python2.7"
-    set mysql = "/opt/local/lib/mysql5/bin/mysql"
-    set mysqldump = "/opt/local/lib/mysql5/bin/mysqldump"
-    echo "Detected Darwin machine ..."
+if ( $1 == "" ) then
+  echo "Need to provide a session ID!"
+  exit -1
 endif
-echo "####################################################################"
+
+# Below should be find if the package was installed by EUPS. If your setup is
+# different, you'll need to fix the command paths.
 
 echo "####################################################################"
+set python = "python"
+set mysql = "mysql"
+set mysqldump = "mysqldump"
+
 echo "[Getting the correct hostname & tablename]"
-set dbs = `mysql -u www --password=zxcvbnm --skip-column-names -e "show databases like 'OpsimDB%'"`
+set mysqlcmd = "$mysql -u www"
+
+if ( ! -f $HOME/.my.cnf ) then
+  set mysqlcmd = "$mysqlcmd --password=zxcvbnm"
+endif
+
+set dbs = `$mysqlcmd --skip-column-names -e "show databases like 'OpsimDB%'"`
+echo $dbs
 foreach db ($dbs)
-        set sql = "select sessionHost from $db.Session where sessionID=$1"
-        set hname = `mysql -u www --password=zxcvbnm --skip-column-names -e "$sql"`
-        if ($hname != "") then
-                        set database = $db
-                        set host = $hname
-        endif
+  set sql = "select sessionHost from $db.Session where sessionID=$1"
+  set hname = `$mysqlcmd --skip-column-names -e "$sql"`
+  if ($hname != "") then
+    set database = $db
+    set host = $hname
+    # Switch to localhost for local IP as this causes issues further on.
+    if ( $host == "127.0.0.1" ) then
+      set host = "localhost"
+    endif
+  endif
 end
 echo "Processing simulation $host.$1"
 echo "####################################################################"
@@ -52,13 +58,13 @@ echo "####################################################################"
 # Update the names
 echo "####################################################################"
 echo "[Updating the columns]"
-$mysql -u www -pzxcvbnm -e "alter table $database.tObsHistory_${host}_$1 change filtSkyBright filtSkyBrightness double"
-$mysql -u www -pzxcvbnm -e "alter table $database.tObsHistory_${host}_$1 change alt altitude double"
-$mysql -u www -pzxcvbnm -e "alter table $database.tObsHistory_${host}_$1 change az azimuth double"
-$mysql -u www -pzxcvbnm -e "alter table $database.tObsHistory_${host}_$1 add ditheredRA double"
-$mysql -u www -pzxcvbnm -e "alter table $database.tObsHistory_${host}_$1 add ditheredDec double"
-$mysql -u www -pzxcvbnm -e "alter table $database.tObsHistory_${host}_$1 add fiveSigmaDepth double"
-#$mysql -u www -pzxcvbnm -e "alter table $database.tProposal_${host}_$1 add tag varchar(256)"
+$mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 change filtSkyBright filtSkyBrightness double"
+$mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 change alt altitude double"
+$mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 change az azimuth double"
+$mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 add ditheredRA double"
+$mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 add ditheredDec double"
+$mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 add fiveSigmaDepth double"
+#$mysqlcmd -e "alter table $database.tProposal_${host}_$1 add tag varchar(256)"
 echo "####################################################################"
 
 # Add dithering (ra, dec, night, vertex) columns & Adding indexes
@@ -70,16 +76,16 @@ echo "####################################################################"
 # Fixing visitTime & visitExpTime for tObsHistory and output tables
 echo "####################################################################"
 echo "[Fixing visitTime & visitExpTime]"
-$mysql -u www -pzxcvbnm -e "update $database.tObsHistory_${host}_$1 set visitTime=visitExpTime"
-$mysql -u www -pzxcvbnm -e "update $database.tObsHistory_${host}_$1 set visitExpTime=visitTime-4.00"
-$mysql -u www -pzxcvbnm -e "update $database.summary_${host}_$1 set visitTime=visitExpTime"
-$mysql -u www -pzxcvbnm -e "update $database.summary_${host}_$1 set visitExpTime=visitTime-4.00"
+$mysqlcmd -e "update $database.tObsHistory_${host}_$1 set visitTime=visitExpTime"
+$mysqlcmd -e "update $database.tObsHistory_${host}_$1 set visitExpTime=visitTime-4.00"
+$mysqlcmd -e "update $database.summary_${host}_$1 set visitTime=visitExpTime"
+$mysqlcmd -e "update $database.summary_${host}_$1 set visitExpTime=visitTime-4.00"
 echo "####################################################################"
 
 # Adding wfd tag to Proposal table for propID
 #echo "####################################################################"
 #echo "[Adding WFD tag]"
-#$mysql -u www -pzxcvbnm -e "update $database.tProposal_${host}_$1 set tag='wfd' where propID=$2"
+#$mysqlcmd -e "update $database.tProposal_${host}_$1 set tag='wfd' where propID=$2"
 #echo "####################################################################"
 
 # Copying over fiveSigmaDepth, ditheredRA, ditheredDec values from output to ObsHistory
@@ -100,4 +106,3 @@ mv ${host}_$1_* ../output
 echo "[dropSubsetTables.sh]"
 time schema_tools/dropSubsetTables.sh $database $host $1
 echo "####################################################################"
-

@@ -32,12 +32,9 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     Raise
     Exception if there are errors in the SQL.
     """
-    # Get the short hostname
-    #host = socket.gethostname ().split ('.', 1)[0]
-    #host = os.getenv['HOST']
-    #user = os.getenv['USER']
-    host = ''
-    user = ''
+    # Get the hostname and username
+    host = lsstDB.conn.get_host_info().split()[0]
+    user = os.getenv('USER')
     (yy, mm, dd, h, m, s, wday, yday, dst) = time.gmtime ()
     date = '%d-%d-%d %02d:%02d:%02d' % (yy, mm, dd, h, m, s)
     # Remove data from the previous run where user, host and date are

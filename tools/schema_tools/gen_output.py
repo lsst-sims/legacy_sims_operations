@@ -7,10 +7,15 @@ import os
 from socket import gethostname
 
 
-def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbname='OpsimDB'):   
+def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbname='OpsimDB'):
     # connect to lsst_pointings (or other) mysql db, using account that has 'alter table' privileges
-    # connect to the database - this is modular to allow for easier modification from machine/machine    
-    db = mysqldb.connect(host=hostname, user=username, passwd=passwdname, db=dbname)
+    # connect to the database - this is modular to allow for easier modification from machine/machine
+    db = None
+    conf_file = os.path.join(os.getenv("HOME"), ".my.cnf")
+    if os.path.isfile(conf_file):
+        db = mysqldb.connect(read_default_file=conf_file, db=dbname)
+    else:
+        db = mysqldb.connect(host=hostname, user=username, passwd=passwdname, db=dbname)
     cursor = db.cursor()
     db.autocommit(True)
     return cursor
@@ -18,11 +23,10 @@ def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbnam
 def getDbData(database, sql):
     global sessionID
     cursor = connect_db(dbname=database)
-    # Fetch the data from the DB
     ret = {}
     try:
         n = cursor.execute (sql)
-	ret = cursor.fetchall ()
+        ret = cursor.fetchall ()
     except:
         sys.stderr.write('Unable to execute SQL query (%s)\n' % (sql) )
     # Close the connection
@@ -31,35 +35,34 @@ def getDbData(database, sql):
     return (ret)
 
 def insertDbData(database, sql):
-	global sessionID
-	cursor = connect_db(dbname=database)
-	try:
-		cursor.execute(sql)
-	except:
-		sys.stderr.write('Unable to execute SQL query (%s)\n' % (sql) )
-	# Close the connection
-	cursor.close ()
-	del (cursor)
+    global sessionID
+    cursor = connect_db(dbname=database)
+    try:
+        cursor.execute(sql)
+    except:
+        sys.stderr.write('Unable to execute SQL query (%s)\n' % (sql) )
+    # Close the connection
+    cursor.close ()
+    del (cursor)
 
 def check_columns_if_they_exist(hname, database, sessionID):
-	columns = ("obsHistID", "sessionID", "fieldID", "fieldRA", "fieldDec", "filter", "expDate", "expMJD", "night", "visitTime", "visitExpTime", "finRank", "finSeeing", "transparency", "airmass", "vSkyBright", "filtSkyBright", "rotSkyPos", "lst", "altitude", "azimuth", "dist2Moon", "solarElong", "moonRA", "moonDec", "moonAlt", "moonAZ", "moonPhase", "sunAlt", "sunAz", "phaseAngle", "rScatter", "mieScatter", "moonIllum", "moonBright", "darkBright", "rawSeeing", "wind", "humidity", "slewDist", "slewTime", "fiveSigmaDepth");
-	simname = "summary_%s_%d" % (hname, sessionID);
-	sqlquery = "describe %s.%s" % (database, simname);
-	columnsexistbool = True;
+    columns = ("obsHistID", "sessionID", "fieldID", "fieldRA", "fieldDec", "filter", "expDate", "expMJD", "night", "visitTime", "visitExpTime", "finRank", "finSeeing", "transparency", "airmass", "vSkyBright", "filtSkyBright", "rotSkyPos", "lst", "altitude", "azimuth", "dist2Moon", "solarElong", "moonRA", "moonDec", "moonAlt", "moonAZ", "moonPhase", "sunAlt", "sunAz", "phaseAngle", "rScatter", "mieScatter", "moonIllum", "moonBright", "darkBright", "rawSeeing", "wind", "humidity", "slewDist", "slewTime", "fiveSigmaDepth");
+    simname = "summary_%s_%d" % (hname, sessionID);
+    sqlquery = "describe %s.%s" % (database, simname);
+    columnsexistbool = True
+    ret = getDbData(database, sqlquery)
+    columnsexist = {}
+    for ind in columns:
+		columnsexist[ind] = False
 
-	ret = getDbData(database, sqlquery);
-	columnsexist = {};
-	for ind in columns:
-		columnsexist[ind] = False;
-
-	for result in ret:
+    for result in ret:
 		if (result[0] in columnsexist.keys()): # is this index one of the ones we're looking for?
-			columnsexist[result[0]] = True;
+			columnsexist[result[0]] = True
 
-	for ind in columns:
+    for ind in columns:
 		if (columnsexist[ind] == False):
-			columnsexistbool = False;
-	return columnsexistbool;
+			columnsexistbool = False
+    return columnsexistbool
 
 def create_output_table(hname, database, sessionID):
 	# print 'Creating/Recreating Summary Table ...'
@@ -86,14 +89,14 @@ def create_output_table(hname, database, sessionID):
 		slw = getDbData(database, sql)
 		sql = 'select Proposal_propID as propID from ObsHistory_Proposal where ObsHistory_Session_sessionID = %d and ObsHistory_obsHistID = %d' % (sessionID, obsHistID)
 		prp = getDbData(database, sql)
-	
+
 		for i in range(len(prp)):
 			#etc = ETC();
 			filter = ret[k][3];
 			bandindex = -1;
 			if filter == 'u':
 				bandindex=0;
-			elif filter == 'g': 
+			elif filter == 'g':
 				bandindex=1;
 			elif filter == 'r':
 				bandindex=2;
@@ -167,4 +170,3 @@ if __name__ == "__main__":
     sessionID = sys.argv[3]
     if (check_columns_if_they_exist(hname, database, int(sessionID)) == False):
 		create_output_table(hname, database, int(sessionID));
-
