@@ -130,11 +130,6 @@ def _setEnvWithDependencies():
                                     PathVariable.PathIsDirCreate)))
     opts.Update(env)
 
-    opts.AddVariables((PathVariable('MYSQL_LIB', 'mysql libraries path',
-                                    os.path.join(env['MYSQL_DIR'], "lib"),
-                                    PathVariable.PathIsDir)),)
-    opts.Update(env)
-
     opts.AddVariables((PathVariable('python_prefix',
                                     'opsim install directory for python'
                                     ' modules',
