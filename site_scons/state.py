@@ -119,9 +119,7 @@ def _initLog():
 def _setEnvWithDependencies():
 
     log.info("Adding build dependencies information in scons environment")
-    opts.AddVariables((EnumVariable('debug', 'debug gcc output and symbols',
-                                    'yes', allowed_values=('yes', 'no'))),
-                      (PathVariable('MYSQL_DIR', 'mysql install dir',
+    opts.AddVariables((PathVariable('MYSQL_DIR', 'mysql install dir',
                                     _findPrefixFromBin('MYSQL_DIR',
                                                        "mysqld_safe"),
                                     PathVariable.PathIsDir)),
@@ -132,10 +130,7 @@ def _setEnvWithDependencies():
                                     PathVariable.PathIsDirCreate)))
     opts.Update(env)
 
-    opts.AddVariables((PathVariable('MYSQL_INC', 'mysql include path',
-                                    os.path.join(env['MYSQL_DIR'], "include"),
-                                    PathVariable.PathIsDir)),
-                      (PathVariable('MYSQL_LIB', 'mysql libraries path',
+    opts.AddVariables((PathVariable('MYSQL_LIB', 'mysql libraries path',
                                     os.path.join(env['MYSQL_DIR'], "lib"),
                                     PathVariable.PathIsDir)),)
     opts.Update(env)
@@ -148,21 +143,6 @@ def _setEnvWithDependencies():
                                     PathVariable.PathIsDirCreate)))
     opts.Update(env)
 
-    # Allow one to specify where boost is
-    boost_dir = os.getenv("BOOST_DIR")
-    if boost_dir:
-        opts.AddVariables(
-            (PathVariable('BOOST_DIR', 'boost install dir',
-                          _findPrefixFromName("BOOST"),
-                          PathVariable.PathIsDir)),
-            (PathVariable('BOOST_INC', 'boost include path',
-                          os.path.join(boost_dir, "include"),
-                          PathVariable.PathIsDir)),
-            (PathVariable('BOOST_LIB', 'boost libraries path',
-                          os.path.join(boost_dir, "lib"),
-                          PathVariable.PathIsDir)),)
-        opts.Update(env)
-
     SCons.Script.Help(opts.GenerateHelpText(env))
 
 
@@ -173,27 +153,6 @@ def _setBuildEnv():
 
     env.Tool('recinstall')
     env.Tool('unittest')
-    if env['debug'] == 'yes':
-        log.info("Debug build flag (-g) requested.")
-        env.Append(CCFLAGS=['-g'])
-    # Increase compiler strictness
-    env.Append(CCFLAGS=['-pedantic', '-Wall', '-Wno-long-long',
-                        '-Wno-variadic-macros'])
-
-    # to make shared libraries link correctly we need -rpath-link option, for
-    # now add everything that is in LD_LIBRARY_PATH
-    # TODO: this is Linux-gcc-specific, do we have a way to test for a
-    # platform we are running on
-    if 'LD_LIBRARY_PATH' in os.environ:
-        env.Append(LINKFLAGS=["-Wl,-rpath-link=" +
-                              os.environ["LD_LIBRARY_PATH"]])
-
-    # SCons resets many envvars to make clean build, we want to pass some of
-    # them explicitly. Extend the list if you need to add more.
-    for key in ['LD_LIBRARY_PATH', ]:
-        if key in os.environ:
-            env['ENV'][key] = os.environ[key]
-
 
 # TODO : where to save this file ?
 def _saveState():
