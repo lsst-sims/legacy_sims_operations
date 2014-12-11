@@ -9,6 +9,7 @@ setupRequired(mysql)
 setupRequired(mysqlpython)
 setupRequired(twisted)
 setupRequired(palpy)
+setupRequired(pex_config)
 setupRequired(lsst)
 
 # The following is boilerplate for all packages.
