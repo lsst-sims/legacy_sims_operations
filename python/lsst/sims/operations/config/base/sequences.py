@@ -31,3 +31,79 @@ class MasterSequenceConfig(BaseSequenceConfig):
     """
     subSequence = pexConfig.ConfigField('List of configs for sub-sequence',
                                         SequenceConfig, default=None)
+
+class EventSequencingConfig(pexConfig.Config):
+    """
+    This class handles the configuration for event sequences.
+    """
+
+    HiatusNextNight = pexConfig.Field('Gap in nights to next observing night. '
+                                      'Do we want this proposal to run every '
+                                      'night? Every night = 0 and every other '
+                                      'night = 1 etc. (units=nights).', int,
+                                      default=0)
+
+    # Name in Standard (static) proposals: MaxNeedAfterOverflow
+    OverflowLevel = pexConfig.Field('Initial value for needed visits after '
+                                    'completing the requested visits for that '
+                                    'field-filter. Need starts at this value '
+                                    'decaying when getting additional visits.',
+                                    float, default=0.0)
+
+    # Parameters for controlling the promotion of nearly complete field-filters.
+    # The rank is basically the expression:
+    # rank = scale * (partialneed/partialgoal) / (globalneed/globalgoal)
+    # where partialneed = partialgoal - partialvisits for a particular
+    # field-filter progress is defined as partialvisits/partialgoal.
+    # When progress becomes greater than ProgressToStartBoost parameter,
+    # rank receives an additional boost factor determined by:
+    # MaxBoostToComplete * (progress-ProgressToStartBoost) /
+    #                      (1-ProgressToStartBoost)
+    # To disable this feature these are the values for both parameters.
+    # ProgressToStartBoost = 1.00
+    # MaxBoostToComplete   = 0.00
+    ProgressToStartBoost = pexConfig.Field('Threshold of progress (decimal '
+                                           'percentage) when rank receives an '
+                                           'additional boost.', float,
+                                           default=0.90)
+    # This is actually calculated, so it really shouldn't be a parameter!
+    MaxBoostToComplete = pexConfig.Field('Calculated boost value.', float,
+                                         default=10.0)
+
+    filters = pexConfig.ConfigDictField('Alternate specification of filter '
+                                        'parameters.', int, FiltersConfig,
+                                        optional=True)
+
+class StandardEventSequencingConfig(EventSequencingConfig):
+    """
+    This class handles event sequencing in standard proposals.
+    """
+
+    NVisits = pexConfig.Field('Default number (count) of visits per '
+                              'field/filter if specific filter not provided.',
+                              float, default=30.)
+
+class TransientEventSequencingConfig(EventSequencingConfig):
+    """
+    This class handles event sequencing in transient proposals.
+    """
+
+    MaxNumberActiveSequences = pexConfig.Field('Maximum number of sequences '
+                                               'active simultaneously.', int,
+                                               default=100)
+
+    RestartLostSequences = pexConfig.Field('Indicates incomplete sequences '
+                                           'may be restarted if terminated '
+                                           'early.', bool, default=False)
+
+    RestartCompleteSequences = pexConfig.Field('Indicates successfully '
+                                               'completed sequences may be '
+                                               'restarted on completion.',
+                                               bool, default=False)
+
+    masterSequences = pexConfig.ConfigDictField('The list of master sequences.',
+                                                int, MasterSequenceConfig,
+                                                optional=True)
+
+    sequences = pexConfig.ConfigDictField('The list of sequences.', int,
+                                          SequenceConfig)
