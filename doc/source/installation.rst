@@ -30,7 +30,10 @@ Installation Instructions
 
     eups distrib install -t <tag> sims_operations; setup sims_operations -t <tag>
 
-  Where <tag> is the name of an EUPS package tag.
+  Where <tag> is the name of an EUPS package tag. **NOTE**: If you have an
+  existing database installation, do not run the setup command as is, otherwise
+  you environment won't point to the correct executables for the database.
+  Please jump to the Using an Existing Database Installation section below.
 
 * Change Database Passwords
 
@@ -112,3 +115,44 @@ commands::
 
 Finish the setup by following the third and fourth steps in the Installation
 Instructions section above.
+
+Using an Existing Database Installation
+---------------------------------------
+
+The setup step needs to be modified to setup the system packages. This can be
+accomplished by running the following commands::
+
+  eups declare mysql system -m none -r none
+  eups declare mysqlclient system -m none -r none
+  eups declare mysqlpython system -m none -r none
+
+Omit the packages you do not have installed. After this, one can execute the
+setup call as is.
+
+Since a database install already exists, one just needs to create a ``.my.cnf``
+file and place it in you home directory. That file looks like::
+
+  [client]
+  user     = www
+  pass     = changeit
+  # host/port and/or socket
+  host     = 127.0.0.1
+  port     = 3307
+  socket   = /path/to/db/sock/file/mysql.sock
+
+The ``port`` and ``socket`` entries need to be changed to the correct values
+for the existing database installation. The ``pass`` entry needs to match the
+password in the database table setup script described below.
+
+.. warning::
+
+  **DO NOT** run the ``opsim-configure.py`` command above as is it unnecessary.
+
+To finish the setup, one needs to create the OpsimDB and populate some tables.
+Navigate to the ``$SIMS_OPERATIONS_DIR/tools`` directory and edit the password
+variable at the top of the ``setup_db.sh`` script. Then execute the following::
+
+  source setup_db.sh
+
+This should create the OpsimDB and populate some initial tables. One should
+now be able to run OpSim by following the Running OpSim section above.
