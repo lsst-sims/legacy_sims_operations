@@ -1,7 +1,7 @@
-import base.downtime as baseDowntime
+import base
 import utils
 
-class ScheduledDowntime(baseDowntime.DownTimeConfig):
+class ScheduledDowntime(base.DowntimeConfig):
     # List of scheduled downtimes.
     # DO NOT MODIFY UNLESS YOU TALK TO CHUCK CLAVER!
     __events__ = (('general maintenance', 158, 'June 8th in 1st year', 7),
@@ -27,9 +27,9 @@ class ScheduledDowntime(baseDowntime.DownTimeConfig):
         """
         elist = []
         for ev in self.__events__:
-            elist.append(baseDowntime.DowntimeEventConfig(activity=ev[0],
-                                                          startNight=ev[1],
-                                                          comment=ev[2],
-                                                          duration=ev[3]))
+            elist.append(base.DowntimeEventConfig(activity=ev[0],
+                                                  startNight=ev[1],
+                                                  startNightComment=ev[2],
+                                                  duration=ev[3]))
 
         self.events = utils.makeIntDict(elist)

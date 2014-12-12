@@ -1,3 +1,7 @@
+import field
+import sequences as seq
+import target
+
 import lsst.pex.config as pexConfig
 
 class ProposalConfig(pexConfig.Config):
@@ -17,7 +21,7 @@ class ProposalConfig(pexConfig.Config):
                                       default=["WFD"])
 
     targetSelect = pexConfig.ConfigField('Set of target selection parameters.',
-                                         TargetSelectionConfig)
+                                         target.TargetSelectionConfig)
 
 class StandardProposalConfig(ProposalConfig):
     """
@@ -25,13 +29,13 @@ class StandardProposalConfig(ProposalConfig):
     """
 
     eventSequence = pexConfig.ConfigField('Set of event sequencing parameters.',
-                                          StandardEventSequencingConfig)
+                                          seq.StandardEventSequencingConfig)
 
     fieldSelect = pexConfig.ConfigField('Set of field selection parameters.',
-                                        FieldSelectionConfig)
+                                        field.FieldSelectionConfig)
 
     targetRanking = pexConfig.ConfigField('Set of target ranking parameters.',
-                                          TargetRankingConfig)
+                                          target.TargetRankingConfig)
 
 class TransientProposalConfig(ProposalConfig):
     """
@@ -39,10 +43,10 @@ class TransientProposalConfig(ProposalConfig):
     """
 
     eventSequence = pexConfig.ConfigField('Set of event sequencing parameters.',
-                                          TransientEventSequencingConfig)
+                                          seq.TransientEventSequencingConfig)
 
     fieldSelect = pexConfig.ConfigField('Set of field selection parameters.',
-                                        TransientFieldSelectionConfig)
+                                        field.TransientFieldSelectionConfig)
 
     targetRanking = pexConfig.ConfigField('Set of target ranking parameters.',
-                                          TransientTargetRankingConfig)
+                                          target.TransientTargetRankingConfig)

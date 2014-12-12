@@ -1,6 +1,6 @@
 from .base import filters as baseFilters
 
-class Filters30(baseFilters.Filters):
+class Filters30(baseFilters.FiltersConfig):
     """
     This class gathers the information for the standard LSST filters in the
     2x 15 second exposure case.

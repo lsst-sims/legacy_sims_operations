@@ -105,12 +105,13 @@ class InstrumentConfig(pexConfig.Config):
     delay_dict = {TelOptics_AltLimit1: 0.0,
                   TelOptics_AltLimit2: 20.0}
 
-    TelOpticsCL_Delay = pexConfig.ConfigDictField('Time delay (seconds) for '
-                                                  'the corresponding ALT slew '
-                                                  'range in the Closed Loop '
-                                                  'optics correction.',
-                                                  pexConfig.RangeField,
-                                                  float, default=delay_dict)
+    # Need to think about this one!
+    #TelOpticsCL_Delay = pexConfig.ConfigDictField('Time delay (seconds) for '
+    #                                              'the corresponding ALT slew '
+    #                                              'range in the Closed Loop '
+    #                                              'optics correction.',
+    #                                              pexConfig.RangeField,
+    #                                              float, default=delay_dict)
 
     # Dependencies between the slew activities.
     # For each activity there is a list of prerequisites activities, that

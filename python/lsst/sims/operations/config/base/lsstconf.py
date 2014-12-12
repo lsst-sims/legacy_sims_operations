@@ -1,3 +1,11 @@
+from .downtime import DowntimeConfig
+from .filters import FiltersConfig
+from .instrument import InstrumentConfig
+from .proposal import ProposalConfig
+from .scheduler import SchedulerConfig
+from .scheduler import SchedulingDataConfig
+from .site import SiteConfig
+
 import lsst.pex.config as pexConfig
 
 class LsstConfig(pexConfig.Config):
@@ -75,4 +83,4 @@ class LsstConfig(pexConfig.Config):
 
     opsimdbTables = pexConfig.DictField('The dictionary of table names for the '
                                         'OpsimDB.', str, str,
-                                        default=tables_names)
+                                        default=table_names)

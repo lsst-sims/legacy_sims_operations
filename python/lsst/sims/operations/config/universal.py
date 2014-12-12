@@ -16,7 +16,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
         Class constructor. Setup all the information.
         """
         self.name = "Universal-18-0824"
-        self.WLtype = True
+        self.WLType = True
         self.ScienceType = ["WFD"]
 
         #-----------------
@@ -31,7 +31,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
 
         # Sequences
 
-        useq = baseSequences.BaseSequenceConfig()
+        useq = baseSequences.SequenceConfig()
         useq.name = 'u'
         useq.sequenceFilter = ['u', ]
         useq.numSequenceExposures = {'u': 1}
@@ -42,7 +42,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
         useq.sequenceWindowMax = 0.0
         useq.sequenceWindowEnd = 0.0
 
-        gseq = baseSequences.BaseSequenceConfig()
+        gseq = baseSequences.SequenceConfig()
         gseq.name = 'g'
         gseq.sequenceFilter = ['g', ]
         gseq.numSequenceExposures = {'g': 1}
@@ -53,7 +53,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
         gseq.sequenceWindowMax = 0.5
         gseq.sequenceWindowEnd = 1.0
 
-        rseq = baseSequences.BaseSequenceConfig()
+        rseq = baseSequences.SequenceConfig()
         rseq.name = 'r'
         rseq.sequenceFilter = ['r', ]
         rseq.numSequenceExposures = {'r': 1}
@@ -64,7 +64,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
         rseq.sequenceWindowMax = 0.5
         rseq.sequenceWindowEnd = 1.0
 
-        iseq = baseSequences.BaseSequenceConfig()
+        iseq = baseSequences.SequenceConfig()
         iseq.name = 'i'
         iseq.sequenceFilter = ['i', ]
         iseq.numSequenceExposures = {'i': 1}
@@ -75,7 +75,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
         iseq.sequenceWindowMax = 0.5
         iseq.sequenceWindowEnd = 1.0
 
-        zseq = baseSequences.BaseSequenceConfig()
+        zseq = baseSequences.SequenceConfig()
         zseq.name = 'z'
         zseq.sequenceFilter = ['z', ]
         zseq.numSequenceExposures = {'z': 1}
@@ -86,7 +86,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
         zseq.sequenceWindowMax = 0.5
         zseq.sequenceWindowEnd = 1.0
 
-        yseq = baseSequences.BaseSequenceConfig()
+        yseq = baseSequences.SequenceConfig()
         yseq.name = 'y'
         yseq.sequenceFilter = ['y', ]
         yseq.numSequenceExposures = {'y': 1}
@@ -137,8 +137,12 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
         yFilter.maxBright = 21.0
         yFilter.maxSeeing = 1.5
 
-        es.filters = {'u': uFilter, 'g': gFilter, 'r': rFilter, 'i': iFilter,
-                      'z': zFilter, 'y': yFilter}
+        es.filters = baseFilters.FiltersConfig(filters={'u': uFilter,
+                                                        'g': gFilter,
+                                                        'r': rFilter,
+                                                        'i': iFilter,
+                                                        'z': zFilter,
+                                                        'y': yFilter})
 
         self.eventSequence = es
 

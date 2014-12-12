@@ -15,7 +15,7 @@ class SouthCelestialPole(baseProposal.StandardProposalConfig):
         Class constructor. Setup all the information.
         """
         self.name = "SouthCelestialPole-18-0824"
-        self.WLtype = False
+        self.WLType = False
         self.ScienceType = ["WFD"]
 
         #-----------------
@@ -69,8 +69,12 @@ class SouthCelestialPole(baseProposal.StandardProposalConfig):
         yFilter.maxBright = 21.4
         yFilter.maxSeeing = 3.0
 
-        es.filters = {'u': uFilter, 'g': gFilter, 'r': rFilter, 'i': iFilter,
-                      'z': zFilter, 'y': yFilter}
+        es.filters = baseFilters.FiltersConfig(filters={'u': uFilter,
+                                                        'g': gFilter,
+                                                        'r': rFilter,
+                                                        'i': iFilter,
+                                                        'z': zFilter,
+                                                        'y': yFilter})
 
         self.eventSequence = es
 

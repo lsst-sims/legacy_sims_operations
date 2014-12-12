@@ -1,7 +1,7 @@
-import base.downtime as baseDowntime
+import base
 import utils
 
-class UnscheduledDowntime(baseDowntime.DownTimeConfig):
+class UnscheduledDowntime(base.DowntimeConfig):
     # List of unscheduled downtimes.
     # DO NOT MODIFY UNLESS YOU TALK TO CHUCK CLAVER!
     __events__ = (('intermediate event', 3, 3),
@@ -91,8 +91,8 @@ class UnscheduledDowntime(baseDowntime.DownTimeConfig):
         """
         elist = []
         for ev in self.__events__:
-            elist.append(baseDowntime.DowntimeEventConfig(activity=ev[0],
-                                                          startNight=ev[1],
-                                                          duration=ev[2]))
+            elist.append(base.DowntimeEventConfig(activity=ev[0],
+                                                  startNight=ev[1],
+                                                  duration=ev[2]))
 
         self.events = utils.makeIntDict(elist)

@@ -6,7 +6,7 @@ class DowntimeEventConfig(pexConfig.Config):
     """
     activity = pexConfig.Field('The downtime activity or state', str)
 
-    startnight = pexConfig.Field('Days from simulation start (startnight=0) '
+    startNight = pexConfig.Field('Days from simulation start (startNight=0) '
                                  'when the event occurs.', int)
 
     startNightComment = pexConfig.Field('An optional comment about the '

@@ -1,3 +1,5 @@
+import filters
+
 import lsst.pex.config as pexConfig
 
 class BaseSequenceConfig(pexConfig.Config):
@@ -70,9 +72,8 @@ class EventSequencingConfig(pexConfig.Config):
     MaxBoostToComplete = pexConfig.Field('Calculated boost value.', float,
                                          default=0.0)
 
-    filters = pexConfig.ConfigDictField('Alternate specification of filter '
-                                        'parameters.', int, FiltersConfig,
-                                        optional=True)
+    filters = pexConfig.ConfigField('Alternate specification of filter '
+                                    'parameters.', filters.FiltersConfig)
 
 class StandardEventSequencingConfig(EventSequencingConfig):
     """

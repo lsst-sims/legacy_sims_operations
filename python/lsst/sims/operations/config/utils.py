@@ -7,4 +7,4 @@ def makeIntDict(ilist):
     @param ilist: The list to make the dictionary from.
     @return: An integer indexed dictionary.
     """
-    return dict([(i, x) for x in enumerate(ilist)])
+    return dict([(i, ilist[i]) for i in range(len(ilist))])
