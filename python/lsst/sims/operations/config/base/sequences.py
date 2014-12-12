@@ -65,10 +65,10 @@ class EventSequencingConfig(pexConfig.Config):
     ProgressToStartBoost = pexConfig.Field('Threshold of progress (decimal '
                                            'percentage) when rank receives an '
                                            'additional boost.', float,
-                                           default=0.90)
+                                           default=1.0)
     # This is actually calculated, so it really shouldn't be a parameter!
     MaxBoostToComplete = pexConfig.Field('Calculated boost value.', float,
-                                         default=10.0)
+                                         default=0.0)
 
     filters = pexConfig.ConfigDictField('Alternate specification of filter '
                                         'parameters.', int, FiltersConfig,

@@ -11,6 +11,10 @@ class FilterConfig(pexConfig.Config):
     maxBright = pexConfig.Field('Maximum V band sky brightness', float)
     wavelength = pexConfig.Field('The wavelength (microns) center of the '
                                  'filter band.', float)
+    maxSeeing = pexConfig.Field('The maximum allowed seeing for the filter.',
+                                float, optional=True)
+    numVisits = pexConfig.Field('The number of requested visits for this '
+                                'filter.', int, optional=True)
     # Multiplicative factor for the visit time
     # VisitTime = Nexp*(ShutterTravelTime + EffectiveExpTime) +
     #             (Nexp-1)*ReadoutTime
@@ -24,7 +28,8 @@ class FilterConfig(pexConfig.Config):
     expFactor = pexConfig.Field('A scale factor that can adjust the visit '
                                 'exposure time from the standard of 34 seconds '
                                 'which is based on 2 15 second exposures plus '
-                                'readout and shutter time.', float)
+                                'readout and shutter time.', float,
+                                default=1.0)
 
 class FiltersConfig(pexConfig.Config):
     """

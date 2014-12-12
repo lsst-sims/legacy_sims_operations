@@ -67,7 +67,7 @@ class TargetRankingConfig(pexConfig.Config):
     StopTime = pexConfig.Field('Stop time (seconds since start of simulation) '
                                'for proposal.', int, optional=True)
 
-class TransientTargetRanking(TargetRankingConfig):
+class TransientTargetRankingConfig(TargetRankingConfig):
     """
     This class adds extra parameters to deal with transient proposals.
     """
