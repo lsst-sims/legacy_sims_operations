@@ -1,2 +1,11 @@
-import pkgutil
-__path__ = pkgutil.extend_path(__path__, __name__)
+from .astro_sky import *
+from .downtime import *
+from .field import *
+from .filters import *
+from .instrument import *
+from .lsstconf import *
+from .proposal import *
+from .scheduler import *
+from .sequences import *
+from .site import *
+from .target import *

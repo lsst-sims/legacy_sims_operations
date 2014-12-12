@@ -1,3 +1,3 @@
-import pkgutil
-__path__ = pkgutil.extend_path(__path__, __name__)
-
+"""
+Python interface for sims_operations package.
+"""
