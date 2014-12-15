@@ -33,7 +33,7 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     Exception if there are errors in the SQL.
     """
     # Get the hostname and username
-    host = lsstDB.conn.get_host_info().split()[0]
+    host = os.getenv('HOST').split('.')[0]
     user = os.getenv('USER')
     (yy, mm, dd, h, m, s, wday, yday, dst) = time.gmtime ()
     date = '%d-%d-%d %02d:%02d:%02d' % (yy, mm, dd, h, m, s)
