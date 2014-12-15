@@ -13,9 +13,5 @@ setupRequired(lsst)
 
 # The following is boilerplate for all packages.
 # Pure-Python packages only need the last line.
-envPrepend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
-envPrepend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 envPrepend(PYTHONPATH, ${PRODUCT_DIR}/python)
-# For admin modules
-envPrepend(PYTHONPATH, ${PRODUCT_DIR}/lib/python)
 envPrepend(PATH, ${PRODUCT_DIR}/bin)

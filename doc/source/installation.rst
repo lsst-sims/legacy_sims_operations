@@ -111,7 +111,7 @@ Then run::
 Once this is done the OpSim code can be setup locally by running the following
 commands::
 
-  scons install; setup -k -r .
+  scons; setup -k -r .
 
 Finish the setup by following the third and fourth steps in the Installation
 Instructions section above.

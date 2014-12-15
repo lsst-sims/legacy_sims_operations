@@ -9,7 +9,7 @@
 import argparse
 import ConfigParser
 import fileinput
-from lsst.opsim.admin import configure, commons
+from lsst.sims.operations.admin import configure, commons
 import logging
 import os
 import shutil

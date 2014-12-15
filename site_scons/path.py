@@ -1,1 +1,1 @@
-../admin/python/lsst/opsim/admin/path.py
+../python/lsst/sims/operations/admin/path.py
