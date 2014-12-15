@@ -15,9 +15,6 @@ import binascii
 
 import requests
 
-# globals
-USAGE_STR = '[--profile=yes] [--verbose=yes] [--config=../survey/LSST.conf] [--startup_comment="comment"]'
-
 def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     """
     Create an entry in the the Session table and fetch the key which
@@ -100,15 +97,6 @@ def startLsst( args ):
     """
     Begin LSST telescope observing simulation.
 
-    Command line input
-        [--verbose=yes]
-
-        [--config=./LSST.conf]'
-
-        [--profile=yes]
-
-	[--startup_comment="blah"]
-
     Return
         None
 
@@ -117,23 +105,13 @@ def startLsst( args ):
     """
 
     # Startup comment
-    if (args.has_key ('startup_comment')):
-        startup_comment = args['startup_comment'];
-    else:
-        startup_comment = "No comment was entered";
+    startup_comment = args.startup_comment
 
     # Verbose?
-    if (args.has_key ('verbose') and
-        args['verbose'].lower () == 'yes'):
-        VERBOSE = 1
-    else:
-        VERBOSE = 0
+    VERBOSE = args.verbose
 
     # Alternate configuration file?
-    if (args.has_key ('config') ):
-        confLSST = args['config']
-    else:
-        confLSST = DefaultLSSTConfigFile
+    confLSST = args.config
 
     # Fetch the DB table names so Session DB can be accessed immediately
     configDict, pairs =  readConfFile(confLSST)
@@ -617,15 +595,32 @@ def startLsst( args ):
 
 if (__name__ == '__main__'):
     # Parse the command line args
-    try:
-        args = parseArgs (sys.argv[1:])
-    except:
-        usage (USAGE_STR)
-        sys.stderr.write ('Syntax error\n')
-        sys.exit (1)
+    import argparse
+    
+    description = "This is the LSST operations simulator."
+    
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("-v", "--verbose", dest="verbose", action="count",
+                        default=0, help="Set the program verbosity.")
+    parser.add_argument("--startup-comment", dest="startup_comment",
+                        default="No startup comment was entered.",
+                        help="A helpful comment for the current run.")
+    parser.add_argument("--config", dest="config",
+                        default=utilities.DefaultLSSTConfigFile,
+                        help="Pass a different configuration file to the "
+                        "program.")
+    parser.add_argument("--official-run", dest="official_run",
+                        action="store_true", default=False, 
+                        help="This flag is for logging an official run into "
+                        "the tracking database. PLEASE DO NOT USE UNLESS "
+                        "AUTHORIZED TO DO SO! THANKS!")
+    parser.add_argument("-p", "--profile", dest="profile", action="store_true",
+                        default=False, help="Flag to turn on code profiling.")
+    
+    args = parser.parse_args()
 
     # Profiling?
-    if (args.has_key ('profile') and args['profile'].lower () == 'yes'):
+    if args.profile:
         print ("Profile data sent to file 'ProfileData'")
         import hotshot
         profiler = hotshot.Profile("ProfileData")
