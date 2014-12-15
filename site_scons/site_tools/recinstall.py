@@ -28,7 +28,7 @@
 # and target files within each directory.
 #
 import os
-import state
+import pstate
 
 def recursive_install(env, path):
     nodes = env.Glob(os.path.join(path, '*'), strings=False)
@@ -52,11 +52,12 @@ def RecursiveInstall(env, target, dir):
 
     relnodes = [n.abspath[l:] for n in nodes]
 
-    state.log.debug('RecursiveInstall()')
+    pstate.init()
+    pstate.log.debug('RecursiveInstall()')
     for n in relnodes:
         t = os.path.join(target, n)
         s = os.path.join(dir, n)
-        state.log.debug("RecursiveInstall() : source %s, target %s" % (s, t))
+        pstate.log.debug("RecursiveInstall() : source %s, target %s" % (s, t))
         env.InstallAs(env.File(t), env.File(s))
 
 def generate(env):

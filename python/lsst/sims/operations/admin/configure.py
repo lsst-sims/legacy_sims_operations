@@ -8,7 +8,7 @@ import string
 import shutil
 from twisted.python.procutils import which
 
-from lsst.opsim.admin import path
+from lsst.sims.operations.admin import path
 
 # used in cmd-line tool
 PREPARE = 'prepare'
