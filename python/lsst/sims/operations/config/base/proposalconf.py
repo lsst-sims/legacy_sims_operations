@@ -1,5 +1,5 @@
 import field
-from lsst.sims.operations.config.base import sequencesconf as seq
+import sequencesconf as seq
 import target
 
 import lsst.pex.config as pexConfig

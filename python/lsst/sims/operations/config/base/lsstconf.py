@@ -50,11 +50,11 @@ class LsstConfig(pexConfig.Config):
                                'of proposal needs in decimal percentage.',
                                float, default=0.7)
 
-    siteConf = pexConfig.ConfigField('The telescope site configuration.',
-                                     SiteConfig)
+    #siteConf = pexConfig.ConfigField('The telescope site configuration.',
+    #                                 SiteConfig)
 
-    proposals = pexConfig.ConfigDictField('The list of proposals to run.', int,
-                                          ProposalConfig, default={})
+    #proposals = pexConfig.ConfigDictField('The list of proposals to run.', int,
+    #                                      ProposalConfig, default={})
 
     instrument = pexConfig.ConfigField('The instrument configuration.',
                                        InstrumentConfig)
@@ -62,10 +62,10 @@ class LsstConfig(pexConfig.Config):
     #schedDown = pexConfig.ConfigurableField('The set of scheduled downtimes.',
     #                                        ConfigClass=DowntimeConfig)
 
-    unschedDown = pexConfig.ConfigField('The set of unscheduled downtimes.',
-                                        DowntimeConfig)
+    #unschedDown = pexConfig.ConfigField('The set of unscheduled downtimes.',
+    #                                    DowntimeConfig)
 
-    filters = pexConfig.ConfigField('The filter configuration.', FiltersConfig)
+    #filters = pexConfig.ConfigField('The filter configuration.', FiltersConfig)
 
     scheduler = pexConfig.ConfigField('The scheduler configuration.',
                                       SchedulerConfig)
