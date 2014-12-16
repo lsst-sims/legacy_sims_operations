@@ -2,7 +2,7 @@ import lsst.pex.config as pexConfig
 
 class FilterConfig(pexConfig.Config):
     """
-    This class holds the primary configuration for all of the filters. The
+    This class holds the primary configuration for a given filter. The
     values contained in here are based off two 15 second exposures for the
     visits.
     """

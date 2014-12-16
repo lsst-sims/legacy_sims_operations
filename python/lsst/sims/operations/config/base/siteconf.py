@@ -12,7 +12,7 @@ class SiteConfig(pexConfig.Config):
     longitude = pexConfig.Field('Telescope site\'s Longitude (units=degrees), '
                                 'negative implies West', float)
     height = pexConfig.Field('Telescope site\'s Elevation (units=meters above '
-                             'sea level', float)
+                             'sea level)', float)
     pressure = pexConfig.Field('Telescope site\'s atmospheric pressure '
                                '(units=millibars)', float)
     temperature = pexConfig.Field('Telescope site\'s atmospheric temperature '

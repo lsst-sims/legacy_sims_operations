@@ -1,10 +1,10 @@
 from .downtime import DowntimeConfig
 from .filters import FiltersConfig
 from .instrument import InstrumentConfig
-from .proposal import ProposalConfig
+from lsst.sims.operations.config.base.proposalconf import ProposalConfig
 from .scheduler import SchedulerConfig
 from .scheduler import SchedulingDataConfig
-from .site import SiteConfig
+from lsst.sims.operations.config.base.siteconf import SiteConfig
 
 import lsst.pex.config as pexConfig
 
@@ -59,8 +59,8 @@ class LsstConfig(pexConfig.Config):
     instrument = pexConfig.ConfigField('The instrument configuration.',
                                        InstrumentConfig)
 
-    schedDown = pexConfig.ConfigField('The set of scheduled downtimes.',
-                                      DowntimeConfig)
+    #schedDown = pexConfig.ConfigurableField('The set of scheduled downtimes.',
+    #                                        ConfigClass=DowntimeConfig)
 
     unschedDown = pexConfig.ConfigField('The set of unscheduled downtimes.',
                                         DowntimeConfig)

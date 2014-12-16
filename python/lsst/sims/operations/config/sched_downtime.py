@@ -1,7 +1,8 @@
 import base
 import utils
 
-class ScheduledDowntime(base.DowntimeConfig):
+class ScheduledDowntime(object):
+    ConfigClass = base.DowntimeConfig
     # List of scheduled downtimes.
     # DO NOT MODIFY UNLESS YOU TALK TO CHUCK CLAVER!
     __events__ = (('general maintenance', 158, 'June 8th in 1st year', 7),

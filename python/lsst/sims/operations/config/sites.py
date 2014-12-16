@@ -1,4 +1,4 @@
-from .base import site as baseSite
+from .base import siteconf as baseSite
 
 class CerroPachon(baseSite.SiteConfig):
     """

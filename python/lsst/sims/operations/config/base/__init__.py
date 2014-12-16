@@ -4,8 +4,8 @@ from .field import *
 from .filters import *
 from .instrument import *
 from .lsstconf import *
-from .proposal import *
+from .proposalconf import *
 from .scheduler import *
-from .sequences import *
-from .site import *
+from .sequencesconf import *
+from .siteconf import *
 from .target import *
