@@ -12,7 +12,9 @@ def makeIntDict(ilist):
 
 def load_class(full_class_string):
     """
-    Dynamically load a class from a string.
+    Dynamically load a class from a string. Taken from the following blog:
+    http://thomassileo.com/blog/2012/12/21/
+           dynamically-load-python-modules-or-classes/
 
     @param full_class_string: A standard import like call.
     @return: An instance of the class.
