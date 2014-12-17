@@ -1,3 +1,6 @@
+import lsst.pex.config as pexConfig
+
+import base
 import utils
 
 def load_proposals(proposal_str):
@@ -22,7 +25,6 @@ def list_proposals():
     This function parses through the config module and find all of the proposal
     class names and prints them.
     """
-    import base
     import importlib
     prop_list = []
     module_name = "lsst.sims.operations.config"
@@ -39,3 +41,9 @@ def list_proposals():
             # Don't care about things that aren't classes.
             pass
     return prop_list
+
+siteRegistry = pexConfig.makeRegistry('Registry for observing site '
+                                      'configurations.', base.SiteConfig)
+
+filtersRegistry = pexConfig.makeRegistry('Registry for observation filter '
+                                         'sets.', base.FiltersConfig)

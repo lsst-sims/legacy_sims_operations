@@ -1,9 +1,8 @@
 import lsst.pex.config as pexConfig
 
 import base
-from .filters import Filters30
+import factories
 from .sched_downtime import ScheduledDowntime
-from .sites import CerroPachon
 from .unsched_downtime import UnscheduledDowntime
 
 class LsstConfig(base.LsstBaseConfig):
@@ -23,34 +22,32 @@ class LsstConfig(base.LsstBaseConfig):
     logFile = pexConfig.Field('File for the logging output.', str,
                               default='./lsst.log')
 
+    siteConf = factories.siteRegistry.makeField('The telescope site '
+                                                'configuration.',
+                                                default="CerroPachon")
 
-    siteConf = pexConfig.ConfigField('The telescope site configuration.',
-                                     base.SiteConfig)
-    
-    standard_proposals = pexConfig.ConfigDictField('The list of standard '
+    standardProposals = pexConfig.ConfigDictField('The list of standard '
+                                                  'proposals to run.', int,
+                                                  base.StandardProposalConfig)
+
+    transientProposals = pexConfig.ConfigDictField('The list of transient '
                                                    'proposals to run.', int,
-                                                   base.StandardProposalConfig)
-
-    transient_proposals = pexConfig.ConfigDictField('The list of transient '
-                                                    'proposals to run.', int,
-                                                    base.TransientProposalConfig)
+                                                   base.TransientProposalConfig)
 
     schedDown = pexConfig.ConfigField('The set of scheduled downtimes.',
                                       ScheduledDowntime)
 
     unschedDown = pexConfig.ConfigField('The set of unscheduled downtimes.',
                                         UnscheduledDowntime)
-    
-    filters = pexConfig.ConfigField('The filter configuration.',
-                                    base.FiltersConfig)
 
-    def __init__(self):
+    filters = factories.filtersRegistry.makeField('The filter configuration.',
+                                                  default="Filters30")
+
+    def setDefaults(self):
         """
-        Class constructor. Set some default objects here.
+        Set default objects here.
         """
-        self.siteConf = CerroPachon()
-        self.filters = Filters30()
+        base.LsstBaseConfig.setDefaults(self)
+
         self.schedDown = ScheduledDowntime()
         self.unschedDown = UnscheduledDowntime()
-        
-

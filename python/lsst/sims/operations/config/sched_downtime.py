@@ -21,10 +21,11 @@ class ScheduledDowntime(base.DowntimeConfig):
                   ('general maintenance', 3443, 'June 8th in 10th year', 7),
                   ('general maintenance', 3592, 'November 4th in 10th year', 7))
 
-    def __init__(self):
+    def setDefaults(self):
         """
-        Class constructor. Create the list of downtime events.
+        Create the list of downtime events.
         """
+        base.DowntimeConfig.setDefaults(self)
         elist = []
         for ev in self.__events__:
             elist.append(base.DowntimeEventConfig(activity=ev[0],

@@ -85,10 +85,11 @@ class UnscheduledDowntime(base.DowntimeConfig):
                   ('minor event', 3440, 1),
                   ('intermediate event', 3644, 3))
 
-    def __init__(self):
+    def setDefaults(self):
         """
-        Class constructor. Create the list of downtime events.
+        Create the list of downtime events.
         """
+        base.DowntimeConfig.setDefaults(self)
         elist = []
         for ev in self.__events__:
             elist.append(base.DowntimeEventConfig(activity=ev[0],

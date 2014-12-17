@@ -1,12 +1,20 @@
-from .base import siteconf as baseSite
+import lsst.pex.config as pexConfig
 
+from .base import siteconf as baseSite
+import factories
+
+@pexConfig.registerConfig("CerroPachon", factories.siteRegistry,
+                          baseSite.SiteConfig)
 class CerroPachon(baseSite.SiteConfig):
     """
     This is the concrete class holding all the information for the Cerro Pachon
     telescope site.
     """
 
-    def __init__(self):
+    def setDefaults(self):
+        """
+        This function sets the defaults for the site.
+        """
         self.name = "Cerro Pachon"
         self.seeingEpoch = 49353
         self.latitude = -29.666667

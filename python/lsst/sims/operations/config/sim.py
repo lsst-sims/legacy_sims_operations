@@ -1,4 +1,4 @@
-from .base import lsstconf as baseLsstconf
+import base
 import factories
 import filters
 from .sched_downtime import ScheduledDowntime
@@ -20,11 +20,11 @@ class LsstSim(object):
     def __init__(self, proposal_list, obs_site="CerroPachon"):
         """
         The class constructor.
-        
+
         @param proposal_list: Comma-separated string of proposal names.
         @param obs_site: The class name of the observing site.
         """
-        self.lsst = baseLsstconf.LsstConfig()
+        self.lsst = base.LsstBaseConfig()
         self.obs_site = sites.CerroPachon()
         self.filters = filters.Filters30()
         self.sched_down = ScheduledDowntime()
@@ -34,21 +34,21 @@ class LsstSim(object):
     def save(self, file_head="opsim", save_dir=None, hidden=False):
         """
         This function writes out the configuration objects to separate files.
-        
+
         @param file_head: A file part to add at the start of the filename.
         @param save_dir: Directory to save the configuration files to.
-        @param hidden: Flag to write out config for things most users 
+        @param hidden: Flag to write out config for things most users
                        shouldn't touch.
         """
         import os
         if save_dir is None:
             save_dir = os.path.abspath(os.getcwd())
-            
+
         self.lsst.save(os.path.join(save_dir, file_head + "_lsst.py"))
         self.obs_site.save(os.path.join(save_dir, file_head + "_obssite.py"))
         self.filters.save(os.path.join(save_dir, file_head + "_filters.py"))
         for i, prop in enumerate(self.proposals):
-            prop.save(os.path.join(save_dir, 
+            prop.save(os.path.join(save_dir,
                                    file_head + "_proposal%02d.py" % i))
         if hidden:
             self.sched_down.save(os.path.join(save_dir,
