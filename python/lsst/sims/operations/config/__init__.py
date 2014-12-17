@@ -1,5 +1,5 @@
 from .filters import *
-from .lsstsimconf import *
+from .lsstconf import *
 from .sched_downtime import *
 from .scp import *
 #from .sim import *

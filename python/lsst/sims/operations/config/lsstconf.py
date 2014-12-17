@@ -1,15 +1,15 @@
-from .base import lsstbaseconf as baseLsstBaseConf
-
 import lsst.pex.config as pexConfig
 
+import base
 from .filters import Filters30
 from .sched_downtime import ScheduledDowntime
 from .sites import CerroPachon
 from .unsched_downtime import UnscheduledDowntime
 
-class LsstSimConfig(baseLsstBaseConf.LsstBaseConfig):
+class LsstConfig(base.LsstBaseConfig):
     """
-    This class handles the configuration of the LSST universe.
+    This class handles the configuration of the LSST universe that's not
+    handled in the base class.
     """
     verbose = pexConfig.Field('The chattiness of the program.', int, default=1)
 
@@ -23,30 +23,34 @@ class LsstSimConfig(baseLsstBaseConf.LsstBaseConfig):
     logFile = pexConfig.Field('File for the logging output.', str,
                               default='./lsst.log')
 
-    import base
-    siteConf = pexConfig.ConfigField('The telescope site configuration.',
-                                     base.SiteConfig, default=CerroPachon())
 
+    siteConf = pexConfig.ConfigField('The telescope site configuration.',
+                                     base.SiteConfig)
+    
     standard_proposals = pexConfig.ConfigDictField('The list of standard '
                                                    'proposals to run.', int,
-                                                   base.StandardProposalConfig,
-                                                   default={})
+                                                   base.StandardProposalConfig)
 
     transient_proposals = pexConfig.ConfigDictField('The list of transient '
                                                     'proposals to run.', int,
-                                                    base.TransientProposalConfig,
-                                                    default={})
+                                                    base.TransientProposalConfig)
 
     schedDown = pexConfig.ConfigField('The set of scheduled downtimes.',
-                                      ScheduledDowntime,
-                                      default=ScheduledDowntime())
+                                      ScheduledDowntime)
 
     unschedDown = pexConfig.ConfigField('The set of unscheduled downtimes.',
-                                        UnscheduledDowntime,
-                                        default=UnscheduledDowntime())
-
-    filters = pexConfig.ConfigField('The filter configuration.',
-                                    base.FiltersConfig, default=Filters30())
+                                        UnscheduledDowntime)
     
+    filters = pexConfig.ConfigField('The filter configuration.',
+                                    base.FiltersConfig)
+
     def __init__(self):
-        pass
+        """
+        Class constructor. Set some default objects here.
+        """
+        self.siteConf = CerroPachon()
+        self.filters = Filters30()
+        self.schedDown = ScheduledDowntime()
+        self.unschedDown = UnscheduledDowntime()
+        
+
