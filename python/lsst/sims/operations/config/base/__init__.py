@@ -3,7 +3,7 @@ from .downtime import *
 from .field import *
 from .filters import *
 from .instrument import *
-from .lsstconf import *
+from .lsstbaseconf import *
 from .proposalconf import *
 from .scheduler import *
 from .sequencesconf import *

@@ -1,14 +1,10 @@
-from .downtime import DowntimeConfig
-from .filters import FiltersConfig
-from .instrument import InstrumentConfig
-from lsst.sims.operations.config.base.proposalconf import ProposalConfig
-from .scheduler import SchedulerConfig
-from .scheduler import SchedulingDataConfig
-from lsst.sims.operations.config.base.siteconf import SiteConfig
-
 import lsst.pex.config as pexConfig
 
-class LsstConfig(pexConfig.Config):
+from .instrument import InstrumentConfig
+from .scheduler import SchedulerConfig
+from .scheduler import SchedulingDataConfig
+
+class LsstBaseConfig(pexConfig.Config):
     """
     This class handles the configuration of the LSST universe.
     """
@@ -50,22 +46,8 @@ class LsstConfig(pexConfig.Config):
                                'of proposal needs in decimal percentage.',
                                float, default=0.7)
 
-    #siteConf = pexConfig.ConfigField('The telescope site configuration.',
-    #                                 SiteConfig)
-
-    #proposals = pexConfig.ConfigDictField('The list of proposals to run.', int,
-    #                                      ProposalConfig, default={})
-
     instrument = pexConfig.ConfigField('The instrument configuration.',
                                        InstrumentConfig)
-
-    #schedDown = pexConfig.ConfigurableField('The set of scheduled downtimes.',
-    #                                        ConfigClass=DowntimeConfig)
-
-    #unschedDown = pexConfig.ConfigField('The set of unscheduled downtimes.',
-    #                                    DowntimeConfig)
-
-    #filters = pexConfig.ConfigField('The filter configuration.', FiltersConfig)
 
     scheduler = pexConfig.ConfigField('The scheduler configuration.',
                                       SchedulerConfig)
