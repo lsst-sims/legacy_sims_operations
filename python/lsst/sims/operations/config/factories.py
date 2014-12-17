@@ -24,23 +24,31 @@ def list_proposals():
     """
     This function parses through the config module and find all of the proposal
     class names and prints them.
+
+    @return: A dictionary listing the proposals for the two main classes.
     """
     import importlib
-    prop_list = []
+    STANDARD = "Standard"
+    TRANSIENT = "Transient"
+
+    prop_dict = {STANDARD: [], TRANSIENT: []}
     module_name = "lsst.sims.operations.config"
     module = importlib.import_module(module_name)
     names = dir(module)
     for name in names:
         cls = utils.load_class(module_name + "." + name)
         try:
-            spc = issubclass(cls, base.StandardProposalConfig)
-            tpc = issubclass(cls, base.TransientProposalConfig)
-            if spc or tpc:
-                prop_list.append(cls.__name__)
+            key = None
+            if issubclass(cls, base.StandardProposalConfig):
+                key = STANDARD
+            if issubclass(cls, base.TransientProposalConfig):
+                key = TRANSIENT
+            if key is not None:
+                prop_dict[key].append(cls.__name__)
         except TypeError:
             # Don't care about things that aren't classes.
             pass
-    return prop_list
+    return prop_dict
 
 siteRegistry = pexConfig.makeRegistry('Registry for observing site '
                                       'configurations.', base.SiteConfig)

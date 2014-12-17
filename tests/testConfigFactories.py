@@ -6,7 +6,8 @@ class TestConfigFactories(unittest.TestCase):
 
     def testListProposals(self):
         proposals = factories.list_proposals()
-        self.assertEquals(len(proposals), 2)
+        self.assertEquals(len(proposals.keys()), 2)
+        self.assertEquals(len(proposals.items()), 2)
 
     def testLoadProposals(self):
         proposals = factories.load_proposals("SouthCelestialPole")
