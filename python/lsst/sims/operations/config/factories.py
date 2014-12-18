@@ -11,7 +11,7 @@ def load_proposals(proposal_str):
     @param proposal_str: A comma-separates string of proposal names
     """
     proposals = []
-    module_name = "lsst.sims.operations.config."
+    module_name = "lsst.sims.operations.config.proposals."
     for proposal_class in proposal_str.split(','):
         try:
             cls = utils.load_class(module_name + proposal_class)
@@ -32,7 +32,7 @@ def list_proposals():
     TRANSIENT = "Transient"
 
     prop_dict = {STANDARD: [], TRANSIENT: []}
-    module_name = "lsst.sims.operations.config"
+    module_name = "lsst.sims.operations.config.proposals"
     module = importlib.import_module(module_name)
     names = dir(module)
     for name in names:

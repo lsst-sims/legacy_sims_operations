@@ -1,9 +1,9 @@
-from .base import field as baseField
-from .base import filters as baseFilters
-from .base import proposalconf as baseProposal
-from .base import sequencesconf as baseSequences
-from .base import target as baseTarget
-import utils
+from ..base import field as baseField
+from ..base import filters as baseFilters
+from ..base import proposalconf as baseProposal
+from ..base import sequencesconf as baseSequences
+from ..base import target as baseTarget
+from .. import utils
 
 class SouthCelestialPole(baseProposal.StandardProposalConfig):
     """
