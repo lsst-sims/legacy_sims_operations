@@ -1,19 +1,25 @@
+import lsst.pex.config as pexConfig
+
 from ..base import field as baseField
 from ..base import filters as baseFilters
 from ..base import proposalconf as baseProposal
 from ..base import sequencesconf as baseSequences
 from ..base import target as baseTarget
+from .. import factories
 from .. import utils
 
+@pexConfig.registerConfig("SouthCelestialPole", factories.standardPropReg,
+                          baseProposal.StandardProposalConfig)
 class SouthCelestialPole(baseProposal.StandardProposalConfig):
     """
     This class gathers the information for the South Celestial Pole proposal.
     """
 
-    def __init__(self):
+    def setDefaults(self):
         """
-        Class constructor. Setup all the information.
+        Setup all the proposal information.
         """
+        
         self.name = "SouthCelestialPole-18-0824"
         self.WLType = False
         self.ScienceType = ["WFD"]

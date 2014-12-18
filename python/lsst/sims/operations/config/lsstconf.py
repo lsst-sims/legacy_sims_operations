@@ -2,6 +2,7 @@ import lsst.pex.config as pexConfig
 
 import base
 import factories
+import proposals
 from .sched_downtime import ScheduledDowntime
 from .unsched_downtime import UnscheduledDowntime
 
@@ -22,13 +23,16 @@ class LsstConfig(base.LsstBaseConfig):
     logFile = pexConfig.Field('File for the logging output.', str,
                               default='./lsst.log')
 
-    standardProposals = pexConfig.ConfigDictField('The list of standard '
-                                                  'proposals to run.', int,
-                                                  base.StandardProposalConfig)
+    standardProposals = factories.standardPropReg.makeField('The list of '
+                                                            'standard '
+                                                            'proposals to run.',
+                                                            multi=True)
 
-    transientProposals = pexConfig.ConfigDictField('The list of transient '
-                                                   'proposals to run.', int,
-                                                   base.TransientProposalConfig)
+    transientProposals = factories.transientPropReg.makeField('The list of '
+                                                              'transient '
+                                                              'proposals to '
+                                                              'run.',
+                                                              multi=True)
 
     schedDown = pexConfig.ConfigField('The set of scheduled downtimes.',
                                       ScheduledDowntime)

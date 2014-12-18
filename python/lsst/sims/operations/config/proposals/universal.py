@@ -1,19 +1,24 @@
+import lsst.pex.config as pexConfig
+
 from ..base import field as baseField
 from ..base import filters as baseFilters
 from ..base import proposalconf as baseProposal
 from ..base import sequencesconf as baseSequences
 from ..base import target as baseTarget
+from .. import factories
 from .. import utils
 
+@pexConfig.registerConfig("UniversalWfd", factories.transientPropReg,
+                          baseProposal.TransientProposalConfig)
 class UniversalWfd(baseProposal.TransientProposalConfig):
     """
     This class gathers the information for the Universal WFD (18,000 sq deg,
     824 visits) proposal.
     """
 
-    def __init__(self):
+    def setDefaults(self):
         """
-        Class constructor. Setup all the information.
+        Setup all the proposal information.
         """
         self.name = "Universal-18-0824"
         self.WLType = True

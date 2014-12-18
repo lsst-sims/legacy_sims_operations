@@ -3,6 +3,13 @@ import lsst.pex.config as pexConfig
 import base
 import utils
 
+standardPropReg = pexConfig.makeRegistry('A registry for standard proposal '
+                                         'types.', base.StandardProposalConfig)
+
+transientPropReg = pexConfig.makeRegistry('A registry for transient proposal '
+                                          'types.',
+                                          base.TransientProposalConfig)
+
 def load_proposals(proposal_str):
     """
     Get a list of proposal instances based off a comma-separated string of
