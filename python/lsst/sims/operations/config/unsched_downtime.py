@@ -2,8 +2,10 @@ import base
 import utils
 
 class UnscheduledDowntime(base.DowntimeConfig):
-    # List of unscheduled downtimes.
-    # DO NOT MODIFY UNLESS YOU TALK TO CHUCK CLAVER!
+    """
+    List of unscheduled downtimes.
+    DO NOT MODIFY UNLESS YOU TALK TO CHUCK CLAVER!
+    """
     __events__ = (('intermediate event', 3, 3),
                   ('minor event', 22, 1),
                   ('minor event', 30, 1),
