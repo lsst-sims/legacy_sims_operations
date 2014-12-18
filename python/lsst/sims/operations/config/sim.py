@@ -1,5 +1,5 @@
 import base
-import factories
+import helpers
 import filters
 from .sched_downtime import ScheduledDowntime
 import sites
@@ -29,7 +29,7 @@ class LsstSim(object):
         self.filters = filters.Filters30()
         self.sched_down = ScheduledDowntime()
         self.unsched_down = UnscheduledDowntime()
-        self.proposals = factories.load_proposals(proposal_list)
+        self.proposals = helpers.load_proposals(proposal_list)
 
     def save(self, file_head="opsim", save_dir=None, hidden=False):
         """

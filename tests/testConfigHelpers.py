@@ -1,16 +1,16 @@
 import unittest
 
-import lsst.sims.operations.config.factories as factories
+import lsst.sims.operations.config.helpers as helpers
 
-class TestConfigFactories(unittest.TestCase):
+class TestConfigHelpers(unittest.TestCase):
 
     def testListProposals(self):
-        proposals = factories.listProposals()
+        proposals = helpers.listProposals()
         self.assertEquals(len(proposals.keys()), 2)
         self.assertEquals(len(proposals.items()), 2)
 
     def testLoadProposals(self):
-        proposals = factories.loadProposals("SouthCelestialPole")
+        proposals = helpers.loadProposals("SouthCelestialPole")
         self.assertEquals(proposals[0].name, "SouthCelestialPole-18-0824")
         self.assertEquals(proposals[0].eventSequence.NVisits, 3)
 

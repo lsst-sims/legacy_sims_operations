@@ -5,10 +5,10 @@ from ..base import filters as baseFilters
 from ..base import proposalconf as baseProposal
 from ..base import sequencesconf as baseSequences
 from ..base import target as baseTarget
-from .. import factories
+from .. import helpers
 from .. import utils
 
-@pexConfig.registerConfig("UniversalWfd", factories.transientPropReg,
+@pexConfig.registerConfig("UniversalWfd", helpers.transientPropReg,
                           baseProposal.TransientProposalConfig)
 class UniversalWfd(baseProposal.TransientProposalConfig):
     """
