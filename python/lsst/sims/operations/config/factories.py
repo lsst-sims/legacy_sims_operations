@@ -10,7 +10,7 @@ transientPropReg = pexConfig.makeRegistry('A registry for transient proposal '
                                           'types.',
                                           base.TransientProposalConfig)
 
-def load_proposals(proposal_str):
+def loadProposals(proposalStr):
     """
     Get a list of proposal instances based off a comma-separated string of
     proposal class names. The module name is set in the function.
@@ -18,16 +18,16 @@ def load_proposals(proposal_str):
     @param proposal_str: A comma-separates string of proposal names
     """
     proposals = []
-    module_name = "lsst.sims.operations.config.proposals."
-    for proposal_class in proposal_str.split(','):
+    moduleName = "lsst.sims.operations.config.proposals."
+    for proposalClass in proposalStr.split(','):
         try:
-            cls = utils.load_class(module_name + proposal_class)
+            cls = utils.load_class(moduleName + proposalClass)
             proposals.append(cls())
         except AttributeError:
-            print("WARNING: %s proposal not found!" % proposal_class)
+            print("WARNING: %s proposal not found!" % proposalClass)
     return proposals
 
-def list_proposals():
+def listProposals():
     """
     This function parses through the config module and find all of the proposal
     class names and prints them.
@@ -38,12 +38,12 @@ def list_proposals():
     STANDARD = "Standard"
     TRANSIENT = "Transient"
 
-    prop_dict = {STANDARD: [], TRANSIENT: []}
-    module_name = "lsst.sims.operations.config.proposals"
-    module = importlib.import_module(module_name)
+    propDict = {STANDARD: [], TRANSIENT: []}
+    moduleName = "lsst.sims.operations.config.proposals"
+    module = importlib.import_module(moduleName)
     names = dir(module)
     for name in names:
-        cls = utils.load_class(module_name + "." + name)
+        cls = utils.load_class(moduleName + "." + name)
         try:
             key = None
             if issubclass(cls, base.StandardProposalConfig):
@@ -51,8 +51,8 @@ def list_proposals():
             if issubclass(cls, base.TransientProposalConfig):
                 key = TRANSIENT
             if key is not None:
-                prop_dict[key].append(cls.__name__)
+                propDict[key].append(cls.__name__)
         except TypeError:
             # Don't care about things that aren't classes.
             pass
-    return prop_dict
+    return propDict

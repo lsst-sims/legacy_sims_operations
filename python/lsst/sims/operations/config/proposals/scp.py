@@ -19,7 +19,6 @@ class SouthCelestialPole(baseProposal.StandardProposalConfig):
         """
         Setup all the proposal information.
         """
-        
         self.name = "SouthCelestialPole-18-0824"
         self.WLType = False
         self.ScienceType = ["WFD"]
@@ -89,7 +88,7 @@ class SouthCelestialPole(baseProposal.StandardProposalConfig):
         #----------------
 
         fs = baseField.FieldSelectionConfig()
-        fs.userRegions = self.__make_user_regions__()
+        fs.userRegions = self._makeUserRegions()
         fs.taperL = 0.0
         fs.taperB = 0.0
         fs.peakL = 0.0
@@ -115,8 +114,8 @@ class SouthCelestialPole(baseProposal.StandardProposalConfig):
 
         self.targetRanking = tr
 
-    def __make_user_regions__(self):
-        __regions__ = ((0.0, -90.0, 0.03),
+    def _makeUserRegions(self):
+        _rawRegions = ((0.0, -90.0, 0.03),
                        (180.0, -87.57, 0.03),
                        (324.0, -87.57, 0.03),
                        (36.0, -87.57, 0.03),
@@ -411,7 +410,7 @@ class SouthCelestialPole(baseProposal.StandardProposalConfig):
                        (36.0, -62.51, 0.03),)
 
         rlist = []
-        for ur in __regions__:
+        for ur in _rawRegions:
             rlist.append(baseField.UserRegionConfig(ra=ur[0], dec=ur[1],
                                                     diameter=ur[2]))
         return utils.makeIntDict(rlist)

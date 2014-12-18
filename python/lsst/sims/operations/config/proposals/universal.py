@@ -156,7 +156,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
         #----------------
 
         fs = baseField.TransientFieldSelectionConfig()
-        fs.userRegions = self.__make_user_regions__()
+        fs.userRegions = self._makeUserRegions()
         fs.taperL = 0.0
         fs.taperB = 0.0
         fs.peakL = 0.0
@@ -184,8 +184,8 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
 
         self.targetRanking = tr
 
-    def __make_user_regions__(self):
-        __regions__ = ((240.05, -62.02, 0.03),
+    def _makeUserRegions(self):
+        _rawRegions = ((240.05, -62.02, 0.03),
                        (119.94, -62.02, 0.03),
                        (335.95, -62.02, 0.03),
                        (24.06, -62.02, 0.03),
@@ -2480,7 +2480,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
                        (68.81, 2.69, 0.03),)
 
         rlist = []
-        for ur in __regions__:
+        for ur in _rawRegions:
             rlist.append(baseField.UserRegionConfig(ra=ur[0], dec=ur[1],
                                                     diameter=ur[2]))
         return utils.makeIntDict(rlist)
