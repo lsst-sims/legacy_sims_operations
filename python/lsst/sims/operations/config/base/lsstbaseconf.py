@@ -1,8 +1,10 @@
 import lsst.pex.config as pexConfig
 
+from .filters import FiltersConfig
 from .instrument import InstrumentConfig
 from .scheduler import SchedulerConfig
 from .scheduler import SchedulingDataConfig
+from .siteconf import SiteConfig
 
 class LsstBaseConfig(pexConfig.Config):
     """
@@ -45,6 +47,12 @@ class LsstBaseConfig(pexConfig.Config):
     maxCloud = pexConfig.Field('Maximum cloudiness for observing, regardless '
                                'of proposal needs in decimal percentage.',
                                float, default=0.7)
+
+    obsFilters = pexConfig.ConfigField('The observation filters configuration.',
+                                       FiltersConfig)
+
+    obsSite = pexConfig.ConfigField('The observing site configuration.',
+                                    SiteConfig)
 
     instrument = pexConfig.ConfigField('The instrument configuration.',
                                        InstrumentConfig)

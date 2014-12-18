@@ -22,10 +22,6 @@ class LsstConfig(base.LsstBaseConfig):
     logFile = pexConfig.Field('File for the logging output.', str,
                               default='./lsst.log')
 
-    siteConf = factories.siteRegistry.makeField('The telescope site '
-                                                'configuration.',
-                                                default="CerroPachon")
-
     standardProposals = pexConfig.ConfigDictField('The list of standard '
                                                   'proposals to run.', int,
                                                   base.StandardProposalConfig)
@@ -39,9 +35,6 @@ class LsstConfig(base.LsstBaseConfig):
 
     unschedDown = pexConfig.ConfigField('The set of unscheduled downtimes.',
                                         UnscheduledDowntime)
-
-    filters = factories.filtersRegistry.makeField('The filter configuration.',
-                                                  default="Filters30")
 
     def setDefaults(self):
         """

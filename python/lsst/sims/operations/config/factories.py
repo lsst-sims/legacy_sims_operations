@@ -49,9 +49,3 @@ def list_proposals():
             # Don't care about things that aren't classes.
             pass
     return prop_dict
-
-siteRegistry = pexConfig.makeRegistry('Registry for observing site '
-                                      'configurations.', base.SiteConfig)
-
-filtersRegistry = pexConfig.makeRegistry('Registry for observation filter '
-                                         'sets.', base.FiltersConfig)
