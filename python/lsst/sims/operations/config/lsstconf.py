@@ -2,6 +2,7 @@ import lsst.pex.config as pexConfig
 
 import base
 import helpers
+import proposals
 from .sched_downtime import ScheduledDowntime
 from .unsched_downtime import UnscheduledDowntime
 
