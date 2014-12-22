@@ -1,7 +1,7 @@
 # File for holding little utilities
 import importlib
 
-__all__ = ["load_class", "makeIntDict"]
+__all__ = ["loadClass", "makeIntDict"]
 
 def makeIntDict(ilist):
     """
@@ -12,7 +12,7 @@ def makeIntDict(ilist):
     """
     return dict([(i, ilist[i]) for i in range(len(ilist))])
 
-def load_class(full_class_string):
+def loadClass(full_class_string):
     """
     Dynamically load a class from a string. Taken from the following blog:
     http://thomassileo.com/blog/2012/12/21/

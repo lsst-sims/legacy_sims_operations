@@ -23,7 +23,7 @@ def loadProposals(proposalStr):
     moduleName = "lsst.sims.operations.config.proposals."
     for proposalClass in proposalStr.split(','):
         try:
-            cls = utils.load_class(moduleName + proposalClass)
+            cls = utils.loadClass(moduleName + proposalClass)
             proposals.append(cls())
         except AttributeError:
             print("WARNING: %s proposal not found!" % proposalClass)
@@ -45,7 +45,7 @@ def listProposals():
     module = importlib.import_module(moduleName)
     names = dir(module)
     for name in names:
-        cls = utils.load_class(moduleName + "." + name)
+        cls = utils.loadClass(moduleName + "." + name)
         try:
             key = None
             if issubclass(cls, base.StandardProposalConfig):
