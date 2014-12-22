@@ -8,7 +8,7 @@ class UnscheduledDowntime(base.DowntimeConfig):
     List of unscheduled downtimes.
     DO NOT MODIFY UNLESS YOU TALK TO CHUCK CLAVER!
     """
-    _rawEvents = (('intermediate event', 3, 3),
+    __udEvents = (('intermediate event', 3, 3),
                   ('minor event', 22, 1),
                   ('minor event', 30, 1),
                   ('minor event', 44, 1),
@@ -95,7 +95,7 @@ class UnscheduledDowntime(base.DowntimeConfig):
         """
         base.DowntimeConfig.setDefaults(self)
         elist = []
-        for ev in self._rawEvents:
+        for ev in self.__udEvents:
             elist.append(base.DowntimeEventConfig(activity=ev[0],
                                                   startNight=ev[1],
                                                   duration=ev[2]))

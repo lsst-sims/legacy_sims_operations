@@ -8,7 +8,7 @@ class ScheduledDowntime(base.DowntimeConfig):
     List of scheduled downtimes.
     DO NOT MODIFY UNLESS YOU TALK TO CHUCK CLAVER!
     """
-    _rawEvents = (('general maintenance', 158, 'June 8th in 1st year', 7),
+    __sdEvents = (('general maintenance', 158, 'June 8th in 1st year', 7),
                   ('general maintenance', 307, 'November 4th in 1st year', 7),
                   ('general maintenance', 523, 'June 8th in 2nd year', 7),
                   ('general maintenance', 672, 'November 4th in 2nd year', 7),
@@ -31,7 +31,7 @@ class ScheduledDowntime(base.DowntimeConfig):
         """
         base.DowntimeConfig.setDefaults(self)
         elist = []
-        for ev in self._rawEvents:
+        for ev in self.__sdEvents:
             elist.append(base.DowntimeEventConfig(activity=ev[0],
                                                   startNight=ev[1],
                                                   startNightComment=ev[2],

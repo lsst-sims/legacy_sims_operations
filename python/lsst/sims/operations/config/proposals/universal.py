@@ -187,7 +187,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
         self.targetRanking = tr
 
     def _makeUserRegions(self):
-        _rawRegions = ((240.05, -62.02, 0.03),
+        __urRegions = ((240.05, -62.02, 0.03),
                        (119.94, -62.02, 0.03),
                        (335.95, -62.02, 0.03),
                        (24.06, -62.02, 0.03),
@@ -2482,7 +2482,7 @@ class UniversalWfd(baseProposal.TransientProposalConfig):
                        (68.81, 2.69, 0.03),)
 
         rlist = []
-        for ur in _rawRegions:
+        for ur in __urRegions:
             rlist.append(baseField.UserRegionConfig(ra=ur[0], dec=ur[1],
                                                     diameter=ur[2]))
         return utils.makeIntDict(rlist)

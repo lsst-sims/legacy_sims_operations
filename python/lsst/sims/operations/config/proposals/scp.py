@@ -117,7 +117,7 @@ class SouthCelestialPole(baseProposal.StandardProposalConfig):
         self.targetRanking = tr
 
     def _makeUserRegions(self):
-        _rawRegions = ((0.0, -90.0, 0.03),
+        __urRegions = ((0.0, -90.0, 0.03),
                        (180.0, -87.57, 0.03),
                        (324.0, -87.57, 0.03),
                        (36.0, -87.57, 0.03),
@@ -412,7 +412,7 @@ class SouthCelestialPole(baseProposal.StandardProposalConfig):
                        (36.0, -62.51, 0.03),)
 
         rlist = []
-        for ur in _rawRegions:
+        for ur in __urRegions:
             rlist.append(baseField.UserRegionConfig(ra=ur[0], dec=ur[1],
                                                     diameter=ur[2]))
         return utils.makeIntDict(rlist)
