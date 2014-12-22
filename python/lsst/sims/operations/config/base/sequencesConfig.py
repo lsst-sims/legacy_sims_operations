@@ -1,6 +1,6 @@
-import filters
-
 import lsst.pex.config as pexConfig
+
+import filters
 
 __all__ = ["BaseSequenceConfig", "EventSequencingConfig", "MasterSequenceConfig", "SequenceConfig",
            "StandardEventSequencingConfig", "TransientEventSequencingConfig"]

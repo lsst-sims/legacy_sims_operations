@@ -1,8 +1,8 @@
+import lsst.pex.config as pexConfig
+
 import field
 import sequencesConfig as seq
 import target
-
-import lsst.pex.config as pexConfig
 
 __all__ = ["ProposalConfig", "StandardProposalConfig", "TransientProposalConfig"]
 
