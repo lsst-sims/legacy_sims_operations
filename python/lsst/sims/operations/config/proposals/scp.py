@@ -8,6 +8,8 @@ from ..base import target as baseTarget
 from .. import helpers
 from .. import utils
 
+__all__ = ["SouthCelestialPole"]
+
 @pexConfig.registerConfig("SouthCelestialPole", helpers.standardPropReg,
                           baseProposal.StandardProposalConfig)
 class SouthCelestialPole(baseProposal.StandardProposalConfig):

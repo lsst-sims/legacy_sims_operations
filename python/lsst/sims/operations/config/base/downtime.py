@@ -1,5 +1,7 @@
 import lsst.pex.config as pexConfig
 
+__all__ = ["DowntimeConfig", "DowntimeEventConfig"]
+
 class DowntimeEventConfig(pexConfig.Config):
     """
     This class is for holding downtime event information.

@@ -1,5 +1,7 @@
 import lsst.pex.config as pexConfig
 
+__all__ = ["SchedulerConfig", "SchedulingDataConfig"]
+
 class SchedulerConfig(pexConfig.Config):
     """
     This class handles the configuration for the Scheduler.

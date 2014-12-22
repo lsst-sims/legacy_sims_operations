@@ -1,5 +1,7 @@
 import lsst.pex.config as pexConfig
 
+__all__ = ["FieldSelectionConfig", "TransientFieldSelectionConfig", "UserRegionConfig"]
+
 class UserRegionConfig(pexConfig.Config):
     """
     This class configures a given user sky region.

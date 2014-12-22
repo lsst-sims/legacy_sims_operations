@@ -8,6 +8,8 @@ from ..base import target as baseTarget
 from .. import helpers
 from .. import utils
 
+__all__ = ["UniversalWfd"]
+
 @pexConfig.registerConfig("UniversalWfd", helpers.transientPropReg,
                           baseProposal.TransientProposalConfig)
 class UniversalWfd(baseProposal.TransientProposalConfig):

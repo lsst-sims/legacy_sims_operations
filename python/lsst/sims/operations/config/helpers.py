@@ -3,6 +3,8 @@ import lsst.pex.config as pexConfig
 import base
 import utils
 
+__all__ = ["listProposals", "loadProposals", "standardPropReg", "transientPropReg"]
+
 standardPropReg = pexConfig.makeRegistry('A registry for standard proposal '
                                          'types.', base.StandardProposalConfig)
 

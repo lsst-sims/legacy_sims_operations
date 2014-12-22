@@ -1,5 +1,7 @@
 import lsst.pex.config as pexConfig
 
+__all__ = ["SiteConfig"]
+
 class SiteConfig(pexConfig.Config):
     """
     This is the base configuration class for Telescope site information.

@@ -1,6 +1,8 @@
 import lsst.pex.config as pexConfig
 from lsst.pex.config.rangeField import RangeField
 
+__all__ = ["InstrumentConfig"]
+
 class InstrumentConfig(pexConfig.Config):
     """
     This class contains the configuration of telescope and camera parameters

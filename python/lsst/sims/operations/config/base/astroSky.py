@@ -1,5 +1,7 @@
 import lsst.pex.config as pexConfig
 
+__all__ = ["AstronomicalSkyConfig"]
+
 class AstronomicalSkyConfig(pexConfig.Config):
     """
     This class holds the parameters for defining aspects of the astronomical

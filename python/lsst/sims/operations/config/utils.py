@@ -1,6 +1,8 @@
 # File for holding little utilities
 import importlib
 
+__all__ = ["load_class", "makeIntDict"]
+
 def makeIntDict(ilist):
     """
     This function makes an integer indexed dictionary from a list.

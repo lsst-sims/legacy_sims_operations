@@ -6,6 +6,8 @@ import proposals
 from .schedDowntime import ScheduledDowntime
 from .unschedDowntime import UnscheduledDowntime
 
+__all__ = ["LsstConfig"]
+
 class LsstConfig(base.LsstBaseConfig):
     """
     This class handles the configuration of the LSST universe that's not

@@ -6,6 +6,8 @@ from .scheduler import SchedulerConfig
 from .scheduler import SchedulingDataConfig
 from .siteConfig import SiteConfig
 
+__all__ = ["LsstBaseConfig"]
+
 class LsstBaseConfig(pexConfig.Config):
     """
     This class handles the configuration of the LSST universe.

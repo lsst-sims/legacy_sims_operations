@@ -4,6 +4,8 @@ import target
 
 import lsst.pex.config as pexConfig
 
+__all__ = ["ProposalConfig", "StandardProposalConfig", "TransientProposalConfig"]
+
 class ProposalConfig(pexConfig.Config):
     """
     This is the base class for the proposal variants.

@@ -2,6 +2,9 @@ import filters
 
 import lsst.pex.config as pexConfig
 
+__all__ = ["BaseSequenceConfig", "EventSequencingConfig", "MasterSequenceConfig", "SequenceConfig",
+           "StandardEventSequencingConfig", "TransientEventSequencingConfig"]
+
 class BaseSequenceConfig(pexConfig.Config):
     """
     This class holds the information for configuring an observation sequence.

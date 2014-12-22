@@ -1,5 +1,7 @@
 import lsst.pex.config as pexConfig
 
+__all__ = ["FilterConfig", "FiltersConfig"]
+
 class FilterConfig(pexConfig.Config):
     """
     This class holds the primary configuration for a given filter. The

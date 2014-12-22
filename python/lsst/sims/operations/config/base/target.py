@@ -1,5 +1,7 @@
 import lsst.pex.config as pexConfig
 
+__all__ = ["TargetRankingConfig", "TargetSelectionConfig", "TransientTargetRankingConfig"]
+
 class TargetSelectionConfig(pexConfig.Config):
     """
     This class handles the configuration for the target selection criteria.

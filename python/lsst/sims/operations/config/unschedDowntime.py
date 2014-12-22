@@ -1,6 +1,8 @@
 import base
 import utils
 
+__all__ = ["UnscheduledDowntime"]
+
 class UnscheduledDowntime(base.DowntimeConfig):
     """
     List of unscheduled downtimes.
