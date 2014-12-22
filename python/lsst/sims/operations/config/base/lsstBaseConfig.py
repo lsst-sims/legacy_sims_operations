@@ -4,7 +4,7 @@ from .filters import FiltersConfig
 from .instrument import InstrumentConfig
 from .scheduler import SchedulerConfig
 from .scheduler import SchedulingDataConfig
-from .siteconf import SiteConfig
+from .siteConfig import SiteConfig
 
 class LsstBaseConfig(pexConfig.Config):
     """

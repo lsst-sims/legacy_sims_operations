@@ -3,8 +3,8 @@ import lsst.pex.config as pexConfig
 import base
 import helpers
 import proposals
-from .sched_downtime import ScheduledDowntime
-from .unsched_downtime import UnscheduledDowntime
+from .schedDowntime import ScheduledDowntime
+from .unschedDowntime import UnscheduledDowntime
 
 class LsstConfig(base.LsstBaseConfig):
     """

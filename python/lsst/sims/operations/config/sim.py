@@ -1,9 +1,9 @@
 import base
 import helpers
 import filters
-from .sched_downtime import ScheduledDowntime
+from lsst.sims.operations.config.schedDowntime import ScheduledDowntime
 import sites
-from .unsched_downtime import UnscheduledDowntime
+from lsst.sims.operations.config.unschedDowntime import UnscheduledDowntime
 
 class OpSimConfig(object):
     """

@@ -2,8 +2,8 @@ import lsst.pex.config as pexConfig
 
 from ..base import field as baseField
 from ..base import filters as baseFilters
-from ..base import proposalconf as baseProposal
-from ..base import sequencesconf as baseSequences
+from ..base import proposalConfig as baseProposal
+from ..base import sequencesConfig as baseSequences
 from ..base import target as baseTarget
 from .. import helpers
 from .. import utils

@@ -1,5 +1,5 @@
 import field
-import sequencesconf as seq
+import sequencesConfig as seq
 import target
 
 import lsst.pex.config as pexConfig
