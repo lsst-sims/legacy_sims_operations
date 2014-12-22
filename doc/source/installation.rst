@@ -46,8 +46,11 @@ Installation Instructions
 * Run the OpSim Configuration
 
   The OpSim database is installed in a directory separate from the binary files.
-  This directory ($OPSIM_RUN_DIR) is by default ``$HOME/opsim-run``, but can be
-  changed via the configuration script.
+  This directory is by default ``$HOME/opsim-run``, but can be changed via
+  passing the -R flag and a directory path to the configuration script. The
+  documentation below will refer to this directory location as $OPSIM_RUN_DIR,
+  but please note that this is not an environmental variable. The configuration
+  script does not create one.
 
   To setup the OpSim database, run the following command::
 
