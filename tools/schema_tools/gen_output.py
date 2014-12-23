@@ -146,7 +146,7 @@ def create_output_table(hname, database, sessionID):
 				kAtm = 0.11;
 
 			tauCloud = 0.;
-			expTime = (expTime - 4.00);
+			#expTime = (expTime - 4.00);
 			m5_1 = Cm + 0.50*(filtsky-21) + 2.5*math.log10(0.7/seeing) +1.25*math.log10(expTime/30) - kAtm*(airmass-1) + 1.1*tauCloud; # Using Kem's SkyBrightness
 			# Feature 120: Add 2 columns: skybrightness (ETC for dark and filtsky for z & y filters for twilight) and 5 sigma from this column
 			if (salt*RAD2DEG) > -18.0 and (filter == 'y' or filter == 'z'):

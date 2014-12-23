@@ -68,13 +68,13 @@ time $python schema_tools/prep_opsim.py $host $database $1
 echo "####################################################################"
 
 # Fixing visitTime & visitExpTime for tObsHistory and output tables
-echo "####################################################################"
-echo "[Fixing visitTime & visitExpTime]"
-$mysql -u www -pzxcvbnm -e "update $database.tObsHistory_${host}_$1 set visitTime=visitExpTime"
-$mysql -u www -pzxcvbnm -e "update $database.tObsHistory_${host}_$1 set visitExpTime=visitTime-4.00"
-$mysql -u www -pzxcvbnm -e "update $database.summary_${host}_$1 set visitTime=visitExpTime"
-$mysql -u www -pzxcvbnm -e "update $database.summary_${host}_$1 set visitExpTime=visitTime-4.00"
-echo "####################################################################"
+#echo "####################################################################"
+#echo "[Fixing visitTime & visitExpTime]"
+#$mysql -u www -pzxcvbnm -e "update $database.tObsHistory_${host}_$1 set visitTime=visitExpTime"
+#$mysql -u www -pzxcvbnm -e "update $database.tObsHistory_${host}_$1 set visitExpTime=visitTime-4.00"
+#$mysql -u www -pzxcvbnm -e "update $database.summary_${host}_$1 set visitTime=visitExpTime"
+#$mysql -u www -pzxcvbnm -e "update $database.summary_${host}_$1 set visitExpTime=visitTime-4.00"
+#echo "####################################################################"
 
 # Adding wfd tag to Proposal table for propID
 #echo "####################################################################"
@@ -83,7 +83,7 @@ echo "####################################################################"
 #echo "####################################################################"
 
 # Copying over fiveSigmaDepth, ditheredRA, ditheredDec values from output to ObsHistory
-echo "####################################################################"
+#echo "####################################################################"
 echo "[Fixing fiveSigmaDepth, ditheredRA, ditheredDec values from output to ObsHistory]"
 time $python schema_tools/move_data_output_obshistory.py $host $database $1
 echo "####################################################################"
@@ -100,4 +100,3 @@ mv ${host}_$1_* ../output
 echo "[dropSubsetTables.sh]"
 time schema_tools/dropSubsetTables.sh $database $host $1
 echo "####################################################################"
-
