@@ -28,7 +28,8 @@ Installation Instructions
 
   .. code-block:: bash
 
-    eups distrib install -t <tag> sims_operations; setup sims_operations -t <tag>
+    eups distrib install -t <tag> sims_operations
+    setup sims_operations -t <tag>
 
   Where <tag> is the name of an EUPS package tag. **NOTE**: If you have an
   existing database installation, do not run the setup command as is, otherwise
