@@ -5,7 +5,7 @@
 #except:
 #    pass
 
-OPSIM_VERSION = '3.2'
+OPSIM_VERSION = '3.2.1'
 
 from utilities import *
 from Simulator import *
