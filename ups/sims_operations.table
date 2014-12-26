@@ -7,7 +7,6 @@
 # rather than assuming it will be included recursively.
 setupRequired(mysql)
 setupRequired(mysqlpython)
-setupRequired(twisted)
 setupRequired(palpy)
 setupRequired(lsst)
 

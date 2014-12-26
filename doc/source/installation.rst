@@ -101,14 +101,12 @@ already installed, here are the required packages::
 
   eups distrib install mysql -t qserv
   eups distrib install mysqlpython
-  eups distrib install twisted -t qserv
   eups distrib install palpy -t sims
 
 Then run::
 
   setup mysql -t qserv
   setup mysqlpython
-  setup twisted -t qserv
   setup palpy -t sims
 
 Once this is done the OpSim code can be setup locally by running the following
