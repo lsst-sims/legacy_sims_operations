@@ -1,3 +1,16 @@
+Release Notes for OpSim3.2.1                             Dec 26, 2014
+==================================
+Bug Fixes:
+  * Add username and hostname retrieval back
+  * Patch issue with visitTime/visitExpTime being wrong in MySQL DB
+
+Release Notes for OpSim3.2                               Nov 21, 2014
+==================================
+  * Palpy replacing slalib
+  * Updates and rationalization of configuration files
+  * Updates and streamlining of post-processing steps
+  * Numerous bug fixes
+
 Release Notes for Opsim3.1                               Apr 9, 2014
 ==================================
 Bug Fixes:
@@ -85,10 +98,10 @@ New feature: Scheduled downtime
 New feature: Random downtime
   * Added a tool to generate a sequence of random downtimes in the format of
 	an OpSim config file. A user can then choose which file to use in a
-	given simulation. 
+	given simulation.
   * Created a new downtime table in database, downHist, so NOBHist can be
-	deprecated without breaking backwards compatibility with previous 
-	releases. 
+	deprecated without breaking backwards compatibility with previous
+	releases.
   * Scheduled downtime is given precedence in the case of conflicting
 	downtime events. Random downtime is allowed to finish the fraction
 	of time remaining, if any, after scheduled downtime completes.
@@ -115,7 +128,7 @@ KNOWN Problems:
 	the completed sequence from Supernova deep drilling proposal's
 	self.tonightTargets[] and find it has already been deleted. Added
 	debugging in this release to help track how this is happening.
-    
+
 
 Release Notes for OpSim2.4				Jun. 16, 2010
 ============================
@@ -146,7 +159,7 @@ Minor changes and bug fixes have been made.
   * Correct 'y' sky brightness in twilight to be the same as 'z'.
   * Reset camera rotator to zero position during a filter change.
   * Add sort to suggested observations list for low airmass, dark sky
-	brightness, and fieldID to help with reproducible runs 
+	brightness, and fieldID to help with reproducible runs
 	(initial commit).
   * Correct error in accessing weather table that kept opsim from using the
 	last year of weather data.
@@ -162,22 +175,22 @@ Minor changes and bug fixes have been made.
   * New post-processing tool to calculate filter sky brightness and
       ETC sky brightness.
   * Calculate and store actual airmass at time of observation.
-  * Remove sky brightness cache to enforce minimum distance to moon 
+  * Remove sky brightness cache to enforce minimum distance to moon
       limit on observing.
-  * Change post-processing movie-making script to create a frame 
+  * Change post-processing movie-making script to create a frame
       every X days and update documentation.
   * Cleanup unneeded configuration saving routines.
-  * Add usage string for --startup_comment command-line option to 
+  * Add usage string for --startup_comment command-line option to
       main.py.
   * Fix airmass cache to use correct parameters and set to off.
   * Update configuration files to new baseline run (opsim1.29).
-  
-  
+
+
 
 Release Notes for OpSim2.3				Jan. 9, 2008
 ==========================
 Only minor changes have been made to the Operations Simulator since the
-last release OpSim2.2.  
+last release OpSim2.2.
 
   * Script that dumps sql table and data in a form that allows the table
       to be reconstructed.
@@ -193,4 +206,3 @@ last release OpSim2.2.
   * Better tessellation of sky into fields.
   * Account for scheduled downtime by changing the cloud tables.
   * External library updates.
-
