@@ -115,7 +115,7 @@ class Observation (LSSTObject):
         (self.date,self.mjd,self.lst) = dateProfile
         self.night = -1
         self.exposureTime = exposureTime
-	self.visitTime = 0.0
+	self.visitTime = 30.0
         self.slewTime = slewTime
         self.slewDistance = slewDistance
         self.fieldFilterInterval = fieldFilterInterval

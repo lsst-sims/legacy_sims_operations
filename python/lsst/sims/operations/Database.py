@@ -413,6 +413,10 @@ class Database :
                        lst, alt, az, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ,
                        moonPhase, sunAlt, sunAZ, phaseAngle, rScatter, mieScatter, moonIllum,
                        moonBright, darkBright, rawSeeing, wind, humidity, sessionID, fieldID):
+        # visitTime and visitExpTime are switched here to correct their incorrect use elsewhere. There are 
+        # too many places where visitExpTime (seen as 34 in the code and DB) are used to make changes in the 
+        # code. visitTime (which is seen as zero in the code and DB) will be made to be 30 in the Observation 
+        # class since it is never used anywhere else in the code.
         try:
             oObs = Opsim_ObsHistory()
             oObs.obsHistID = obsHistID
@@ -420,8 +424,8 @@ class Database :
             oObs.expDate = expDate
             oObs.expMJD = expMJD
             oObs.night = night
-            oObs.visitTime = visitTime
-            oObs.visitExpTime = visitExpTime
+            oObs.visitTime = visitExpTime
+            oObs.visitExpTime = visitTime
             oObs.finRank = finRank
             oObs.finSeeing = finSeeing
             oObs.transparency = transparency
@@ -453,7 +457,7 @@ class Database :
             oObs.Session_sessionID = sessionID
             oObs.Field_fieldID = fieldID
             if self.dbWrite:
-                sql = 'insert into ObsHistory (obsHistID, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBright, rotSkyPos, lst, alt, az, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAZ, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind, humidity, Session_sessionID, Field_fieldID) values (%d, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d)' % (obsHistID, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBright, rotSkyPos, lst, alt, az, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAZ, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind, humidity, sessionID, fieldID)
+                sql = 'insert into ObsHistory (obsHistID, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBright, rotSkyPos, lst, alt, az, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAZ, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind, humidity, Session_sessionID, Field_fieldID) values (%d, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d)' % (obsHistID, filter, expDate, expMJD, night, visitExpTime, visitTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBright, rotSkyPos, lst, alt, az, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAZ, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind, humidity, sessionID, fieldID)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
