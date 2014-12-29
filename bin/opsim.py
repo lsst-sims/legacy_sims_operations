@@ -5,7 +5,7 @@
 #except:
 #    pass
 
-OPSIM_VERSION = '3.2'
+OPSIM_VERSION = '3.2.1'
 
 from lsst.sims.operations.utilities import *
 from lsst.sims.operations.Simulator import *

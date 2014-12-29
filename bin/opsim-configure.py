@@ -273,10 +273,11 @@ def main():
                     "{0} is now pointing to : {1}".format(cfg_link, cfg_file)
                 )
 
-        client_cfg_from_tpl(configure.MYSQL)
+            if configure.MYSQL in args.step_list:
+                client_cfg_from_tpl(configure.MYSQL)
 
-        if configure.CLIENT in args.step_list:
-            client_cfg_from_tpl(configure.OPSIM)
+            if configure.CLIENT in args.step_list:
+                client_cfg_from_tpl(configure.OPSIM)
 
 if __name__ == '__main__':
     main()

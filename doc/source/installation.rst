@@ -28,7 +28,8 @@ Installation Instructions
 
   .. code-block:: bash
 
-    eups distrib install -t <tag> sims_operations; setup sims_operations -t <tag>
+    eups distrib install -t <tag> sims_operations
+    setup sims_operations -t <tag>
 
   Where <tag> is the name of an EUPS package tag. **NOTE**: If you have an
   existing database installation, do not run the setup command as is, otherwise
@@ -46,8 +47,11 @@ Installation Instructions
 * Run the OpSim Configuration
 
   The OpSim database is installed in a directory separate from the binary files.
-  This directory ($OPSIM_RUN_DIR) is by default ``$HOME/opsim-run``, but can be
-  changed via the configuration script.
+  This directory is by default ``$HOME/opsim-run``, but can be changed via
+  passing the -R flag and a directory path to the configuration script. The
+  documentation below will refer to this directory location as $OPSIM_RUN_DIR,
+  but please note that this is not an environmental variable. The configuration
+  script does not create one.
 
   To setup the OpSim database, run the following command::
 
@@ -98,20 +102,19 @@ already installed, here are the required packages::
 
   eups distrib install mysql -t qserv
   eups distrib install mysqlpython
-  eups distrib install twisted -t qserv
   eups distrib install palpy -t sims
 
 Then run::
 
   setup mysql -t qserv
   setup mysqlpython
-  setup twisted -t qserv
   setup palpy -t sims
 
 Once this is done the OpSim code can be setup locally by running the following
 commands::
 
-  scons; setup -k -r .
+  setup sims_operations -t $USER
+  scons
 
 Finish the setup by following the third and fourth steps in the Installation
 Instructions section above.

@@ -6,7 +6,6 @@ import os
 import sys
 import string
 import shutil
-from twisted.python.procutils import which
 
 from lsst.sims.operations.admin import path
 
@@ -156,17 +155,9 @@ def _get_template_params():
                                  "NOT-AVAILABLE # please set environment "
                                  "variable OPSIMTESTDATA_DIR if needed")
 
-        python_bin_list = which("python")
-        if python_bin_list:
-            python_bin = python_bin_list[0]
-        else:
-            python_bin = "NOT-AVAILABLE"
-
         params_dict = {
             'PATH': os.environ.get('PATH'),
             'LD_LIBRARY_PATH': os.environ.get('LD_LIBRARY_PATH'),
-            'PYTHON_BIN': python_bin,
-            'PYTHONPATH': os.environ['PYTHONPATH'],
             'OPSIM_MASTER': config['opsim']['master'],
             'OPSIM_DIR': config['opsim']['base_dir'],
             'OPSIM_RUN_DIR': config['opsim']['run_base_dir'],
