@@ -1,0 +1,7 @@
+[client]
+user     = {{OPSIM_USER}}
+pass     = {{OPSIM_PASS}}
+# host/port and/or socket
+host     = {{MYSQLD_HOST}}
+port     = {{MYSQLD_PORT}}
+socket   = {{MYSQLD_SOCK}}

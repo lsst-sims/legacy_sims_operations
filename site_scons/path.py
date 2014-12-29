@@ -1,0 +1,1 @@
+../python/lsst/sims/operations/admin/path.py

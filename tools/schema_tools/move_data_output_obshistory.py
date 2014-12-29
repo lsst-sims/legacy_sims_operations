@@ -6,10 +6,15 @@ import MySQLdb as mysqldb
 import os
 from socket import gethostname
 
-def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbname='OpsimDB'):   
+def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbname='OpsimDB'):
     # connect to lsst_pointings (or other) mysql db, using account that has 'alter table' privileges
-    # connect to the database - this is modular to allow for easier modification from machine/machine    
-    db = mysqldb.connect(host=hostname, user=username, passwd=passwdname, db=dbname)
+    # connect to the database - this is modular to allow for easier modification from machine/machine
+    db = None
+    conf_file = os.path.join(os.getenv("HOME"), ".my.cnf")
+    if os.path.isfile(conf_file):
+        db = mysqldb.connect(read_default_file=conf_file, db=dbname)
+    else:
+        db = mysqldb.connect(host=hostname, user=username, passwd=passwdname, db=dbname)
     cursor = db.cursor()
     db.autocommit(True)
     return cursor
@@ -64,4 +69,3 @@ if __name__ == "__main__":
     database = sys.argv[2]
     sessionID = sys.argv[3]
     copy_data_over(hname, database, int(sessionID));
-

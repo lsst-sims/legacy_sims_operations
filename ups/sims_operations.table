@@ -1,0 +1,16 @@
+# For each dependency except python, list it here along with its minimum
+# version number.
+# Very common third-party packages (boost, python, swig, doxygen)
+# and very low-level LSST packages can be assumed to be recursively
+# included by low-level LSST packages such as utils or daf_base.
+# Any other package whose interface is used should be listed explicitly
+# rather than assuming it will be included recursively.
+setupRequired(mysql)
+setupRequired(mysqlpython)
+setupRequired(palpy)
+setupRequired(lsst)
+
+# The following is boilerplate for all packages.
+# Pure-Python packages only need the last line.
+envPrepend(PYTHONPATH, ${PRODUCT_DIR}/python)
+envPrepend(PATH, ${PRODUCT_DIR}/bin)

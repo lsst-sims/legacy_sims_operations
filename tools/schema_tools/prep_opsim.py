@@ -1,13 +1,20 @@
+import os
+
 import MySQLdb as mysqldb
 
-# this is just the minimum expected expMJD for any opsim. 
+# this is just the minimum expected expMJD for any opsim.
 # this was hardcoded so the 'night' value always refers to the same 'night' from opsim to opsim
 minexpmjd = 49353.0
 
-def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbname='LSST'):   
+def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbname='LSST'):
     # connect to lsst_pointings (or other) mysql db, using account that has 'alter table' privileges
-    # connect to the database - this is modular to allow for easier modification from machine/machine    
-    db = mysqldb.connect(host=hostname, user=username, passwd=passwdname, db=dbname)
+    # connect to the database - this is modular to allow for easier modification from machine/machine
+    db = None
+    conf_file = os.path.join(os.getenv("HOME"), ".my.cnf")
+    if os.path.isfile(conf_file):
+        db = mysqldb.connect(read_default_file=conf_file, db=dbname)
+    else:
+        db = mysqldb.connect(host=hostname, user=username, passwd=passwdname, db=dbname)
     cursor = db.cursor()
     return cursor
 
@@ -82,15 +89,15 @@ def add_nights(database, simname):
         if (result[0]=='night'):
             print "night column already exists - skipping adding nights"
             break
-    else: 
+    else:
         print "Adding night column"
         # add a column for night
         sqlquery = "alter table %s add night int" %(simname)
         cursor.execute(sqlquery)
-        # add the night info into the table 
+        # add the night info into the table
         sqlquery = "update %s set night = floor(expmjd- %s)" %(simname, const)
         cursor.execute(sqlquery)
-       
+
     cursor.close()
 
 def remove_dither(simname, dropdatacol = False):
@@ -108,21 +115,21 @@ def remove_dither(simname, dropdatacol = False):
         cursor.execute(sqlquery)
     cursor.close()
     return
-    
+
 def offsetHex():
     import numpy
     # some constants for the dithering
     fov = 3.5
     # set values associated with dithering
     dith_level = 4
-    # number of rows in dither pattern 
+    # number of rows in dither pattern
     # number of vertices in longest row is the same.
-    nrows = 2**dith_level 
+    nrows = 2**dith_level
     halfrows = int(nrows/2)  # useful for counting from 0 at center
     # calculate size of each offset
-    dith_size_x = fov  / (nrows)  
+    dith_size_x = fov  / (nrows)
     dith_size_y = numpy.sqrt(3) * fov/2.0/(nrows)  #sqrt 3 comes from hexagon
-    # calculate the row identification number, going from 0 at center 
+    # calculate the row identification number, going from 0 at center
     nid_row = numpy.arange(-halfrows, halfrows+1, 1)
     # and calculate the number of vertices in each row
     vert_in_row = numpy.arange(-halfrows, halfrows+1, 1)
@@ -131,14 +138,14 @@ def offsetHex():
     for i in range(-halfrows, halfrows+1, 1):
         vert_in_row[i] = (nrows+1) - abs(nid_row[i])
         total_vert += vert_in_row[i]
-    vertex_count = 0  
-    for i in range(0, nrows+1, 1): 
+    vertex_count = 0
+    for i in range(0, nrows+1, 1):
         for j in range(0, vert_in_row[i], 1):
             # calculate displacement
             x_off = numpy.radians(dith_size_x * (j - (vert_in_row[i]-1)/2.0))
             y_off = numpy.radians(dith_size_y * nid_row[i])
             offsets.append([x_off, y_off])
-            vertex_count += 1 
+            vertex_count += 1
     return offsets
 
 def add_dither(database, simname, overwrite=True):
