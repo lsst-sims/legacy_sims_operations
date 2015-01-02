@@ -22,7 +22,8 @@ env.Tool('textfile')
 env.Tool('recinstall')
 
 # Add the setup configuration files to the install target.
-env.Alias("install", [env.Alias("configuration"), env.Alias("templates")])
+env.Alias("install-cfg", [env.Alias("configuration"), env.Alias("templates")])
+env.Depends("install", env.Alias("install-cfg"))
 
 finder = binfind.Find()
 
