@@ -103,15 +103,12 @@ locally by running the following command from the checkout directory::
 
   setup sims_operations -t $USER
 
-**NOTE**: You can run the scons ``tests`` and ``doc`` targets without issue.
-However, if running just ``scons`` in the local mode, the prefix option is
-required to keep files from being installed in the stack location rather than
-the local directory. One needs to issue the following::
+**NOTE**: You can run the scons ``tests`` and ``doc`` targets without issue. If
+you are modifying python code, nothing special needs to be done. If you are
+changing the DB setup/configuration files, one needs to run the following
+command before running the OpSim configuration step::
 
-  scons prefix=.
-
-This should only be necessary if you are changing the DB setup/configuration
-files.
+  scons install-cfg
 
 Using an Existing Database Installation
 ---------------------------------------
