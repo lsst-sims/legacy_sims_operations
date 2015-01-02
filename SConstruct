@@ -14,6 +14,8 @@ from lsst.sconsUtils import scripts
 pstate.init()
 
 env = scripts.BasicSConstruct("sims_operations")
+dir(env)
+srcDir = Dir('.').srcnode().abspath
 
 # Makes sure env.Substfile is available
 env.Tool('textfile')
@@ -31,11 +33,12 @@ opts.AddVariables((SCons.Variables.PathVariable('MYSQL_DIR',
                                     finder.prefixFromBin('MYSQL_DIR',
                                                          "mysqld_safe"),
                                     SCons.Variables.PathVariable.PathIsDir)),)
+opts.AddVariables((PathVariable('prefix', 'opsim install dir', srcDir,
+                                SCons.Variables.PathVariable.PathIsDirCreate)))
+
 opts.Update(env)
 
-abs_prefix = os.path.abspath(env['prefix'])
-
-env.Replace(configuration_prefix=os.path.join(abs_prefix, "cfg"))
+env.Replace(configuration_prefix=os.path.join(env['prefix'], "cfg"))
 
 template_target = os.path.join(env['configuration_prefix'], "templates")
 env.RecursiveInstall(template_target, os.path.join("templates", 
@@ -52,7 +55,7 @@ def get_template_targets():
                     "{0}".format(template_dir_path)
     )
 
-    script_dict = {'{{OPSIM_DIR}}': abs_prefix,
+    script_dict = {'{{OPSIM_DIR}}': os.path.abspath(env['prefix']),
                    '{{MYSQL_DIR}}': env['MYSQL_DIR'],
                    }
 
