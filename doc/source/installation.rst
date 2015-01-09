@@ -31,9 +31,13 @@ Installation Instructions
     eups distrib install -t <tag> sims_operations
     setup sims_operations -t <tag>
 
-  Where <tag> is the name of an EUPS package tag. **NOTE**: If you have an
+  Where <tag> is the name of an EUPS package tag. You may see a warning if the
+  $HOST environment variable is not set. Don't worry as this will be handled
+  for you when running OpSim. However, if you need to override the hostname for
+  the machine, create or change the environment variable $OPSIM_HOSTNAME
+  (it defaults to $HOST) to the appropriate name. **NOTE**: If you have an
   existing database installation, do not run the setup command as is, otherwise
-  you environment won't point to the correct executables for the database.
+  your environment won't point to the correct executables for the database.
   Please jump to the Using an Existing Database Installation section below.
 
 * Change Database Passwords

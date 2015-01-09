@@ -33,9 +33,8 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     Exception if there are errors in the SQL.
     """
     # Get the hostname and username
-    host = os.getenv('HOST')
-    if host is None:
-        # This happens when HOST isn't set
+    host = os.getenv('OPSIM_HOSTNAME')
+    if host is None or host == "":
         import socket
         host = socket.gethostname()
     host = host.split('.')[0]
