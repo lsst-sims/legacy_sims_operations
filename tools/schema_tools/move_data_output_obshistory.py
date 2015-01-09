@@ -23,19 +23,13 @@ def getDbData(cursor, sql):
     global sessionID
     # Fetch the data from the DB
     ret = {}
-    try:
-        n = cursor.execute(sql)
-        ret = cursor.fetchall()
-    except:
-        sys.stderr.write('Unable to execute SQL query (%s)\n' % (sql))
+    n = cursor.execute(sql)
+    ret = cursor.fetchall()
     return ret
 
 def insertDbData(cursor, sql):
 	global sessionID
-	try:
-		cursor.execute(sql)
-	except:
-		sys.stderr.write('Unable to execute SQL query (%s)\n' % (sql))
+	cursor.execute(sql)
 
 def copy_data_over(hname, database, cursor, sessionID):
 	# print 'Copying data over'

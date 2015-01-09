@@ -23,19 +23,13 @@ def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbnam
 def getDbData(cursor, sql):
     global sessionID
     ret = {}
-    try:
-        n = cursor.execute(sql)
-        ret = cursor.fetchall()
-    except:
-        sys.stderr.write('Unable to execute SQL query (%s)\n' % (sql))
+    n = cursor.execute(sql)
+    ret = cursor.fetchall()
     return ret
 
 def insertDbData(cursor, sql):
     global sessionID
-    try:
-        cursor.execute(sql)
-    except:
-        sys.stderr.write('Unable to execute SQL query (%s)\n' % (sql))
+    cursor.execute(sql)
 
 def check_columns_if_they_exist(hname, database, cursor, sessionID):
     columns = ("obsHistID", "sessionID", "fieldID", "fieldRA", "fieldDec", "filter", "expDate", "expMJD", "night", "visitTime", "visitExpTime", "finRank", "finSeeing", "transparency", "airmass", "vSkyBright", "filtSkyBright", "rotSkyPos", "lst", "altitude", "azimuth", "dist2Moon", "solarElong", "moonRA", "moonDec", "moonAlt", "moonAZ", "moonPhase", "sunAlt", "sunAz", "phaseAngle", "rScatter", "mieScatter", "moonIllum", "moonBright", "darkBright", "rawSeeing", "wind", "humidity", "slewDist", "slewTime", "fiveSigmaDepth");
