@@ -6,6 +6,8 @@ Installing the OpSim Code
 The current source code is in the LSST Simulations sims_operations git (Stash)
 repository. However, the code is now available as an EUPS package.
 
+.. _install-instruct:
+
 Installation Instructions
 -------------------------
 
@@ -99,29 +101,18 @@ designated LSST directory. For the purpose of this documentation we shall use
 If you need to only obtain a readonly copy, omit the ``<your_stash_username>@``
 from the clone command.
 
-The LSST Stack needs to be setup according to the first step in the Installation
-Instructions section above. There are a few dependencies that need to be
-installed so that the setup commands below won't fail. If theses are not
-already installed, here are the required packages::
-
-  eups distrib install mysql -t qserv
-  eups distrib install mysqlpython
-  eups distrib install palpy -t sims
-
-Then run::
-
-  setup mysql -t qserv
-  setup mysqlpython
-  setup palpy -t sims
-
-Once this is done the OpSim code can be setup locally by running the following
-commands::
+You should have already installed and configured OpSim by following the
+instructions in the :ref:`install-instruct` section. The OpSim code can be setup
+locally by running the following command from the checkout directory::
 
   setup sims_operations -t $USER
-  scons
 
-Finish the setup by following the third and fourth steps in the Installation
-Instructions section above.
+**NOTE**: You can run the scons ``tests`` and ``doc`` targets without issue. If
+you are modifying python code, nothing special needs to be done. If you are
+changing the DB setup/configuration files, one needs to run the following
+command before running the OpSim configuration step::
+
+  scons install-cfg
 
 Using an Existing Database Installation
 ---------------------------------------
