@@ -16,7 +16,7 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Session` (
   `sessionUser` VARCHAR(80) NOT NULL COMMENT 'operator user name' ,
   `sessionHost` VARCHAR(80) NOT NULL COMMENT 'hostname of processor' ,
   `sessionDate` DATETIME NOT NULL COMMENT 'date of simulation run' ,
-  `version` VARCHAR(20) NULL DEFAULT NULL COMMENT 'software version' ,
+  `version` VARCHAR(25) NULL DEFAULT NULL COMMENT 'software version' ,
   `runComment` VARCHAR(200) NULL DEFAULT NULL COMMENT 'user startup comment' ,
   PRIMARY KEY (`sessionID`) ,
   UNIQUE INDEX `s_host_user_date_idx` (`sessionUser` ASC, `sessionHost` ASC, `sessionDate` ASC) )

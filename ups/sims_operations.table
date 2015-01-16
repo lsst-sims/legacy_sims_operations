@@ -14,3 +14,7 @@ setupRequired(lsst)
 # Pure-Python packages only need the last line.
 envPrepend(PYTHONPATH, ${PRODUCT_DIR}/python)
 envPrepend(PATH, ${PRODUCT_DIR}/bin)
+
+# Make a variable so someone can set the hostname by this, the variable
+# to try and use is HOST
+envSet(OPSIM_HOSTNAME, ${HOST})

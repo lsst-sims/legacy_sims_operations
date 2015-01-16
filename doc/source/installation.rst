@@ -38,7 +38,11 @@ Installation Instructions
     eups distrib install -t <tag> sims_operations
     setup sims_operations -t <tag>
 
-  Where <tag> is the name of an EUPS package tag.
+  Where <tag> is the name of an EUPS package tag. You may see a warning if the
+  $HOST environment variable is not set. Don't worry as this will be handled
+  for you when running OpSim. However, if you need to override the hostname for
+  the machine, create or change the environment variable $OPSIM_HOSTNAME
+  (it defaults to $HOST) to the appropriate name.
 
 * Change Database Passwords
 
@@ -101,29 +105,18 @@ designated LSST directory. For the purpose of this documentation we shall use
 If you need to only obtain a readonly copy, omit the ``<your_stash_username>@``
 from the clone command.
 
-The LSST Stack needs to be setup according to the first step in the Installation
-Instructions section above. There are a few dependencies that need to be
-installed so that the setup commands below won't fail. If theses are not
-already installed, here are the required packages::
-
-  eups distrib install mysql -t qserv
-  eups distrib install mysqlpython
-  eups distrib install palpy -t sims
-
-Then run::
-
-  setup mysql -t qserv
-  setup mysqlpython
-  setup palpy -t sims
-
-Once this is done the OpSim code can be setup locally by running the following
-commands::
+You should have already installed and configured OpSim by following the
+instructions in the :ref:`install-instruct` section. The OpSim code can be setup
+locally by running the following command from the checkout directory::
 
   setup sims_operations -t $USER
-  scons
 
-Finish the setup by following the third and fourth steps in the Installation
-Instructions section above.
+**NOTE**: You can run the scons ``tests`` and ``doc`` targets without issue. If
+you are modifying python code, nothing special needs to be done. If you are
+changing the DB setup/configuration files, one needs to run the following
+command before running the OpSim configuration step::
+
+  scons install-cfg
 
 .. _existing-db:
 
