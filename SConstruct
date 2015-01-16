@@ -21,9 +21,9 @@ srcDir = Dir('.').srcnode().abspath
 env.Tool('textfile')
 env.Tool('recinstall')
 
-# Add the setup configuration files to all target.
-all = env.Alias("all", [env.Alias("configuration"), env.Alias("templates")])
-env.Default(all)
+# Add the setup configuration files to the install target.
+env.Alias("install-cfg", [env.Alias("configuration"), env.Alias("templates")])
+env.Depends("install", env.Alias("install-cfg"))
 
 finder = binfind.Find()
 

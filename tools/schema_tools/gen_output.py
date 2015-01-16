@@ -20,37 +20,23 @@ def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbnam
     db.autocommit(True)
     return cursor
 
-def getDbData(database, sql):
+def getDbData(cursor, sql):
     global sessionID
-    cursor = connect_db(dbname=database)
     ret = {}
-    try:
-        n = cursor.execute (sql)
-        ret = cursor.fetchall ()
-    except:
-        sys.stderr.write('Unable to execute SQL query (%s)\n' % (sql) )
-    # Close the connection
-    cursor.close ()
-    del (cursor)
-    return (ret)
+    n = cursor.execute(sql)
+    ret = cursor.fetchall()
+    return ret
 
-def insertDbData(database, sql):
+def insertDbData(cursor, sql):
     global sessionID
-    cursor = connect_db(dbname=database)
-    try:
-        cursor.execute(sql)
-    except:
-        sys.stderr.write('Unable to execute SQL query (%s)\n' % (sql) )
-    # Close the connection
-    cursor.close ()
-    del (cursor)
+    cursor.execute(sql)
 
-def check_columns_if_they_exist(hname, database, sessionID):
+def check_columns_if_they_exist(hname, database, cursor, sessionID):
     columns = ("obsHistID", "sessionID", "fieldID", "fieldRA", "fieldDec", "filter", "expDate", "expMJD", "night", "visitTime", "visitExpTime", "finRank", "finSeeing", "transparency", "airmass", "vSkyBright", "filtSkyBright", "rotSkyPos", "lst", "altitude", "azimuth", "dist2Moon", "solarElong", "moonRA", "moonDec", "moonAlt", "moonAZ", "moonPhase", "sunAlt", "sunAz", "phaseAngle", "rScatter", "mieScatter", "moonIllum", "moonBright", "darkBright", "rawSeeing", "wind", "humidity", "slewDist", "slewTime", "fiveSigmaDepth");
     simname = "summary_%s_%d" % (hname, sessionID);
     sqlquery = "describe %s.%s" % (database, simname);
     columnsexistbool = True
-    ret = getDbData(database, sqlquery)
+    ret = getDbData(cursor, sqlquery)
     columnsexist = {}
     for ind in columns:
 		columnsexist[ind] = False
@@ -64,14 +50,14 @@ def check_columns_if_they_exist(hname, database, sessionID):
 			columnsexistbool = False
     return columnsexistbool
 
-def create_output_table(hname, database, sessionID):
+def create_output_table(hname, database, cursor, sessionID):
 	# print 'Creating/Recreating Summary Table ...'
 	sql = 'use %s' % (database)
-	ret = getDbData(database, sql)
+	ret = getDbData(cursor, sql)
 	sql = 'create table summary_%s_%d (obsHistID int(10) unsigned not null, sessionID int(10) unsigned not null, propID int(10), fieldID int(10) unsigned not null, fieldRA double, fieldDec double, filter varchar(8), expDate int(10) unsigned, expMJD double, night int(10) unsigned, visitTime double, visitExpTime double, finRank double, finSeeing double, transparency double, airmass double, vSkyBright double, filtSkyBrightness double, rotSkyPos double, lst double, altitude double, azimuth double, dist2Moon double, solarElong double, moonRA double, moonDec double, moonAlt double, moonAZ double, moonPhase double, sunAlt double, sunAz double, phaseAngle double, rScatter double, mieScatter double, moonIllum double, moonBright double, darkBright double, rawSeeing double, wind double, humidity double, slewDist double, slewTime double, fiveSigmaDepth double);' % (hname, sessionID)
-	ret = getDbData(database, sql)
+	ret = getDbData(cursor, sql)
 	sql = 'select obsHistID, Session_sessionID as sessionID, Field_fieldID as fieldID, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBright as filtSkyBrightness, rotSkyPos, lst, alt as altitude, az as azimuth, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAz, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind, humidity from ObsHistory where Session_sessionID = %d;' % (sessionID)
-	ret = getDbData(database, sql)
+	ret = getDbData(cursor, sql)
 
 	ctioHeight = 2215.;
 	ctioLat = -30.16527778;
@@ -84,11 +70,11 @@ def create_output_table(hname, database, sessionID):
 		obsHistID = ret[k][0]
 		fieldID = ret[k][2]
 		sql = 'select fieldRA, fieldDec from Field where fieldID = %d' % fieldID
-		fld = getDbData(database, sql)
+		fld = getDbData(cursor, sql)
 		sql = 'select slewTime, slewDist from SlewHistory where ObsHistory_Session_sessionID = %d and ObsHistory_obsHistID = %d' % (sessionID, obsHistID)
-		slw = getDbData(database, sql)
+		slw = getDbData(cursor, sql)
 		sql = 'select Proposal_propID as propID from ObsHistory_Proposal where ObsHistory_Session_sessionID = %d and ObsHistory_obsHistID = %d' % (sessionID, obsHistID)
-		prp = getDbData(database, sql)
+		prp = getDbData(cursor, sql)
 
 		for i in range(len(prp)):
 			#etc = ETC();
@@ -158,7 +144,7 @@ def create_output_table(hname, database, sessionID):
 			else :
 				sql = 'insert into summary_%s_%d (obsHistID, sessionID, propID, fieldID, fieldRA, fieldDec, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBrightness, rotSkyPos, lst, altitude, azimuth, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAz, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind, humidity, slewDist, slewTime, fiveSigmaDepth) values (%d, %d, %d, %d, %f, %f, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)' % (hname, sessionID, ret[k][0], ret[k][1], prp[i][0], ret[k][2], math.radians(fld[0][0]), math.radians(fld[0][1]), ret[k][3], ret[k][4], ret[k][5], ret[k][6], ret[k][7], ret[k][8], ret[k][9], ret[k][10], ret[k][11], ret[k][12], ret[k][13], ret[k][14], ret[k][15], ret[k][16], ret[k][17], ret[k][18], ret[k][19], ret[k][20], ret[k][21], ret[k][22], ret[k][23], ret[k][24], ret[k][25], ret[k][26], ret[k][27], ret[k][28], ret[k][29], ret[k][30], ret[k][31], ret[k][32], ret[k][33], ret[k][34], ret[k][35], ret[k][36], slw[0][1], slw[0][0], m5_1);
 			#print sql
-			insertDbData(database, sql)
+			insertDbData(cursor, sql)
 
 if __name__ == "__main__":
     import sys
@@ -168,5 +154,6 @@ if __name__ == "__main__":
     hname = sys.argv[1]
     database = sys.argv[2]
     sessionID = sys.argv[3]
-    if (check_columns_if_they_exist(hname, database, int(sessionID)) == False):
-		create_output_table(hname, database, int(sessionID));
+    cursor = connect_db(dbname=database)
+    if (check_columns_if_they_exist(hname, database, cursor, int(sessionID)) == False):
+		create_output_table(hname, database, cursor, int(sessionID));

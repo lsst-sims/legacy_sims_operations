@@ -6,6 +6,8 @@ Installing the OpSim Code
 The current source code is in the LSST Simulations sims_operations git (Stash)
 repository. However, the code is now available as an EUPS package.
 
+.. _install-instruct:
+
 Installation Instructions
 -------------------------
 
@@ -26,15 +28,21 @@ Installation Instructions
 
 * Install the OpSim code
 
+  **NOTE**: If you have an existing database installation (i.e. a system
+  installed mysql) and wish to use that, do not run the following commands
+  just yet. Please go to the :ref:`existing-db` section below. If you do not,
+  then continue on.
+
   .. code-block:: bash
 
     eups distrib install -t <tag> sims_operations
     setup sims_operations -t <tag>
 
-  Where <tag> is the name of an EUPS package tag. **NOTE**: If you have an
-  existing database installation, do not run the setup command as is, otherwise
-  you environment won't point to the correct executables for the database.
-  Please jump to the Using an Existing Database Installation section below.
+  Where <tag> is the name of an EUPS package tag. You may see a warning if the
+  $HOST environment variable is not set. Don't worry as this will be handled
+  for you when running OpSim. However, if you need to override the hostname for
+  the machine, create or change the environment variable $OPSIM_HOSTNAME
+  (it defaults to $HOST) to the appropriate name.
 
 * Change Database Passwords
 
@@ -61,6 +69,8 @@ Installation Instructions
 
 	  The above command will remove any previous configuration setup and database
 	  content!
+
+.. _running-opsim:
 
 Running OpSim
 -------------
@@ -95,42 +105,49 @@ designated LSST directory. For the purpose of this documentation we shall use
 If you need to only obtain a readonly copy, omit the ``<your_stash_username>@``
 from the clone command.
 
-The LSST Stack needs to be setup according to the first step in the Installation
-Instructions section above. There are a few dependencies that need to be
-installed so that the setup commands below won't fail. If theses are not
-already installed, here are the required packages::
-
-  eups distrib install mysql -t qserv
-  eups distrib install mysqlpython
-  eups distrib install palpy -t sims
-
-Then run::
-
-  setup mysql -t qserv
-  setup mysqlpython
-  setup palpy -t sims
-
-Once this is done the OpSim code can be setup locally by running the following
-commands::
+You should have already installed and configured OpSim by following the
+instructions in the :ref:`install-instruct` section. The OpSim code can be setup
+locally by running the following command from the checkout directory::
 
   setup sims_operations -t $USER
-  scons
 
-Finish the setup by following the third and fourth steps in the Installation
-Instructions section above.
+**NOTE**: You can run the scons ``tests`` and ``doc`` targets without issue. If
+you are modifying python code, nothing special needs to be done. If you are
+changing the DB setup/configuration files, one needs to run the following
+command before running the OpSim configuration step::
+
+  scons install-cfg
+
+.. _existing-db:
 
 Using an Existing Database Installation
 ---------------------------------------
 
-The setup step needs to be modified to setup the system packages. This can be
-accomplished by running the following commands::
+Before installing OpSim from EUPS, the following steps need to be accomplished.
+First, navigate to ``$EUPS_PATH/site`` and create a file called
+``manifest.remap``. Add the following line to the file::
 
-  eups declare mysql system -m none -r none
-  eups declare mysqlclient system -m none -r none
-  eups declare mysqlpython system -m none -r none
+  mysql system
 
-Omit the packages you do not have installed. After this, one can execute the
-setup call as is.
+If you are using your own python and not the LSST stack version, you need to
+add the following line to the same file::
+
+  mysqlpython system
+
+Please ensure that your python knows about the MySQLdb python package.
+
+Next, the EUPS setup needs to know about the system packages. This can be
+accomplished by running the following command::
+
+  eups declare mysql system -m none -r none -c
+
+If you are using your own python, also run the following::
+
+  eups declare mysqlpython system -m none -r none -c
+
+After this, one can execute the ``eups distrib install`` and ``setup`` calls
+as is from the :ref:`install-instruct` section. Then, continue following the
+instructions here.
 
 Since a database install already exists, one just needs to create a ``.my.cnf``
 file and place it in you home directory. That file looks like::
@@ -155,7 +172,9 @@ To finish the setup, one needs to create the OpsimDB and populate some tables.
 Navigate to the ``$SIMS_OPERATIONS_DIR/tools`` directory and edit the password
 variable at the top of the ``setup_db.sh`` script. Then execute the following::
 
-  source setup_db.sh
+  sh setup_db.sh
 
 This should create the OpsimDB and populate some initial tables. One should
-now be able to run OpSim by following the Running OpSim section above.
+now be able to run OpSim by following the :ref:`running-opsim` section above.
+However, one can ignore the ``mysql`` start and stop commands as the existing
+installation will probably already be running.
