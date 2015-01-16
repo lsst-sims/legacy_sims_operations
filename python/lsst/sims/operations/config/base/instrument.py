@@ -5,8 +5,7 @@ __all__ = ["InstrumentConfig"]
 
 class InstrumentConfig(pexConfig.Config):
     """
-    This class contains the configuration of telescope and camera parameters
-    and is intended to be fully instatiable.
+    This class contains the configuration of telescope and camera parameters.
     DO NOT MODIFY UNLESS YOU'VE TALKED WITH CHUCK CLAVER!!
     """
     DomAlt_MaxSpeed = pexConfig.Field('Maximum speed (degrees/second) of dome '
@@ -96,24 +95,12 @@ class InstrumentConfig(pexConfig.Config):
 
     # Table of delay factors for Closed Loop optics correction according to
     # the ALT slew range.
-    TelOptics_AltLimit1 = pexConfig.RangeField('Altitude (degrees) limits for '
-                                               'the 1st delay range.', float,
-                                               default=0.0, min=0.0, max=9.0)
-    TelOptics_AltLimit2 = pexConfig.RangeField('Altitude (degrees) limits for '
-                                               'the 2nd delay range.', float,
-                                               default=9.0, min=9.0, max=90.0)
+    TelOptics_AltLimit = pexConfig.ListField('Altitude (degrees) limits for the delay ranges.', float,
+                                             default=[0.0, 9.0, 90.0])
 
-    # Values are time in seconds.
-    delay_dict = {TelOptics_AltLimit1: 0.0,
-                  TelOptics_AltLimit2: 20.0}
-
-    # Need to think about this one!
-    #TelOpticsCL_Delay = pexConfig.ConfigDictField('Time delay (seconds) for '
-    #                                              'the corresponding ALT slew '
-    #                                              'range in the Closed Loop '
-    #                                              'optics correction.',
-    #                                              pexConfig.RangeField,
-    #                                              float, default=delay_dict)
+    TelOpticsCL_Delay = pexConfig.ListField('Time delay (seconds) for the corresponding ALT slew range in '
+                                            'the Closed Loop optics correction.', float,
+                                            default=[0.0, 20.0])
 
     # Dependencies between the slew activities.
     # For each activity there is a list of prerequisites activities, that
@@ -208,3 +195,30 @@ class InstrumentConfig(pexConfig.Config):
 
     ADC_Speed = pexConfig.Field('UNUSED: ADC rotation speed (units=??).', float,
                                 default=360.0 / 10.0)
+
+    def validate(self):
+        """
+        Validate configuration parameters
+        """
+        pexConfig.Config.validate(self)
+        if len(self.TelOptics_AltLimit) - 1 != len(self.TelOpticsCL_Delay):
+            raise ValueError("Length of TelOptics_AltLimit - 1 must equal length of TelOpticsCL_Delay")
+
+    def getTelOpticsClDelay(self, altitude):
+        """
+        This function retrieves the telescope optics closed-loop delay time based on the altitude limits
+        and the given altitude.
+
+        Parameters
+        ----------
+        altitude : int
+            The altitude to check against the altitude limit ranges.
+
+        Returns
+        -------
+        float
+            The delay time in seconds for the corresponding altitude limit range.
+        """
+        for i, delay_time in enumerate(self.TelOpticsCL_Delay):
+            if self.TelOptics_AltLimit[i] <= altitude < self.TelOptics_AltLimit[i + 1]:
+                return delay_time
