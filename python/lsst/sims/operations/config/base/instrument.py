@@ -211,7 +211,7 @@ class InstrumentConfig(pexConfig.Config):
 
         Parameters
         ----------
-        altitude : int
+        altitude : float
             The altitude to check against the altitude limit ranges.
 
         Returns
