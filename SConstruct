@@ -16,8 +16,6 @@ pstate.init()
 env = scripts.BasicSConstruct("sims_operations")
 dir(env)
 srcDir = Dir('.').srcnode().abspath
-print "A:", env['prefix']
-print "B:", srcDir
 
 # Makes sure env.Substfile is available
 env.Tool('textfile')
@@ -36,7 +34,7 @@ opts.AddVariables((SCons.Variables.PathVariable('MYSQL_DIR',
                                                          "mysqld_safe"),
                                     SCons.Variables.PathVariable.PathIsDir)),)
 opts.Update(env)
-# This override causes issues with EUPS distribution, so don't do it then.
+# This override causes issues with EUPS builds and distribution, so don't do it then.
 if "EupsBuildDir" and "build" not in srcDir:
     opts.AddVariables((PathVariable('prefix', 'opsim install dir', srcDir,
                                     SCons.Variables.PathVariable.PathIsDirCreate)))
