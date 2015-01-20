@@ -16,6 +16,8 @@ pstate.init()
 env = scripts.BasicSConstruct("sims_operations")
 dir(env)
 srcDir = Dir('.').srcnode().abspath
+print "A:", env['prefix']
+print "B:", srcDir
 
 # Makes sure env.Substfile is available
 env.Tool('textfile')
