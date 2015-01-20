@@ -33,10 +33,13 @@ opts.AddVariables((SCons.Variables.PathVariable('MYSQL_DIR',
                                     finder.prefixFromBin('MYSQL_DIR',
                                                          "mysqld_safe"),
                                     SCons.Variables.PathVariable.PathIsDir)),)
-opts.AddVariables((PathVariable('prefix', 'opsim install dir', srcDir,
-                                SCons.Variables.PathVariable.PathIsDirCreate)))
-
 opts.Update(env)
+# This override causes issues with EUPS distribution, so don't do it then.
+if "EupsBuildDir" not in srcDir:
+    opts.AddVariables((PathVariable('prefix', 'opsim install dir', srcDir,
+                                    SCons.Variables.PathVariable.PathIsDirCreate)))
+
+    opts.Update(env)
 
 env.Replace(configuration_prefix=os.path.join(env['prefix'], "cfg"))
 
