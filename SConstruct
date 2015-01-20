@@ -37,7 +37,7 @@ opts.AddVariables((SCons.Variables.PathVariable('MYSQL_DIR',
                                     SCons.Variables.PathVariable.PathIsDir)),)
 opts.Update(env)
 # This override causes issues with EUPS distribution, so don't do it then.
-if "EupsBuildDir" not in srcDir:
+if "EupsBuildDir" and "build" not in srcDir:
     opts.AddVariables((PathVariable('prefix', 'opsim install dir', srcDir,
                                     SCons.Variables.PathVariable.PathIsDirCreate)))
 
