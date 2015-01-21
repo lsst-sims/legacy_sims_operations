@@ -25,6 +25,20 @@ env.Tool('recinstall')
 env.Alias("install-cfg", [env.Alias("configuration"), env.Alias("templates")])
 env.Depends("install", env.Alias("install-cfg"))
 
+def build_doc(env, target, source):
+    """
+    Function to build the project's sphinx documentation.
+    """
+    pstate.log.info("Building sphinx documentation")
+    from lsst.sconsUtils import utils
+    utils.runExternal("cd doc && make html")
+
+# Create a new build target for building the documentation
+bsph = env.Command("doc_sphinx", [], build_doc)
+env.Alias("doc-sphinx", bsph)
+env.Depends("doc-sphinx", env.Alias("version"))
+env.Depends("doc", env.Alias("doc-sphinx"))
+
 finder = binfind.Find()
 
 opts = SCons.Script.Variables("custom.py")
