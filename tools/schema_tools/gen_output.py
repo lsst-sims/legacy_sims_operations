@@ -36,7 +36,11 @@ def check_columns_if_they_exist(hname, database, cursor, sessionID):
     simname = "summary_%s_%d" % (hname, sessionID);
     sqlquery = "describe %s.%s" % (database, simname);
     columnsexistbool = True
-    ret = getDbData(cursor, sqlquery)
+    # An exception occurs when the summary table doesn't exist.
+    try:
+        ret = getDbData(cursor, sqlquery)
+    except mysqldb.ProgrammingError:
+        ret = {}
     columnsexist = {}
     for ind in columns:
 		columnsexist[ind] = False
