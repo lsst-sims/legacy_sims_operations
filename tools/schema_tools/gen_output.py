@@ -56,10 +56,20 @@ def check_columns_if_they_exist(hname, database, cursor, sessionID):
 
 def create_output_table(hname, database, cursor, sessionID):
 	# print 'Creating/Recreating Summary Table ...'
-	sql = 'use %s' % (database)
-	ret = getDbData(cursor, sql)
-	sql = 'create table summary_%s_%d (obsHistID int(10) unsigned not null, sessionID int(10) unsigned not null, propID int(10), fieldID int(10) unsigned not null, fieldRA double, fieldDec double, filter varchar(8), expDate int(10) unsigned, expMJD double, night int(10) unsigned, visitTime double, visitExpTime double, finRank double, finSeeing double, transparency double, airmass double, vSkyBright double, filtSkyBrightness double, rotSkyPos double, lst double, altitude double, azimuth double, dist2Moon double, solarElong double, moonRA double, moonDec double, moonAlt double, moonAZ double, moonPhase double, sunAlt double, sunAz double, phaseAngle double, rScatter double, mieScatter double, moonIllum double, moonBright double, darkBright double, rawSeeing double, wind double, humidity double, slewDist double, slewTime double, fiveSigmaDepth double);' % (hname, sessionID)
-	ret = getDbData(cursor, sql)
+    sql = 'use %s' % (database)
+    ret = getDbData(cursor, sql)
+    sql = 'create table summary_%s_%d (obsHistID int(10) unsigned not null, sessionID int(10) unsigned not null, propID int(10), fieldID int(10) unsigned not null, fieldRA double, fieldDec double, filter varchar(8), expDate int(10) unsigned, expMJD double, night int(10) unsigned, visitTime double, visitExpTime double, finRank double, finSeeing double, transparency double, airmass double, vSkyBright double, filtSkyBrightness double, rotSkyPos double, lst double, altitude double, azimuth double, dist2Moon double, solarElong double, moonRA double, moonDec double, moonAlt double, moonAZ double, moonPhase double, sunAlt double, sunAz double, phaseAngle double, rScatter double, mieScatter double, moonIllum double, moonBright double, darkBright double, rawSeeing double, wind double, humidity double, slewDist double, slewTime double, fiveSigmaDepth double);' % (hname, sessionID)
+    try:
+        ret = getDbData(cursor, sql)
+    except mysqldb.OperationalError:
+        # This exception occurs when the summary table exists.
+        simname = "summary_%s_%d" % (hname, sessionID)
+        message = []
+        message.append("The summary table %s already exists in the MySQL %s database." % (simname, database))
+        message.append("Please remove the table if you wish to rerun gen_output.py")
+        print os.linesep.join(message)
+        sys.exit(255)
+
 	sql = 'select obsHistID, Session_sessionID as sessionID, Field_fieldID as fieldID, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBright as filtSkyBrightness, rotSkyPos, lst, alt as altitude, az as azimuth, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAz, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind, humidity from ObsHistory where Session_sessionID = %d;' % (sessionID)
 	ret = getDbData(cursor, sql)
 
