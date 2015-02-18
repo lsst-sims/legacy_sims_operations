@@ -17,9 +17,10 @@ import binascii
 import requests
 
 # globals
-USAGE_STR = '[--profile=yes] [--verbose=yes] [--config=conf/survey/LSST.conf] [--startup_comment="comment"]'
+USAGE_STR = '[--profile=yes] [--verbose=yes] [--track=yes] [--config=conf/survey/LSST.conf] '\
+            '[--startup_comment="comment"]'
 
-def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
+def getSessionID (lsstDB, sessionTbl, code_test, track_run, startup_comment):
     """
     Create an entry in the the Session table and fetch the key which
     have been assigned to us.
@@ -72,10 +73,11 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     sessionID = oSession.sessionID
 
     # the last argument = 1 is the status_id
-    try:
-    	track(sessionID, host, user, startup_comment, code_test, 1.0)
-    except:
-	print ("Unable to contact opsimcvs : Server might be down.")
+    if track_run:
+        try:
+            track(sessionID, host, user, startup_comment, code_test, 1.0)
+        except:
+            print ("Unable to contact opsimcvs : Server might be down.")
     # Return the newly found sessionID
     return (sessionID)
 
@@ -103,6 +105,8 @@ def startLsst( args ):
     Command line input
         [--verbose=yes]
 
+        [--track=yes]
+
         [--config=./LSST.conf]'
 
         [--profile=yes]
@@ -128,6 +132,11 @@ def startLsst( args ):
         VERBOSE = 1
     else:
         VERBOSE = 0
+
+    if args.has_key('track') and args['track'].lower() == 'yes':
+        track_run = True
+    else:
+        track_run = False
 
     # Alternate configuration file?
     if (args.has_key ('config') ):
@@ -167,7 +176,7 @@ def startLsst( args ):
 
     # Get a Session ID
     try:
-        SID = getSessionID (lsstDB, sessionTbl, code_test, startup_comment)
+        SID = getSessionID (lsstDB, sessionTbl, code_test, track_run, startup_comment)
     except:
         fatalError ('Unable to acquire a Session ID. Please check ',
                     'that the DB is up and running on the localhost.')
