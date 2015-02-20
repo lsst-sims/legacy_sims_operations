@@ -81,9 +81,10 @@ started by executing the following command::
 
 The OpSim code can be run as follows::
 
-	opsim.py --startup_comment="Startup comment"
+	opsim.py --track=no --startup_comment="Startup comment"
 
-To shutdown the database, execute the following command::
+The ``track`` option is necessary to avoid adding an entry into the official
+run tracking DB. To shutdown the database, execute the following command::
 
 	$OPSIM_RUN_DIR/etc/init.d/mysqld stop
 

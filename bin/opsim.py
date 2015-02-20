@@ -17,7 +17,7 @@ import binascii
 import requests
 
 # globals
-USAGE_STR = '[--profile=yes] [--verbose=yes] [--track=yes] [--config=conf/survey/LSST.conf] '\
+USAGE_STR = '[--profile=yes] [--verbose=yes] [--track=no] [--config=conf/survey/LSST.conf] '\
             '[--startup_comment="comment"]'
 
 def getSessionID (lsstDB, sessionTbl, code_test, track_run, startup_comment):
@@ -105,7 +105,7 @@ def startLsst( args ):
     Command line input
         [--verbose=yes]
 
-        [--track=yes]
+        [--track=no]
 
         [--config=./LSST.conf]'
 
@@ -133,10 +133,10 @@ def startLsst( args ):
     else:
         VERBOSE = 0
 
-    if args.has_key('track') and args['track'].lower() == 'yes':
-        track_run = True
-    else:
+    if args.has_key('track') and args['track'].lower() == 'no':
         track_run = False
+    else:
+        track_run = True
 
     # Alternate configuration file?
     if (args.has_key ('config') ):
