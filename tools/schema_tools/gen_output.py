@@ -74,7 +74,7 @@ def create_output_table(cursor, database, hname, sessionID):
     sql += 'propID int(10), fieldID int(10) unsigned not null, fieldRA double, fieldDec double, '
     sql += 'filter varchar(8), expDate int(10) unsigned, expMJD double, night int(10) unsigned, '
     sql += 'visitTime double, visitExpTime double, finRank double, finSeeing double, transparency double, '
-    sql += 'airmass double, vSkyBright double, filtSkyBrightness double, rotSkyPos double, lst double, '
+    sql += 'airmass double, vSkyBright double, filtSkyBrightness double, rotSkyPos double, rotTelPos double, lst double, '
     sql += 'altitude double, azimuth double, dist2Moon double, solarElong double, moonRA double, moonDec double, '
     sql += 'moonAlt double, moonAZ double, moonPhase double, sunAlt double, sunAz double, phaseAngle double, '
     sql += 'rScatter double, mieScatter double, moonIllum double, moonBright double, darkBright double, '
@@ -105,10 +105,12 @@ def create_output_table(cursor, database, hname, sessionID):
         fieldID = ret[k][2]
         sql = 'select fieldRA, fieldDec from Field where fieldID = %d' % fieldID
         fld = getDbData(cursor, sql)
-        sql = 'select slewTime, slewDist from SlewHistory where ObsHistory_Session_sessionID = %d and ObsHistory_obsHistID = %d' % (sessionID, obsHistID)
+        sql = 'select slewTime, slewDist, slewID from SlewHistory where ObsHistory_Session_sessionID = %d and ObsHistory_obsHistID = %d' % (sessionID, obsHistID)
         slw = getDbData(cursor, sql)
         sql = 'select Proposal_propID as propID from ObsHistory_Proposal where ObsHistory_Session_sessionID = %d and ObsHistory_obsHistID = %d' % (sessionID, obsHistID)
         prp = getDbData(cursor, sql)
+        sql = 'select rotTelPos from SlewState where SlewHistory_slewID = %d' % slw[0][2]
+        rtp = getDbData(cursor, sql)
 
         for i in range(len(prp)):
             MJD = float(ret[k][5]);
@@ -134,10 +136,10 @@ def create_output_table(cursor, database, hname, sessionID):
             m5 = calc_m5(visitFilter, filtsky, seeing, expTime, airmass, tauCloud)
             sql = 'insert into %s (obsHistID, sessionID, propID, fieldID, fieldRA, fieldDec, filter, ' %(summarytable)
             sql += 'expDate, expMJD, night, visitTime, visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, '
-            sql += 'filtSkyBrightness, rotSkyPos, lst, altitude, azimuth, dist2Moon, solarElong, moonRA, moonDec, '
+            sql += 'filtSkyBrightness, rotSkyPos, rotTelPos, lst, altitude, azimuth, dist2Moon, solarElong, moonRA, moonDec, '
             sql += 'moonAlt, moonAZ, moonPhase, sunAlt, sunAz, phaseAngle, rScatter, mieScatter, moonIllum, '
             sql += 'moonBright, darkBright, rawSeeing, wind, humidity, slewDist, slewTime, fiveSigmaDepth) values '
-            sql += '(%d, %d, %d, %d, %f, %f, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)' % (ret[k][0], ret[k][1], prp[i][0], ret[k][2], math.radians(fld[0][0]), math.radians(fld[0][1]), ret[k][3], ret[k][4], ret[k][5], ret[k][6], ret[k][7], ret[k][8], ret[k][9], ret[k][10], ret[k][11], ret[k][12], ret[k][13], ret[k][14], ret[k][15], ret[k][16], ret[k][17], ret[k][18], ret[k][19], ret[k][20], ret[k][21], ret[k][22], ret[k][23], ret[k][24], ret[k][25], ret[k][26], ret[k][27], ret[k][28], ret[k][29], ret[k][30], ret[k][31], ret[k][32], ret[k][33], ret[k][34], ret[k][35], ret[k][36], slw[0][1], slw[0][0], m5)
+            sql += '(%d, %d, %d, %d, %f, %f, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)' % (ret[k][0], ret[k][1], prp[i][0], ret[k][2], math.radians(fld[0][0]), math.radians(fld[0][1]), ret[k][3], ret[k][4], ret[k][5], ret[k][6], ret[k][7], ret[k][8], ret[k][9], ret[k][10], ret[k][11], ret[k][12], ret[k][13], ret[k][14], ret[k][15], rtp[0][0], ret[k][16], ret[k][17], ret[k][18], ret[k][19], ret[k][20], ret[k][21], ret[k][22], ret[k][23], ret[k][24], ret[k][25], ret[k][26], ret[k][27], ret[k][28], ret[k][29], ret[k][30], ret[k][31], ret[k][32], ret[k][33], ret[k][34], ret[k][35], ret[k][36], slw[0][1], slw[0][0], m5)
             insertDbData(cursor, sql)
 
 if __name__ == "__main__":
