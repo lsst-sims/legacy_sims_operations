@@ -16,7 +16,7 @@ import binascii
 
 import requests
 
-def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
+def getSessionID (lsstDB, sessionTbl, code_test, track_run, startup_comment):
     """
     Create an entry in the the Session table and fetch the key which
     have been assigned to us.
@@ -111,10 +111,7 @@ def startLsst( args ):
     # Verbose?
     VERBOSE = args.verbose
 
-    if args.has_key('track') and args['track'].lower() == 'no':
-        track_run = False
-    else:
-        track_run = True
+    track_run = not args.no_track
 
     # Alternate configuration file?
     confLSST = args.config
@@ -615,11 +612,8 @@ if (__name__ == '__main__'):
                         default=utilities.DefaultLSSTConfigFile,
                         help="Pass a different configuration file to the "
                         "program.")
-    parser.add_argument("--official-run", dest="official_run",
-                        action="store_true", default=False, 
-                        help="This flag is for logging an official run into "
-                        "the tracking database. PLEASE DO NOT USE UNLESS "
-                        "AUTHORIZED TO DO SO! THANKS!")
+    parser.add_argument("--no-track", dest="no_track", action="store_true", 
+                        help="PLEASE SET THIS FLAG TO AVOID ADDING AN ENTRY INTO THE OFFICIAL DATABASE!")
     parser.add_argument("-p", "--profile", dest="profile", action="store_true",
                         default=False, help="Flag to turn on code profiling.")
     
