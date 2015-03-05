@@ -69,10 +69,11 @@ def getSessionID (lsstDB, sessionTbl, code_test, startup_comment):
     sessionID = oSession.sessionID
 
     # the last argument = 1 is the status_id
-    try:
-    	track(sessionID, host, user, startup_comment, code_test, 1.0)
-    except:
-	print ("Unable to contact opsimcvs : Server might be down.")
+    if track_run:
+        try:
+            track(sessionID, host, user, startup_comment, code_test, 1.0)
+        except:
+            print ("Unable to contact opsimcvs : Server might be down.")
     # Return the newly found sessionID
     return (sessionID)
 
@@ -110,6 +111,11 @@ def startLsst( args ):
     # Verbose?
     VERBOSE = args.verbose
 
+    if args.has_key('track') and args['track'].lower() == 'no':
+        track_run = False
+    else:
+        track_run = True
+
     # Alternate configuration file?
     confLSST = args.config
 
@@ -145,7 +151,7 @@ def startLsst( args ):
 
     # Get a Session ID
     try:
-        SID = getSessionID (lsstDB, sessionTbl, code_test, startup_comment)
+        SID = getSessionID (lsstDB, sessionTbl, code_test, track_run, startup_comment)
     except:
         fatalError ('Unable to acquire a Session ID. Please check ',
                     'that the DB is up and running on the localhost.')

@@ -25,6 +25,20 @@ env.Tool('recinstall')
 env.Alias("install-cfg", [env.Alias("configuration"), env.Alias("templates")])
 env.Depends("install", env.Alias("install-cfg"))
 
+def build_doc(env, target, source):
+    """
+    Function to build the project's sphinx documentation.
+    """
+    pstate.log.info("Building sphinx documentation")
+    from lsst.sconsUtils import utils
+    utils.runExternal("cd doc && make html")
+
+# Create a new build target for building the documentation
+bsph = env.Command("doc_sphinx", [], build_doc)
+env.Alias("doc-sphinx", bsph)
+env.Depends("doc-sphinx", env.Alias("version"))
+env.Depends("doc", env.Alias("doc-sphinx"))
+
 finder = binfind.Find()
 
 opts = SCons.Script.Variables("custom.py")
@@ -33,10 +47,13 @@ opts.AddVariables((SCons.Variables.PathVariable('MYSQL_DIR',
                                     finder.prefixFromBin('MYSQL_DIR',
                                                          "mysqld_safe"),
                                     SCons.Variables.PathVariable.PathIsDir)),)
-opts.AddVariables((PathVariable('prefix', 'opsim install dir', srcDir,
-                                SCons.Variables.PathVariable.PathIsDirCreate)))
-
 opts.Update(env)
+# This override causes issues with EUPS builds and distribution, so don't do it then.
+if "EupsBuildDir" not in srcDir and "build" not in srcDir:
+    opts.AddVariables((PathVariable('prefix', 'opsim install dir', srcDir,
+                                    SCons.Variables.PathVariable.PathIsDirCreate)))
+
+    opts.Update(env)
 
 env.Replace(configuration_prefix=os.path.join(env['prefix'], "cfg"))
 

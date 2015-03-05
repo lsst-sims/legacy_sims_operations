@@ -38,11 +38,9 @@ Installation Instructions
     eups distrib install -t <tag> sims_operations
     setup sims_operations -t <tag>
 
-  Where <tag> is the name of an EUPS package tag. You may see a warning if the
-  $HOST environment variable is not set. Don't worry as this will be handled
-  for you when running OpSim. However, if you need to override the hostname for
-  the machine, create or change the environment variable $OPSIM_HOSTNAME
-  (it defaults to $HOST) to the appropriate name.
+  Where <tag> is the name of an EUPS package tag. If you need to override the
+  hostname for the machine, create or change the environment variable
+  $OPSIM_HOSTNAME to the appropriate name.
 
 * Change Database Passwords
 
@@ -83,9 +81,10 @@ started by executing the following command::
 
 The OpSim code can be run as follows::
 
-	opsim.py --startup_comment="Startup comment"
+	opsim.py --track=no --startup_comment="Startup comment"
 
-To shutdown the database, execute the following command::
+The ``track`` option is necessary to avoid adding an entry into the official
+run tracking DB. To shutdown the database, execute the following command::
 
 	$OPSIM_RUN_DIR/etc/init.d/mysqld stop
 
