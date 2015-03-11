@@ -79,6 +79,11 @@ started by executing the following command::
 
 	$OPSIM_RUN_DIR/etc/init.d/mysqld start
 
+Once OpSim is installed on a machine, the simulation configuration may be done
+by reviewing and customizing values for the parameters defined in the
+configuration files, which are located in ``$SIMS_OPERATIONS_DIR/conf`` and are
+described in the :ref:`configuration` section.
+
 The OpSim code can be run as follows::
 
 	opsim.py --track=no --startup_comment="Startup comment"

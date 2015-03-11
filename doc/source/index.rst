@@ -15,7 +15,6 @@ Contents:
    installation.rst
    directory.rst
    architecture.rst
-   execution.rst
    configuration.rst
    output.rst
    release_notes.rst
@@ -26,4 +25,3 @@ Contents:
 .. * :ref:`genindex`
 .. * :ref:`modindex`
 .. * :ref:`search`
-
