@@ -34,7 +34,7 @@ CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Config` (
   `moduleName` VARCHAR(64) NOT NULL COMMENT 'module name' ,
   `paramIndex` INT(11) NOT NULL COMMENT 'index of parameter for module' ,
   `paramName` VARCHAR(64) NOT NULL COMMENT 'parameter name' ,
-  `paramValue` VARCHAR(64) NOT NULL COMMENT 'string of parameter value' ,
+  `paramValue` VARCHAR(128) NOT NULL COMMENT 'string of parameter value' ,
   `comment` VARCHAR(512) NULL DEFAULT NULL COMMENT 'comment' ,
   `Session_sessionID` INT(10) UNSIGNED NOT NULL ,
   `nonPropID` INT(10) NULL ,
