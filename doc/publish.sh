@@ -44,4 +44,4 @@ else
   VERSION=$(python -c "import lsst.sims.operations.version as version; print version.__version__")
 fi
 echo "Uploading documentation from $PWD to $REMOTE_HOST"
-rsync -ave ssh  doc/build/html/* ${REMOTE_HOST}:${DOC_ROOT_PATH}/${VERSION}
+scp -r doc/build/html/* ${REMOTE_HOST}:${DOC_ROOT_PATH}/${VERSION}
