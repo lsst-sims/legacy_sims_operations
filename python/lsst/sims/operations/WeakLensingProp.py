@@ -277,7 +277,11 @@ class WeakLensingProp (Proposal):
         # PAUSE
 #        yield hold, self
         return
-    
+
+    def ComplyToFilterChangeBurstConstraint(self, filterBurstNumber, filterBurstTime, visitTime, readoutTime, filterTime):
+
+	return True
+
     def startNight(self,dateProfile,moonProfile,startNewLunation,randomizeSequencesSelection, nRun, mountedFiltersList):
 
         super (WeakLensingProp, self).startNight (dateProfile,moonProfile,startNewLunation, mountedFiltersList)
@@ -609,13 +613,13 @@ class WeakLensingProp (Proposal):
 
         self.clearSuggestList()
 
-	if (len(listOfFieldsToEvaluate) > 0):
-	    if self.useLookAhead:
-	        self.rankAreaDistributionWithLookAhead(listOfFieldsToEvaluate, sdnight, sdtime,
-						dateProfile, rawSeeing, seeing, transparency)
-	    else:
-	        self.rankAreaDistribution(listOfFieldsToEvaluate, sdnight, sdtime,
-						dateProfile, rawSeeing, seeing, transparency)
+        if (len(listOfFieldsToEvaluate) > 0):
+            if self.useLookAhead:
+                self.rankAreaDistributionWithLookAhead(listOfFieldsToEvaluate, sdnight, sdtime,
+                        dateProfile, rawSeeing, seeing, transparency)
+            else:
+                self.rankAreaDistribution(listOfFieldsToEvaluate, sdnight, sdtime,
+                        dateProfile, rawSeeing, seeing, transparency)
 
         # Chose the n highest ranking observations
 #        self.reuseRanking = self.reuseRankingCount
@@ -705,7 +709,7 @@ class WeakLensingProp (Proposal):
         date_MJD = int (mjd) + (sunSet / 24.)
         #raMin = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.deltaLST
         raMin = ((pal.gmst(date_MJD) + lon_RAD) * RAD2DEG) - self.deltaLST
-                                                                                
+
         # Compute RA max (at twilight)
         date_MJD = int (mjd) + (sunRise / 24.)
         #raMax = ((slalib.sla_gmst(date_MJD) + lon_RAD) * RAD2DEG) + self.deltaLST
@@ -767,9 +771,11 @@ class WeakLensingProp (Proposal):
             sql += '%s BETWEEN 0.0 AND %f) AND ' % (dbRA,
                                                     raAbsMax)
 
-        sql += '%s BETWEEN %f AND %f order by FieldRA,FieldDec' % (dbDec,
-                                         (lat_RAD*RAD2DEG)-abs(self.maxReach),
-                                         (lat_RAD*RAD2DEG)+abs(self.maxReach))
+        DecLimit = math.acos(1./float(self.maxAirmass)) * RAD2DEG
+        sql += '%s BETWEEN %f AND %f  and %f < %s < %f order by FieldRA,FieldDec' % (dbDec,
+                                         (lat_RAD*RAD2DEG)-DecLimit,
+                                         (lat_RAD*RAD2DEG)+DecLimit,
+                                         -abs(self.maxReach),dbDec,abs(self.maxReach))
 
         # Send the query to the DB
         (n, res) = self.lsstDB.executeSQL (sql)

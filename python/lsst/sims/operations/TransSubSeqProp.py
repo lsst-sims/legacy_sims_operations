@@ -145,6 +145,42 @@ class TransSubSeqProp (Proposal):
 #        yield hold, self
         return
 
+    def ComplyToFilterChangeBurstConstraint(self, filterBurstNumber, filterBurstTime, visitTime, readoutTime, filterTime):
+
+	N = len(self.subSeqName)
+	for n in range(N):
+	    subFilters = self.subSeqFilters[n].split(',')
+	    nfilters = len(subFilters)
+	    if nfilters > 1:
+                print self.propConf
+                print self.subSeqName[n]
+                print subFilters
+		subVisits = self.subSeqExposures[n].split(',')
+                print subVisits
+		T = []
+		for k in range(nfilters):
+		    tk = 0
+		    if k > 0:
+			tk += filterTime
+		    tk += int(subVisits[k])*visitTime + (int(subVisits[k])-1)*readoutTime
+		    T.append(tk)
+		print T
+
+		numIdxToCheck = nfilters-1
+		if numIdxToCheck >= filterBurstNumber:
+		    for startIdx in range(0,numIdxToCheck-filterBurstNumber+1):
+		        tt = 0
+		        for idx in range(startIdx,startIdx+filterBurstNumber):
+			    tt += T[idx]
+		        if tt < filterBurstTime:
+			    print "REJECTED %f < %f" % (tt,filterBurstTime)
+			    return False
+
+	return True
+
+
+
+
     def startNight(self,dateProfile,moonProfile,startNewLunation,randomizeSequencesSelection,nRun, mountedFiltersList):
 
         super (TransSubSeqProp, self).startNight (dateProfile,moonProfile,startNewLunation, mountedFiltersList)
@@ -160,7 +196,7 @@ class TransSubSeqProp (Proposal):
         for fieldID in self.sequences.keys():
 	    if not fieldID in self.targetsNewSeq.keys():
 		if self.sequences[fieldID].IsIdle():
-		    self.log.info('%sProp: startNight() deleted sequence field=%d at progress=%.3f%% state=%d nevents=%d' % (self.propFullName, fieldID, 100*self.sequences[fieldID].GetProgress(), self.sequences[fieldID].state, self.sequences[fieldID].nAllEvents))
+		    #self.log.info('%sProp: startNight() deleted sequence field=%d at progress=%.3f%% state=%d nevents=%d' % (self.propFullName, fieldID, 100*self.sequences[fieldID].GetProgress(), self.sequences[fieldID].state, self.sequences[fieldID].nAllEvents))
 		    notstarted+=1
 		    del self.sequences[fieldID]
 

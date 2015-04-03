@@ -447,7 +447,7 @@ class InstrumentState (InstrumentPosition):
 	    self.Filter_RemovableList[remidx] = newf
 
         return
-    
+
     def SetFilter(self, filter):
 
         if not self.IsFilterMounted(filter):
@@ -668,6 +668,11 @@ class InstrumentSlewParams (object):
         self.Filter_MountTime = eval(str(config_dict["Filter_MountTime"]))
         self.Filter_MoveTime  = eval(str(config_dict["Filter_MoveTime"]))
 
+	self.Filter_MaxChangesBurstNumber = eval(str(config_dict["Filter_MaxChangesBurstNumber"]))
+	self.Filter_MaxChangesBurstTime   = eval(str(config_dict["Filter_MaxChangesBurstTime"]))
+        self.Filter_MaxChangesAvgNumber   = eval(str(config_dict["Filter_MaxChangesAvgNumber"]))
+        self.Filter_MaxChangesAvgTime     = eval(str(config_dict["Filter_MaxChangesAvgTime"]))
+
         # List of activities defined.
         self.activities = ["DomAlt",
                            "DomAz",
@@ -791,6 +796,9 @@ class Instrument (object):
                                                   instrumentConf=instrumentConf)
 	self.targetposition = InstrumentPosition()
 
+        self.filterChangesTimeHistory = []
+	self.filterChangesHistory     = []
+
 	self.delay_time_for = {}
 	self.longest_prereq_for = {}
         self.functionGetDelayFor = {}
@@ -802,6 +810,24 @@ class Instrument (object):
             self.functionGetDelayFor[activity] = GetDelayFor_Activity
 
         return
+
+    def AllowFilterChange(self, newfilter, newtime):
+
+        if (newfilter == self.current_state.Filter_Pos):
+            return True
+
+        maxChangesBurst = int(self.slew_params.Filter_MaxChangesBurstNumber)
+        if len(self.filterChangesTimeHistory) >= maxChangesBurst:
+            reftime = self.filterChangesTimeHistory[-maxChangesBurst]
+            if (newtime - reftime) < self.slew_params.Filter_MaxChangesBurstTime:
+		return False
+	    maxChangesAvg = int(self.slew_params.Filter_MaxChangesAvgNumber)
+	    if len(self.filterChangesTimeHistory) >= maxChangesAvg:
+		reftime = self.filterChangesTimeHistory[-maxChangesAvg]
+		if (newtime - reftime) < self.slew_params.Filter_MaxChangesAvgTime:
+		    return False
+
+        return True
 
     def GetDependencies (self):
         """
@@ -1098,6 +1124,25 @@ class Instrument (object):
 
 	(delay, new_state) = self.GetSlewDelay(new_position, self.current_state, allSlewData=True)
 
+	if new_position.Filter_Pos != self.current_state.Filter_Pos:
+	    self.filterChangesTimeHistory.append(new_position.TIME)
+	    self.filterChangesHistory.append(new_position.Filter_Pos)
+	    if (self.log):
+		bn = min(int(self.slew_params.Filter_MaxChangesBurstNumber), len(self.filterChangesTimeHistory)-1)
+		if bn>0:
+		    bt = self.filterChangesTimeHistory[-1] - self.filterChangesTimeHistory[-1-bn]
+		else:
+		    bt = 0
+                an = min(int(self.slew_params.Filter_MaxChangesAvgNumber), len(self.filterChangesTimeHistory)-1)
+                if an>0:
+                    at = self.filterChangesTimeHistory[-1] - self.filterChangesTimeHistory[-1-an]
+                else:
+                    at = 0
+
+		self.log.info("Filter Change t=%d from %s to %s Burst=%d in %3.1f minutes Avg=%d in %3.1f days" % (new_position.TIME, self.current_state.Filter_Pos, new_position.Filter_Pos, bn, bt/60.0, an, at/24/3600.0))
+	    #print self.filterChangesTimeHistory
+	    #print self.filterChangesHistory
+
 	new_state.Tracking = True
 	self.SetState(new_state)
 
@@ -1155,13 +1200,16 @@ class Instrument (object):
         if self.log and self.verbose>1:
             self.log.info("Instrument: GetDelayForTarget(): COMPUTING OBSERVATION DELAY")
 
-	# Do not allow filter mount as result from ranks.
+    # Do not allow filter mount as result from ranks.
 	if not self.current_state.IsFilterMounted(filter):
 	    return -1.0
 
         (date,mjd,lst_RAD) = dateProfile
 
-        ha_RAD = lst_RAD - ra_RAD 
+        if not self.AllowFilterChange(filter, date):
+            return -1.0
+
+        ha_RAD = lst_RAD - ra_RAD
         #(az_RAD,d1,d2,alt_RAD,d4,d5,pa_RAD,d7,d8) = slalib.sla_altaz (ha_RAD,
         #                                   dec_RAD,
         #                                   self.params.latitude_RAD)
@@ -1249,10 +1297,10 @@ class Instrument (object):
         rotator_telpos = self.current_state.GetRotatorTelPos()
         altitude = self.current_state.ALT_RAD
         azimuth = self.current_state.AZ_RAD
-	#slewDistance = slalib.sla_dsep(ra_RAD, dec_RAD, init_state.RA_RAD, init_state.DEC_RAD)
+        #slewDistance = slalib.sla_dsep(ra_RAD, dec_RAD, init_state.RA_RAD, init_state.DEC_RAD)
         slewDistance = pal.dsep(ra_RAD, dec_RAD, init_state.RA_RAD, init_state.DEC_RAD)
-	
-        slewdata = dataSlew(self.slewCount, date, date+delay, delay, slewDistance)
+        
+	slewdata = dataSlew(self.slewCount, date, date+delay, delay, slewDistance)
 
 #        sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewHistory')
 #        sql += '%d, ' % (self.sessionID)
