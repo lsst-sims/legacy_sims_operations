@@ -6,4 +6,4 @@ code_dir=${SIMS_OPERATIONS_DIR}/DataForInstall
 mysql -u root -p -e "create database OpsimDB; create user 'www'@'localhost' identified by '${passwd}'; grant all on OpsimDB.* to 'www'@'localhost';"
 mysql -u root -p -e "drop schema OpsimDB; source ${code_dir}/sql/v3_0.sql; grant all privileges on OpsimDB.* to 'www'@'localhost' identified by '${passwd}' with grant option; flush privileges;"
 
-mysql -u www -p${passwd} -e "use OpsimDB;source ${code_dir}/data/current/cloud.sql;source ${code_dir}/data/current/seeing.sql;source ${code_dir}/data/current/field.sql;"
+mysql -u www -p${passwd} -e "use OpsimDB;source ${code_dir}/data/current/Cloud.sql;source ${code_dir}/data/current/Seeing.sql;source ${code_dir}/data/current/Field.sql;"
