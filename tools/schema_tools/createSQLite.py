@@ -76,3 +76,9 @@ if __name__ == '__main__':
 	conn.commit()
 	conn.close()
 
+	# Correct file permissions since sqlite3.connect ignores any umask
+	# Putting in a dummy umask to get users current umask
+	cumask = os.umask(0o022)
+	# Invert umask to get file permissions
+	file_perm = 0o666 & ~cumask
+	os.chmod(sql_fname, file_perm)
