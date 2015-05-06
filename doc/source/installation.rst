@@ -100,14 +100,22 @@ Getting the Source
 ------------------
 
 If one requires using the bleeding edge code, it can be obtained from the LSST
-Simulations Stash repository. Check out the following repositories in a
+Github repository. Check out the following repositories in a
 designated LSST directory. For the purpose of this documentation we shall use
 ``/lsst`` ::
 
-  git clone https://<your_stash_username>@stash.lsstcorp.org/scm/sim/sims_operations.git
+  git clone https://github.com/lsst/sims_operations.git
 
-If you need to only obtain a readonly copy, omit the ``<your_stash_username>@``
-from the clone command.
+If you have write permission to the repostory, you will be able to push changes
+back to the remote. If you do not have write permission, you can still make
+local changes but you will not be able to push them to the remote.
+
+Alternatively, one can setup SSH keys to handle source code control. Please
+follow Github's
+`procedure <https://help.github.com/articles/generating-ssh-keys>`_. In this
+case, the clone URL looks like::
+
+  git clone git@github.com:lsst/sims_operations.git
 
 You should have already installed and configured OpSim by following the
 instructions in the :ref:`install-instruct` section. The OpSim code can be setup
