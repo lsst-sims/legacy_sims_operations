@@ -106,7 +106,7 @@ designated LSST directory. For the purpose of this documentation we shall use
 
   git clone https://github.com/lsst/sims_operations.git
 
-If you have write permission to the repostory, you will be able to push changes
+If you have write permission to the repository, you will be able to push changes
 back to the remote. If you do not have write permission, you can still make
 local changes but you will not be able to push them to the remote.
 
