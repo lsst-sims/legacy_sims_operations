@@ -3,7 +3,7 @@
 *************************
 Installing the OpSim Code
 *************************
-The current source code is in the LSST Simulations sims_operations git (Stash)
+The current source code is in the LSST Simulations sims_operations git (Github)
 repository. However, the code is now available as an EUPS package.
 
 .. _install-instruct:
