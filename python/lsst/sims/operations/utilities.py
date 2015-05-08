@@ -68,9 +68,11 @@ MONTH           = 262800.       # seconds in one month (approximate)
 YEAR            = 31536000.     # seconds in one year (approximate)
 TWOPI 		= 2 * math.pi
 
+cpath = __file__.split('python')[0]
+
 # Default Configuration Files
-DefaultLSSTConfigFile = 'conf/survey/LSST.conf'
-DefaultInstrumentConfigFile = 'conf/system/Instrument.conf'
+DefaultLSSTConfigFile = cpath + 'conf/survey/LSST.conf'
+DefaultInstrumentConfigFile = cpath + 'conf/system/Instrument.conf'
 
 DefaultGeneralPropConfigFile = './GeneralProp.conf'
 DefaultNEAConfigFile = './NearEarthProp.conf'
@@ -81,9 +83,9 @@ DefaultWLSConfigFile = './WeakLensShearProp.conf'
 DefaultKBOConfigFile = './KuiperBeltProp.conf'
 DefaultWLTSSConfigFile = './WLprop.conf'
 
-DefaultASConfigFile = 'conf/system/AstronomicalSky.conf'
-DefaultFiltersConfigFile = 'conf/survey/Filters.conf'
-DefaultSchedulerConfigFile = 'conf/scheduler/Scheduler.conf'
+DefaultASConfigFile = cpath + 'conf/system/AstronomicalSky.conf'
+DefaultFiltersConfigFile = cpath + 'conf/survey/Filters.conf'
+DefaultSchedulerConfigFile = cpath + 'conf/scheduler/Scheduler.conf'
 
 # Observation Types for events in sequences
 OBSTYPE_VISIT = 0
