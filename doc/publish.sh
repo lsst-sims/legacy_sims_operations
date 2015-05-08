@@ -24,9 +24,12 @@
 # Upload sphinx documentation for operations simulator to web-server.
 # Special thanks to Fabrice Jammes, IN2P3 for the original script.
 
+# To push documenation, one needs to make sure that the clone is up-to-date and
+# scons is run. Then run this script: ./publish.sh
+
 # To push documentation for a version (a git tag), one needs to make sure
-# that the clone is checked out to the tag. Then run this script passing it
-# any integer: publish.sh 0
+# that the clone is checked out to the tag and scons is run. Then run this
+# script passing it any integer: ./publish.sh 0
 
 # eval `ssh-agent -s`
 # ssh-add ~/.ssh/id_rsa_lsst
@@ -39,9 +42,11 @@ scons doc
 REMOTE_HOST=opsimcvs.tuc.noao.edu
 DOC_ROOT_PATH=/var/www/html/docs/simulator
 if [ -z $1 ]; then
-  VERSION=""
+  VERSION="master"
 else
   VERSION=$(python -c "import lsst.sims.operations.version as version; print version.__version__")
+  # Version X.Y.Z will be truncated to X.Y
+  VERSION=${VERSION%.*}
 fi
 echo "Uploading documentation from $PWD to $REMOTE_HOST"
 scp -r doc/build/html/* ${REMOTE_HOST}:${DOC_ROOT_PATH}/${VERSION}
