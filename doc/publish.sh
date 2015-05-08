@@ -49,4 +49,5 @@ else
   VERSION=${VERSION%.*}
 fi
 echo "Uploading documentation from $PWD to $REMOTE_HOST"
+ssh ${REMOTE_HOST} "mkdir -p ${DOC_ROOT_PATH}/${VERSION}"
 scp -r doc/build/html/* ${REMOTE_HOST}:${DOC_ROOT_PATH}/${VERSION}
