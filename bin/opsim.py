@@ -377,7 +377,9 @@ def startLsst( args ):
         logfile =  configDict["logfile"]
         print("    logfile:%s" % (logfile))
     else :
-        logfile =  'log/lsst.log_%s' % (SID)
+        logfile = 'lsst.log_%s' % (SID)
+        if os.path.exists('log'):
+            logfile = os.path.join('log', logfile)
         print("    logfile:%s default" % (logfile))
 
     if ( configDict.has_key ('verbose')) :
