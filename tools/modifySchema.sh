@@ -104,7 +104,7 @@ echo "[Exporting session data]"
 time $rundir/schema_tools/exportSession.sh $database $host $1
 echo "[Creating SQLite file]"
 time $python $rundir/schema_tools/createSQLite.py $host $1
-mv ${host}_$1_* ../output
+mv ${host}_$1_* output
 #endif
 echo "[dropSubsetTables.sh]"
 time $rundir/schema_tools/dropSubsetTables.sh $database $host $1
