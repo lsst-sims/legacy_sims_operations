@@ -29,6 +29,9 @@ class TestInstrument(unittest.TestCase):
         self.db.closeConnection()
 
     def testBurstFilterChange(self):
+        # Allow 1 filter change in 20 minutes
+        self.inst.slew_params.Filter_MaxChangesBurstNumber = 1
+        self.inst.slew_params.Filter_MaxChangesBurstTime = 20.0 * 60.0
         # No filter change
         self.assertTrue(self.inst.AllowFilterChange("r", 0))
         # Do filter change, should be allowed
