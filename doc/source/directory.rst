@@ -4,7 +4,7 @@
 Directory Structure
 *******************
 
-The following table shows the directory structure from ``/lsst/sims_operations``.
+The following table shows the directory structure from ``$SIMS_OPERATIONS_DIR``.
 
 .. code::
 
@@ -19,6 +19,7 @@ The following table shows the directory structure from ``/lsst/sims_operations``
 	| log             | Contains the log files generated during the OpSim execution        |
 	| python          | Contains all the python module files for the OpSim                 |
         | site_scons      | Contains python files related to SCons setup and installation      |
+	| templates       | Contains template files used in configuration of the OpSim database|
 	| tests           | Contains the Unit Tests for the OpSim i.e. DatabaseTest.py etc.    |
 	| tools           | Contains debugging scripts used during the development of OpSim    |
 	| ups             | Contains the files related to the EUPS package configuration       |

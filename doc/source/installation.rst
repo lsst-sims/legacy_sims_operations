@@ -24,7 +24,7 @@ Installation Instructions
     # script below will ask some questions. Unless you know what you're doing,
     # and you need a fine tuned setup, please answer 'yes' everywhere.
     bash newinstall.sh
-    . loadLSST.bash
+    source loadLSST.bash
 
 * Install the OpSim code
 
