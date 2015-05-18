@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # LSST Data Management System
 # Copyright 2015 LSST Corporation.
@@ -31,23 +31,22 @@
 # that the clone is checked out to the tag. Then run this script passing it
 # any integer: ./publish.sh 0
 
-# eval `ssh-agent -s`
-# ssh-add ~/.ssh/id_rsa_lsst
-DIR=$(cd "$(dirname "$0")"; pwd -P)
-cd $DIR/..
+DIR=$(cd "$(dirname "${0}")"; pwd -P)
+cd ${DIR}/..
 (
 echo "Generating documentation"
 scons doc
 )
-REMOTE_HOST=opsimcvs.tuc.noao.edu
-DOC_ROOT_PATH=/var/www/html/docs/simulator
-if [ -z $1 ]; then
+DOC_ROOT_PATH=/home/lsst/docs
+if [ -z ${1} ]; then
   VERSION="master"
 else
   VERSION=$(python -c "import lsst.sims.operations.version as version; print version.__version__")
   # Version X.Y.Z will be truncated to X.Y
   VERSION=${VERSION%.*}
 fi
-echo "Uploading documentation from $PWD to $REMOTE_HOST"
-ssh ${REMOTE_HOST} "mkdir -p ${DOC_ROOT_PATH}/${VERSION}"
-scp -r doc/build/html/* ${REMOTE_HOST}:${DOC_ROOT_PATH}/${VERSION}
+echo "Copying documentation from ${PWD} to ${DOC_ROOT_PATH}/${VERSION}"
+if [ ! -d "${DOC_ROOT_PATH}/${VERSION}" ]; then
+  mkdir -p ${DOC_ROOT_PATH}/${VERSION}
+fi
+cp -r doc/build/html/* ${DOC_ROOT_PATH}/${VERSION}
