@@ -31,7 +31,7 @@ DROP TABLE IF EXISTS `OpsimDB`.`Config` ;
 
 CREATE  TABLE IF NOT EXISTS `OpsimDB`.`Config` (
   `configID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `moduleName` VARCHAR(64) NOT NULL COMMENT 'module name' ,
+  `moduleName` VARCHAR(128) NOT NULL COMMENT 'module name' ,
   `paramIndex` INT(11) NOT NULL COMMENT 'index of parameter for module' ,
   `paramName` VARCHAR(64) NOT NULL COMMENT 'parameter name' ,
   `paramValue` VARCHAR(128) NOT NULL COMMENT 'string of parameter value' ,
