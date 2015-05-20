@@ -20,6 +20,10 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 
+# NOTE: This script does not need to be run for the documentation to be created.
+# This script is meant for the OpSim team. The documentation can be built from 
+# a cloned repo by setting up the LSST environment, setting up sims_operations 
+# and running scons.
 
 # Upload sphinx documentation for operations simulator to web-server.
 # Special thanks to Fabrice Jammes, IN2P3 for the original script.
