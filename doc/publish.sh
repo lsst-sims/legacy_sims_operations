@@ -28,6 +28,8 @@
 # Upload sphinx documentation for operations simulator to web-server.
 # Special thanks to Fabrice Jammes, IN2P3 for the original script.
 
+# NOTE TO OPSIM TEAM: This script should be run on the ops2 machine!
+
 # To push documenation, one needs to make sure that the clone is up-to-date
 # Then run this script: ./publish.sh
 
