@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # LSST Data Management System
 # Copyright 2015 LSST Corporation.
@@ -20,28 +20,39 @@
 # the GNU General Public License along with this program.  If not,
 # see <http://www.lsstcorp.org/LegalNotices/>.
 
+# NOTE: This script does not need to be run for the documentation to be created.
+# This script is meant for the OpSim team. The documentation can be built from 
+# a cloned repo by setting up the LSST environment, setting up sims_operations 
+# and running scons.
 
 # Upload sphinx documentation for operations simulator to web-server.
 # Special thanks to Fabrice Jammes, IN2P3 for the original script.
 
+# NOTE TO OPSIM TEAM: This script should be run on the ops2 machine!
+
+# To push documenation, one needs to make sure that the clone is up-to-date
+# Then run this script: ./publish.sh
+
 # To push documentation for a version (a git tag), one needs to make sure
 # that the clone is checked out to the tag. Then run this script passing it
-# any integer: publish.sh 0
+# any integer: ./publish.sh 0
 
-# eval `ssh-agent -s`
-# ssh-add ~/.ssh/id_rsa_lsst
-DIR=$(cd "$(dirname "$0")"; pwd -P)
-cd $DIR/..
+DIR=$(cd "$(dirname "${0}")"; pwd -P)
+cd ${DIR}/..
 (
 echo "Generating documentation"
 scons doc
 )
-REMOTE_HOST=opsimcvs.tuc.noao.edu
-DOC_ROOT_PATH=/var/www/html/docs/simulator
-if [ -z $1 ]; then
-  VERSION=""
+DOC_ROOT_PATH=/home/lsst/docs
+if [ -z ${1} ]; then
+  VERSION="master"
 else
   VERSION=$(python -c "import lsst.sims.operations.version as version; print version.__version__")
+  # Version X.Y.Z will be truncated to X.Y
+  VERSION=${VERSION%.*}
 fi
-echo "Uploading documentation from $PWD to $REMOTE_HOST"
-scp -r doc/build/html/* ${REMOTE_HOST}:${DOC_ROOT_PATH}/${VERSION}
+echo "Copying documentation from ${PWD} to ${DOC_ROOT_PATH}/${VERSION}"
+if [ ! -d "${DOC_ROOT_PATH}/${VERSION}" ]; then
+  mkdir -p ${DOC_ROOT_PATH}/${VERSION}
+fi
+cp -r doc/build/html/* ${DOC_ROOT_PATH}/${VERSION}
