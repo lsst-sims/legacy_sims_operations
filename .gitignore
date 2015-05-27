@@ -21,3 +21,4 @@ bin/opsim-configure.py
 bin/opsim-connect-mysql-sock.sh
 cfg/
 lib/
+*.sublime*
