@@ -377,7 +377,9 @@ def startLsst( args ):
         logfile =  configDict["logfile"]
         print("    logfile:%s" % (logfile))
     else :
-        logfile =  'log/lsst.log_%s' % (SID)
+        logfile = 'lsst.log_%s' % (SID)
+        if os.path.exists('log'):
+            logfile = os.path.join('log', logfile)
         print("    logfile:%s default" % (logfile))
 
     if ( configDict.has_key ('verbose')) :
@@ -443,9 +445,15 @@ def startLsst( args ):
         siteConf =  "./SiteCP.conf"
         print("    siteConf:%s default" % (siteConf))
 
-
-    # Fetch Site Specific Configuration file
-    configDict, pairs =  readConfFile(siteConf)
+    try:
+        # Fetch Site Specific Configuration file
+        configDict, pairs =  readConfFile(siteConf)
+    except IOError:
+        message = []
+        message.append("Please make sure you have copied LSST.conf from $SIMS_OPERATIONS_DIR/conf/survey")
+        message.append("and modify all of the config file paths to point to the full path of")
+        message.append("$SIMS_OPERATIONS_DIR/conf")
+        raise RuntimeError(" ".join(message))
 
     # store config in DB
     for line in pairs:

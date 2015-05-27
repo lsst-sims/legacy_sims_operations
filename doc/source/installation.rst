@@ -79,10 +79,17 @@ started by executing the following command::
 
 	$OPSIM_RUN_DIR/etc/init.d/mysqld start
 
-Once OpSim is installed on a machine, the simulation configuration may be done
-by reviewing and customizing values for the parameters defined in the
-configuration files, which are located in ``$SIMS_OPERATIONS_DIR/conf`` and are
-described in the :ref:`configuration` section.
+Once OpSim is installed on a machine, it is recommended to setup a directory to
+run from that is not located with the installed code. You can call this
+directory whatever you like. The documentation will refer to this directory as
+``$RUN_DIR``. For your convenience, make sure to create a ``log`` and
+``output`` directory for easy organization of outputs from OpSim. Before
+running the simulation, the configuration may be done by reviewing and
+customizing values for the parameters defined in the configuration files,
+which are located in ``$SIMS_OPERATIONS_DIR/conf`` and are described in the
+:ref:`configuration` section. As you will at least need to modify the
+``LSST.conf`` file, it should be copied from the
+``$SIMS_OPERATIONS_DIR/conf/survey`` directory to your ``$RUN_DIR``.
 
 The OpSim code can be run as follows::
 
@@ -181,8 +188,9 @@ password in the database table setup script described below.
   **DO NOT** run the ``opsim-configure.py`` command above as is it unnecessary.
 
 To finish the setup, one needs to create the OpsimDB and populate some tables.
-Navigate to the ``$SIMS_OPERATIONS_DIR/tools`` directory and edit the password
-variable at the top of the ``setup_db.sh`` script. Then execute the following::
+Copy the ``setup_db.sh`` script from the ``$SIMS_OPERATIONS_DIR/tools``
+directory and edit the password variable at the top. Then execute the
+following::
 
   sh setup_db.sh
 

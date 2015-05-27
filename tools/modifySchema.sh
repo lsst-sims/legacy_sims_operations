@@ -9,7 +9,10 @@ if ( $1 == "" ) then
   exit -1
 endif
 
-# Below should be find if the package was installed by EUPS. If your setup is
+# Need to allow script to be run from anywhere.
+set rundir = `dirname $0`
+
+# Below should be fine if the package was installed by EUPS. If your setup is
 # different, you'll need to fix the command paths.
 
 echo "####################################################################"
@@ -44,15 +47,15 @@ echo "####################################################################"
 # Making the Output table
 echo "####################################################################"
 echo "[gen_output.py]"
-time $python schema_tools/gen_output.py $host $database $1
+time $python $rundir/schema_tools/gen_output.py $host $database $1
 echo "####################################################################"
 
 # Make subset of all tables
 echo "####################################################################"
 echo "[dropSubsetTables.sh]"
-time schema_tools/dropSubsetTables.sh $database $host $1
+time $rundir/schema_tools/dropSubsetTables.sh $database $host $1
 echo "[createSubsetTables.sh]"
-time schema_tools/createSubsetTables.sh $database $host $1
+time $rundir/schema_tools/createSubsetTables.sh $database $host $1
 echo "####################################################################"
 
 # Update the names
@@ -70,7 +73,7 @@ echo "####################################################################"
 # Add dithering (ra, dec, night, vertex) columns & Adding indexes
 echo "####################################################################"
 echo "[Add dithering (ra, dec, night, vertex) columns -> prep_opsim]"
-time $python schema_tools/prep_opsim.py $host $database $1
+time $python $rundir/schema_tools/prep_opsim.py $host $database $1
 echo "####################################################################"
 
 # Fixing visitTime & visitExpTime for tObsHistory and output tables
@@ -91,18 +94,18 @@ echo "####################################################################"
 # Copying over fiveSigmaDepth, ditheredRA, ditheredDec values from output to ObsHistory
 #echo "####################################################################"
 echo "[Fixing fiveSigmaDepth, ditheredRA, ditheredDec values from output to ObsHistory]"
-time $python schema_tools/move_data_output_obshistory.py $host $database $1
+time $python $rundir/schema_tools/move_data_output_obshistory.py $host $database $1
 echo "####################################################################"
 
 # Exporting session
 echo "####################################################################"
 echo "[Exporting session data]"
 #if ($RECREATE_OUTPUT_TABLE) then
-time schema_tools/exportSession.sh $database $host $1
+time $rundir/schema_tools/exportSession.sh $database $host $1
 echo "[Creating SQLite file]"
-time $python schema_tools/createSQLite.py $host $1
-mv ${host}_$1_* ../output
+time $python $rundir/schema_tools/createSQLite.py $host $1
+mv ${host}_$1_* output
 #endif
 echo "[dropSubsetTables.sh]"
-time schema_tools/dropSubsetTables.sh $database $host $1
+time $rundir/schema_tools/dropSubsetTables.sh $database $host $1
 echo "####################################################################"
