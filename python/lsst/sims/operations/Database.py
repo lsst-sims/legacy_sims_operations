@@ -1,9 +1,6 @@
 # System modules
 import os
-import socket
-import sys
 import time
-import logging
 
 # Third-party includes
 import MySQLdb
@@ -69,36 +66,36 @@ class Opsim_SlewState(object):
 class Opsim_TimeHistory(object):
     pass
 
-class Database :
+class Database:
     def __init__(self, dbWrite):
 
-	self.dbWrite = dbWrite
-	print "dbWrite = "
-	print dbWrite
+        self.dbWrite = dbWrite
+        print "dbWrite = "
+        print dbWrite
 
         try:
-            self.DBHOST  = os.environ['DBHOST']
+            self.DBHOST = os.environ['DBHOST']
         except:
-             self.DBHOST = 'localhost'
+            self.DBHOST = 'localhost'
 
         try:
-            self.DBPORT   = os.environ['DBPORT']
+            self.DBPORT = os.environ['DBPORT']
             if self.DBPORT == 'None':
                 self.DBPORT = None
             else:
-            	self.DBPORT = int(self.DBPORT)
+                self.DBPORT = int(self.DBPORT)
         except:
-            self.DBPORT   = None
+            self.DBPORT = None
 
         try:
-            self.DBDB     = os.environ['DBDB']
+            self.DBDB = os.environ['DBDB']
         except:
-            self.DBDB     = 'OpsimDB'
+            self.DBDB = 'OpsimDB'
 
         try:
-            self.DBUSER   = os.environ['DBUSER']
+            self.DBUSER = os.environ['DBUSER']
         except:
-            self.DBUSER   = 'www'
+            self.DBUSER = 'www'
 
         try:
             self.DBPASSWD = os.environ['DBPASSWD']
@@ -106,42 +103,44 @@ class Database :
             self.DBPASSWD = 'zxcvbnm'
 
         done = False
-        t0 = time.time ()
-        timeout=10
+        t0 = time.time()
+        timeout = 10
         #print "We are going to connect to DB"
         #self.openConnection()
-        while (not done):
+        while not done:
             # Here until handling exceptions better is done.
             #self.connection = self.openConnection ()
             try:
-                self.connection = self.openConnection ()
+                self.connection = self.openConnection()
                 done = True
             #print "Open connection"
             except:
-                if (time.time () - t0 > timeout):
+                if time.time() - t0 > timeout:
                     raise (IOError, 'Connection to the database failed.')
                 else:
                     continue
 
-    def openConnection (self):
+    def openConnection(self):
         """
             Open a connection to DBDB running on DBHOST:DBPORT as user DBUSER
             and return the connection.
 
             Raise exception in case of error.
-            """
+        """
         # Use configuration file with EUPS install otherwise use old way.
         conf_file = os.path.join(os.getenv("HOME"), ".my.cnf")
         if os.path.isfile(conf_file):
             self.conn = MySQLdb.connect(read_default_file=conf_file, db=self.DBDB)
         else:
-            if (self.DBPORT):
-                self.conn = MySQLdb.connect (user=self.DBUSER, passwd=self.DBPASSWD, db=self.DBDB, host=self.DBHOST, port=self.DBPORT)
+            if self.DBPORT:
+                self.conn = MySQLdb.connect(user=self.DBUSER, passwd=self.DBPASSWD, db=self.DBDB,
+                                            host=self.DBHOST, port=self.DBPORT)
             else:
-                self.conn = MySQLdb.connect (user=self.DBUSER, passwd=self.DBPASSWD, db=self.DBDB, host=self.DBHOST)
+                self.conn = MySQLdb.connect(user=self.DBUSER, passwd=self.DBPASSWD, db=self.DBDB,
+                                            host=self.DBHOST)
         self.getCursor()
 
-    def getCursor (self):
+    def getCursor(self):
         """
             If connection is still valid, return a cursor. Otherwise
             open a new connection and return a cursor from it.
@@ -150,15 +149,15 @@ class Database :
             cursor
             """
         try:
-            self.cur = self.conn.cursor ()
+            self.cur = self.conn.cursor()
         except:
             try:
-                self.conn = self.openConnection ()
-                self.cur = self.conn.cursor ()
+                self.conn = self.openConnection()
+                self.cur = self.conn.cursor()
             except:
                 raise (IOException, 'Connection to the DB failed.')
 
-    def executeSQL (self, query):
+    def executeSQL(self, query):
         """
             Execute any given query and return both the number of rows that
             were affected and the results of the query.
@@ -178,23 +177,23 @@ class Database :
             execution of the query failed.
             """
 
-        n = self.cur.execute (query)
+        n = self.cur.execute(query)
         try:
-            res = self.cur.fetchall ()
+            res = self.cur.fetchall()
         except:
             res = []
 
         # Return the results
         return (n, res)
 
-    def closeConnection(self) :
+    def closeConnection(self):
         # Close the cursor
         self.cur.close()
         del (self.cur)
         self.conn.close()
         del (self.conn)
 
-    def newSession(self, sessionUser, sessionHost, sessionDate, version, runComment) :
+    def newSession(self, sessionUser, sessionHost, sessionDate, version, runComment):
         try:
             oSession = Opsim_Session()
             oSession.sessionUser = sessionUser
@@ -202,19 +201,21 @@ class Database :
             oSession.sessionDate = sessionDate
             oSession.version = version
             oSession.runComment = runComment
-            sql = 'insert into Session (sessionUser, sessionHost, sessionDate, version, runComment) values ("%s", "%s", "%s", "%s", "%s")' % (sessionUser, sessionHost, sessionDate, version, runComment)
+            sql = 'insert into Session (sessionUser, sessionHost, sessionDate, version, runComment) values '\
+                  '("%s", "%s", "%s", "%s", "%s")' % \
+                  (sessionUser, sessionHost, sessionDate, version, runComment)
             (n, res) = self.executeSQL(sql)
             sql = 'select sessionID from Session where '
             sql += 'sessionUser="%s" and ' % (sessionUser)
             sql += 'sessionHost="%s" and ' % (sessionHost)
             sql += 'sessionDate="%s"' % (sessionDate)
-            (n, res) = self.executeSQL (sql)
+            (n, res) = self.executeSQL(sql)
             oSession.sessionID = res[0][0]
         except:
             raise
         return oSession
 
-    def addConfig(self, sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment) :
+    def addConfig(self, sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment):
         try:
             oConfig = Opsim_Config()
             oConfig.Session_sessionID = sessionID
@@ -224,12 +225,14 @@ class Database :
             oConfig.paramName = paramName
             oConfig.paramValue = paramValue
             oConfig.comment = comment
-            sql = 'insert into Config (Session_sessionID, nonPropID, moduleName, paramIndex, paramName, paramValue, comment) values (%d, %d, "%s", %d, "%s", "%s", "%s")' % (sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment)
-            (n, res) = self.executeSQL (sql)
+            sql = 'insert into Config (Session_sessionID, nonPropID, moduleName, paramIndex, paramName, '\
+                  'paramValue, comment) values (%d, %d, "%s", %d, "%s", "%s", "%s")' % \
+                  (sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment)
+            (n, res) = self.executeSQL(sql)
         except:
             raise
 
-    def addTimeHistory(self, sessionID, date, mjd, nightCnt, event) :
+    def addTimeHistory(self, sessionID, date, mjd, nightCnt, event):
         try:
             oTimeHistory = Opsim_TimeHistory()
             oTimeHistory.date = date
@@ -237,13 +240,14 @@ class Database :
             oTimeHistory.night = nightCnt
             oTimeHistory.event = event
             oTimeHistory.Session_sessionID = sessionID
-	    if self.dbWrite:
-	        sql = 'insert into TimeHistory (date, mjd, night, event, Session_sessionID) values (%d, %f, %d, %d, %d)' % (date, mjd, nightCnt, event, sessionID)
+            if self.dbWrite:
+                sql = 'insert into TimeHistory (date, mjd, night, event, Session_sessionID) values '\
+                      '(%d, %f, %d, %d, %d)' % (date, mjd, nightCnt, event, sessionID)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
 
-    def addProposal(self, propConf, propName, sessionID, objectHost, objectID) :
+    def addProposal(self, propConf, propName, sessionID, objectHost, objectID):
         try:
             oProposal = Opsim_Proposal()
             oProposal.propConf = propConf
@@ -251,28 +255,32 @@ class Database :
             oProposal.Session_sessionID = sessionID
             oProposal.objectID = objectID
             oProposal.objectHost = objectHost
-            sql = 'insert into Proposal (propConf, propName, Session_sessionID, objectID, objectHost) values ("%s", "%s", %d, %d, "%s")' % (propConf, propName, sessionID, objectID, objectHost)
+            sql = 'insert into Proposal (propConf, propName, Session_sessionID, objectID, objectHost) '\
+                  'values ("%s", "%s", %d, %d, "%s")' % (propConf, propName, sessionID, objectID, objectHost)
             (n, res) = self.executeSQL(sql)
 
             sql = 'select propID from Proposal where '
             sql += 'propConf="%s" and ' % (propConf)
             sql += 'propName="%s" and ' % (propName)
             sql += 'Session_sessionID=%d' % (sessionID)
-            (n, res) = self.executeSQL (sql)
+            (n, res) = self.executeSQL(sql)
             oProposal.propID = res[0][0]
         except:
             raise
         return oProposal
 
-    def createOlapTable(self, overlappingField) :
+    def createOlapTable(self, overlappingField):
         if self.dbWrite:
 
-            sql = 'create table %s (fieldID int(10) not null, fieldFov float not null, fieldRA float not null, fieldDec float not null, fieldGL float not null, fieldGB float not null, fieldEL float not null, fieldEB float not null, constraint field_pk primary key (fieldID))' % (overlappingField)
+            sql = 'create table %s (fieldID int(10) not null, fieldFov float not null, '\
+                  'fieldRA float not null, fieldDec float not null, fieldGL float not null, '\
+                  'fieldGB float not null, fieldEL float not null, fieldEB float not null, '\
+                  'constraint field_pk primary key (fieldID))' % (overlappingField)
             (n, res) = self.executeSQL(sql)
         return overlappingField
 
-    def dropTable(self, tableName) :
-        sql = 'drop table if exists %s; ' %(tableName)
+    def dropTable(self, tableName):
+        sql = 'drop table if exists %s; ' % (tableName)
         (n, res) = self.executeSQL(sql)
         return res
 
@@ -282,7 +290,8 @@ class Database :
             oConfigFile.filename = filename
             oConfigFile.data = data
             oConfigFile.Session_sessionID = sessionID
-            sql = 'insert into ConfigFile (filename, data, Session_sessionID) values ("%s", "%s", %d)' % (filename, data, sessionID)
+            sql = 'insert into ConfigFile (filename, data, Session_sessionID) values ("%s", "%s", %d)' % \
+                  (filename, data, sessionID)
             (n, res) = self.executeSQL(sql)
         except:
             raise
@@ -292,9 +301,10 @@ class Database :
             oLog = Opsim_Log()
             oLog.log_name = log_name
             oLog.log_value = log_value
-            oLog.Session_sessionID = sessionID;
+            oLog.Session_sessionID = sessionID
             if self.dbWrite:
-                sql = 'insert into Log (log_name, log_value, Session_sessionID) values ("%s", "%s", %d)' % (log_name, log_value, sessionID)
+                sql = 'insert into Log (log_name, log_value, Session_sessionID) values ("%s", "%s", %d)' % \
+                      (log_name, log_value, sessionID)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
@@ -306,7 +316,8 @@ class Database :
             oPropField.Proposal_propID = propID
             oPropField.Field_fieldID = fieldID
             if self.dbWrite:
-                sql = 'insert into Proposal_Field (Session_sessionID, Proposal_propID, Field_fieldID) values (%d, %d, %d)' % (sessionID, propID, fieldID)
+                sql = 'insert into Proposal_Field (Session_sessionID, Proposal_propID, Field_fieldID) '\
+                      'values (%d, %d, %d)' % (sessionID, propID, fieldID)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
@@ -327,7 +338,11 @@ class Database :
             oSeqHistory.Session_sessionID = sessionID
             oSeqHistory.Proposal_propID = propID
             if self.dbWrite:
-                sql = 'insert into SeqHistory (startDate, expDate, seqnNum, completion, reqEvents, actualEvents, endStatus, parent_sequenceID, Field_fieldID, Session_sessionID, Proposal_propID) values (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)' % (startDate, expDate, seqnNum, completion, reqEvents, actualEvents, endStatus, parent_sequenceID, fieldID, sessionID, propID)
+                sql = 'insert into SeqHistory (startDate, expDate, seqnNum, completion, reqEvents, '\
+                      'actualEvents, endStatus, parent_sequenceID, Field_fieldID, Session_sessionID, '\
+                      'Proposal_propID) values (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)' % \
+                      (startDate, expDate, seqnNum, completion, reqEvents, actualEvents, endStatus,
+                       parent_sequenceID, fieldID, sessionID, propID)
                 (n, res) = self.executeSQL(sql)
 
                 sql = 'select sequenceID from SeqHistory where '
@@ -336,10 +351,10 @@ class Database :
                 sql += 'Field_fieldID=%d and ' % (fieldID)
                 sql += 'Session_sessionID=%d and ' % (sessionID)
                 sql += 'Proposal_propID=%d' % (propID)
-                (n, res) = self.executeSQL (sql)
+                (n, res) = self.executeSQL(sql)
                 oSeqHistory.sequenceID = res[0][0]
-	    else:
-		oSeqHistory.sequenceID = 0
+            else:
+                oSeqHistory.sequenceID = 0
         except:
             raise
         return oSeqHistory
@@ -351,7 +366,8 @@ class Database :
             oSeqHistoryObsHistory.ObsHistory_obsHistID = obsHistID
             oSeqHistoryObsHistory.ObsHistory_Session_sessionID = sessionID
             if self.dbWrite:
-                sql = 'insert into SeqHistory_ObsHistory (SeqHistory_sequenceID, ObsHistory_obsHistID, ObsHistory_Session_sessionID) values (%d, %d, %d)' % (sequenceID, obsHistID, sessionID)
+                sql = 'insert into SeqHistory_ObsHistory (SeqHistory_sequenceID, ObsHistory_obsHistID, '\
+                      'ObsHistory_Session_sessionID) values (%d, %d, %d)' % (sequenceID, obsHistID, sessionID)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
@@ -363,7 +379,9 @@ class Database :
             oSeqHistoryMissedHistory.MissedHistory_missedHistID = missedHistID
             oSeqHistoryMissedHistory.MissedHistory_Session_sessionID = sessionID
             if self.dbWrite:
-                sql = 'insert into SeqHistory_MissedHistory (SeqHistory_sequenceID, MissedHistory_missedHistID, MissedHistory_Session_sessionID) values (%d, %d, %d)' % (sequenceID, missedHistID, sessionID)
+                sql = 'insert into SeqHistory_MissedHistory (SeqHistory_sequenceID, '\
+                      'MissedHistory_missedHistID, MissedHistory_Session_sessionID) values (%d, %d, %d)' % \
+                      (sequenceID, missedHistID, sessionID)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
@@ -376,7 +394,9 @@ class Database :
             oObsHistoryProposal.ObsHistory_Session_sessionID = sessionID
             oObsHistoryProposal.propRank = propRank
             if self.dbWrite:
-                sql = 'insert into ObsHistory_Proposal (Proposal_propID, ObsHistory_obsHistID, ObsHistory_Session_sessionID, propRank) values (%d, %d, %d, %f)' % (propID, obsHistID, sessionID, propRank)
+                sql = 'insert into ObsHistory_Proposal (Proposal_propID, ObsHistory_obsHistID, '\
+                      'ObsHistory_Session_sessionID, propRank) values (%d, %d, %d, %f)' % \
+                      (propID, obsHistID, sessionID, propRank)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
@@ -392,7 +412,9 @@ class Database :
             oMissed.Session_sessionID = sessionID
             oMissed.Field_fieldID = fieldID
             if self.dbWrite:
-                sql = 'insert into MissedHistory (filter, expDate, expMJD, night, lst, Session_sessionID, Field_fieldID) values ("%s", %d, %f, %d, %f, %d, %d)' % (filter, expDate, expMJD, night, lst, sessionID, fieldID)
+                sql = 'insert into MissedHistory (filter, expDate, expMJD, night, lst, Session_sessionID, '\
+                      'Field_fieldID) values ("%s", %d, %f, %d, %f, %d, %d)' % \
+                      (filter, expDate, expMJD, night, lst, sessionID, fieldID)
                 (n, res) = self.executeSQL(sql)
 
                 sql = 'select missedHistID from MissedHistory where '
@@ -400,10 +422,10 @@ class Database :
                 sql += 'expDate=%d and ' % (expDate)
                 sql += 'Field_fieldID=%d and ' % (fieldID)
                 sql += 'Session_sessionID=%d' % (sessionID)
-                (n, res) = self.executeSQL (sql)
+                (n, res) = self.executeSQL(sql)
                 oMissed.missedHistID = res[0][0]
-	    else:
-		oMissed.missedHistID = 0
+            else:
+                oMissed.missedHistID = 0
         except:
             raise
         return oMissed
@@ -413,9 +435,9 @@ class Database :
                        lst, alt, az, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ,
                        moonPhase, sunAlt, sunAZ, phaseAngle, rScatter, mieScatter, moonIllum,
                        moonBright, darkBright, rawSeeing, wind, humidity, sessionID, fieldID):
-        # visitTime and visitExpTime are switched here to correct their incorrect use elsewhere. There are 
-        # too many places where visitExpTime (seen as 34 in the code and DB) are used to make changes in the 
-        # code. visitTime (which is seen as zero in the code and DB) will be made to be 30 in the Observation 
+        # visitTime and visitExpTime are switched here to correct their incorrect use elsewhere. There are
+        # too many places where visitExpTime (seen as 34 in the code and DB) are used to make changes in the
+        # code. visitTime (which is seen as zero in the code and DB) will be made to be 30 in the Observation
         # class since it is never used anywhere else in the code.
         try:
             oObs = Opsim_ObsHistory()
@@ -457,7 +479,18 @@ class Database :
             oObs.Session_sessionID = sessionID
             oObs.Field_fieldID = fieldID
             if self.dbWrite:
-                sql = 'insert into ObsHistory (obsHistID, filter, expDate, expMJD, night, visitTime, visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBright, rotSkyPos, lst, alt, az, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAZ, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind, humidity, Session_sessionID, Field_fieldID) values (%d, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d)' % (obsHistID, filter, expDate, expMJD, night, visitExpTime, visitTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBright, rotSkyPos, lst, alt, az, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAZ, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind, humidity, sessionID, fieldID)
+                sql = 'insert into ObsHistory (obsHistID, filter, expDate, expMJD, night, visitTime, '\
+                      'visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, filtSkyBright, '\
+                      'rotSkyPos, lst, alt, az, dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, '\
+                      'moonPhase, sunAlt, sunAZ, phaseAngle, rScatter, mieScatter, moonIllum, moonBright, '\
+                      'darkBright, rawSeeing, wind, humidity, Session_sessionID, Field_fieldID) values '\
+                      '(%d, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, '\
+                      '%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %d, %d)' % \
+                      (obsHistID, filter, expDate, expMJD, night, visitExpTime, visitTime, finRank,
+                       finSeeing, transparency, airmass, vSkyBright, filtSkyBright, rotSkyPos, lst, alt, az,
+                       dist2Moon, solarElong, moonRA, moonDec, moonAlt, moonAZ, moonPhase, sunAlt, sunAZ,
+                       phaseAngle, rScatter, mieScatter, moonIllum, moonBright, darkBright, rawSeeing, wind,
+                       humidity, sessionID, fieldID)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
@@ -474,16 +507,19 @@ class Database :
             oSlewHist.ObsHistory_obsHistID = obsHistID
             oSlewHist.ObsHistory_Session_sessionID = sessionID
             if self.dbWrite:
-                sql = 'insert into SlewHistory (slewCount, startDate, endDate, slewTime, slewDist, ObsHistory_obsHistID, ObsHistory_Session_sessionID) values (%d, %f, %f, %f, %f, %d, %d)' % (slewCount, startDate, endDate, slewTime, slewDist, obsHistID, sessionID)
+                sql = 'insert into SlewHistory (slewCount, startDate, endDate, slewTime, slewDist, '\
+                      'ObsHistory_obsHistID, ObsHistory_Session_sessionID) values '\
+                      '(%d, %f, %f, %f, %f, %d, %d)' % \
+                      (slewCount, startDate, endDate, slewTime, slewDist, obsHistID, sessionID)
                 (n, res) = self.executeSQL(sql)
 
                 sql = 'select slewID from SlewHistory where '
                 sql += 'ObsHistory_obsHistID=%d and ' % (obsHistID)
                 sql += 'ObsHistory_Session_sessionID=%d' % (sessionID)
-                (n, res) = self.executeSQL (sql)
+                (n, res) = self.executeSQL(sql)
                 oSlewHist.slewID = res[0][0]
-	    else:
-		oSlewHist.slewID = 0
+            else:
+                oSlewHist.slewID = 0
         except:
             raise
         return oSlewHist
@@ -496,7 +532,8 @@ class Database :
             oSlewAct.inCriticalPath = inCriticalPath
             oSlewAct.SlewHistory_slewID = slewID
             if self.dbWrite:
-                sql = 'insert into SlewActivities (activity, actDelay, inCriticalPath, SlewHistory_slewID) values ("%s", %f, "%s", %d)' % (activity, actDelay, inCriticalPath, slewID)
+                sql = 'insert into SlewActivities (activity, actDelay, inCriticalPath, SlewHistory_slewID)'\
+                      ' values ("%s", %f, "%s", %d)' % (activity, actDelay, inCriticalPath, slewID)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
@@ -511,7 +548,9 @@ class Database :
             oSlewMaxSpeed.rotSpd = rotSpd
             oSlewMaxSpeed.SlewHistory_slewID = slewID
             if self.dbWrite:
-                sql = 'insert into SlewMaxSpeeds (domAltSpd, domAzSpd, telAltSpd, telAzSpd, rotSpd, SlewHistory_slewID) values (%f, %f, %f, %f, %f, %d)' % (domAltSpd, domAzSpd, telAltSpd, telAzSpd, rotSpd, slewID)
+                sql = 'insert into SlewMaxSpeeds (domAltSpd, domAzSpd, telAltSpd, telAzSpd, rotSpd, '\
+                      'SlewHistory_slewID) values (%f, %f, %f, %f, %f, %d)' % \
+                      (domAltSpd, domAzSpd, telAltSpd, telAzSpd, rotSpd, slewID)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
@@ -536,14 +575,20 @@ class Database :
             oSlewState.state = state
             oSlewState.SlewHistory_slewID = slewID
             if self.dbWrite:
-                sql = 'insert into SlewState (slewStateDate, tra, tdec, tracking, alt, az, pa, domAlt, domAz, telAlt, telAz, rotTelPos, filter, state, SlewHistory_slewID) values (%f, %f, %f, "%s", %f, %f, %f, %f, %f, %f, %f, %f, "%s", %d, %d)' % (slewStateDate, tra, tdec, tracking, alt, az, pa, domAlt, domAz, telAlt, telAz, rotTelPos, filter, state, slewID)
+                sql = 'insert into SlewState (slewStateDate, tra, tdec, tracking, alt, az, pa, domAlt, '\
+                      'domAz, telAlt, telAz, rotTelPos, filter, state, SlewHistory_slewID) values '\
+                      '(%f, %f, %f, "%s", %f, %f, %f, %f, %f, %f, %f, %f, "%s", %d, %d)' % \
+                      (slewStateDate, tra, tdec, tracking, alt, az, pa, domAlt, domAz, telAlt, telAz,
+                       rotTelPos, filter, state, slewID)
                 (n, res) = self.executeSQL(sql)
         except:
             raise
 
-    def addOlap(self, olapTable, id, fov, ra, dec, gl, gb, el, eb) :
+    def addOlap(self, olapTable, id, fov, ra, dec, gl, gb, el, eb):
         if self.dbWrite:
-            sql = 'insert into %s (fieldID, fieldFov, fieldRA, fieldDec, fieldGL, fieldGB, fieldEL, fieldEB) values (%d, %f, %f, %f, %f, %f, %f, %f)' % (olapTable, id, fov, ra, dec, gl, gb, el, eb)
+            sql = 'insert into %s (fieldID, fieldFov, fieldRA, fieldDec, fieldGL, fieldGB, fieldEL, '\
+                  'fieldEB) values (%d, %f, %f, %f, %f, %f, %f, %f)' % \
+                  (olapTable, id, fov, ra, dec, gl, gb, el, eb)
             (n, res) = self.executeSQL(sql)
 
 if __name__ == "__main__":

@@ -11,13 +11,11 @@
 #   cronos% ./main.py --profile=yes
 #   cronos% ./LsstProfile.py
 
-
-
-import hotshot, hotshot.stats
+import hotshot
+import hotshot.stats
 stats = hotshot.stats.load("ProfileData")
 stats.strip_dirs()
-stats.sort_stats('time','calls')
+stats.sort_stats('time', 'calls')
 stats.print_stats(1000)
-stats.sort_stats('calls','time')
+stats.sort_stats('calls', 'time')
 stats.print_stats(1000)
-

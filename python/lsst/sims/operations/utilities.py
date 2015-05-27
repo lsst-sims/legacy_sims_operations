@@ -3,14 +3,10 @@
 # System modules
 import os
 import math
-import random
 import re
-import socket
 import string
 import sys
-import tempfile
-import time
-import logging
+
 #import MySQLdb
 
 # SimPy includes
@@ -25,8 +21,6 @@ import logging
 #    import pysla as slalib
 import palpy as pal
 
-import Sun
-
 try:
     from lsstUtil import distance
     #print('Using a FAST implementation of distance().')
@@ -35,38 +29,36 @@ except:
     def distance(field0, fields):
         """
         Compute the distance (on a sphere) between field0 and each one of fields.
-        
+
         Input
         field0:   a two dimensional list of floats/doubles (x, y)
         fields:   a list of two dimensional list of floats/doubles ((x, y), ...)
-        
+
         Output
         A list of N+1 distances, where N=len(fields). Each distance is the angular
         distance between pairs of coordinates.
-        
+
         Note
         1. x and y are assumed to be in radians.
         2. x and y are assumed to be spherical coordinates.
-        3. This is a fallback solution in case an optimized version of this 
+        3. This is a fallback solution in case an optimized version of this
            routine does not exist.
         """
         #return([slalib.sla_dsep(field0[0], field0[1], field[0], field[1]) for field in fields])
-        return([pal.dsep(field0[0], field0[1], field[0], field[1]) for field in fields])
+        return ([pal.dsep(field0[0], field0[1], field[0], field[1]) for field in fields])
 
 # Simulator specific includes
 from dateutils import *
 from exceptions import *
 
-
-
 # Simulation parameters
-STARTMJD        = 50000.        # MJD of the first day of simulation
-HOUR            = 3600.         # seconds in one hour (approximate)
-DAY             = 86400.        # seconds in one day (approximate)
-WEEK            = 604800.       # seconds in one week (approximate)
-MONTH           = 262800.       # seconds in one month (approximate)
-YEAR            = 31536000.     # seconds in one year (approximate)
-TWOPI 		= 2 * math.pi
+STARTMJD = 50000.        # MJD of the first day of simulation
+HOUR = 3600.         # seconds in one hour (approximate)
+DAY = 86400.        # seconds in one day (approximate)
+WEEK = 604800.       # seconds in one week (approximate)
+MONTH = 262800.       # seconds in one month (approximate)
+YEAR = 31536000.     # seconds in one year (approximate)
+TWOPI = 2 * math.pi
 
 cpath = __file__.split('python')[0]
 
@@ -95,24 +87,24 @@ OBSTYPE_MISSED = 1
 SUCCESS = 0
 MAX_MISSED_EVENTS = 1
 CYCLE_END = 2
-SIMULATION_END =3
+SIMULATION_END = 3
 
 # TimeHistory Events
 START_NIGHT = 0
 MOON_WANING = 1         # New lunation, too
 MOON_WAXING = 2
 NEW_YEAR = 3
-END_DUSK    = 4
-START_DAWN  = 5
-END_NIGHT   = 6
+END_DUSK = 4
+START_DAWN = 5
+END_NIGHT = 6
 
 # Telescope parameters
-DOWNTIME        = 10.           # Yearly mean down time (percent)
+DOWNTIME = 10.           # Yearly mean down time (percent)
 
 # For testing only
-AVGPRIORITY     = 1.0           # The mean Observation priority.
-SIGMAPERCENT    = 10.           # Sigma (percent of the mean).
-AVGDELTAPRI     = 0.1           # The mean delta in priority.
+AVGPRIORITY = 1.0           # The mean Observation priority.
+SIGMAPERCENT = 10.           # Sigma (percent of the mean).
+AVGDELTAPRI = 0.1           # The mean delta in priority.
 
 # Routines and non user-specific globals
 DEG2RAD = math.pi / 180.    # radians = degrees * DEG2RAD
@@ -124,84 +116,84 @@ _config_line_re = re.compile(r'^\s*(\w+\[*\w*\]*\s*=\s*[^#]+)(.*)')
 # RE to extract key and value - LD (MM modification)
 _config_item_re = re.compile(r'^\s*(\w+\[*\w*\]*)\s*=\s*(\S+)')
 
-def warning (msg):
+def warning(msg):
     """
     Print a warning (i.e. a non fatal error) to STDOUT.
-    
+
     msg is the warning text to be printed.
     """
-    sys.stderr.write ('Warning: ' + msg + '\n')
+    sys.stderr.write('Warning: ' + msg + '\n')
     return
 
 
-def parseArgs (args):
+def parseArgs(args):
     """
-    Do a quick command line argument parsing. 
-    
-    The expected syntax is --var=val. No check on the semantic is 
+    Do a quick command line argument parsing.
+
+    The expected syntax is --var=val. No check on the semantic is
     performed (it is left to the colling code).
-    
+
     Return a dictionary of var=val entries. If args is None, an empty
     dictionary is returned.
-    
-    Raise an exception of type SyntaxError in case of syntax errors 
+
+    Raise an exception of type SyntaxError in case of syntax errors
     in the command line args.
     """
     result = {}
-    
+
     for arg in args:
         try:
-            (var, val) = string.split (arg, '=', 1)
+            (var, val) = string.split(arg, '=', 1)
         except:
             raise (SyntaxError, '%s is in the wrond format' % (arg))
-        
+
         if (var[:2] != '--'):
             raise (SyntaxError, 'variable names must start with a ' +
                                 'double dash (%s)' % (var))
-        
+
         result[var[2:]] = val
     return (result)
 
 
-def usage (usageString):
+def usage(usageString):
     """
     Print the usageString to STDERR.
-    
+
     If usageString is null, print a generic message saying that some
     of the command line arguments had syntax errors in them.
     """
-    command = os.path.basename (sys.argv[0])
-    if (usageString):
-        sys.stderr.write ('usage: %s %s\n' % (command, usageString))
+    command = os.path.basename(sys.argv[0])
+    if usageString:
+        sys.stderr.write('usage: %s %s\n' % (command, usageString))
     else:
-        sys.stderr.write ('Error in parsing command line arguments.\n')
+        sys.stderr.write('Error in parsing command line arguments.\n')
     return
 
 
-def fatalError (errorMessage, exitCode=1):
+def fatalError(errorMessage, exitCode=1):
     """
     Print the errorMessage to STDERR and exit with an exit code equal
     to exitCode (default 1).
-    
-    If errorMessage is null, print a generic message saying that 
+
+    If errorMessage is null, print a generic message saying that
     something went wrong.
     """
-    if (errorMessage):
-        sys.stderr.write ('Fatal Error: ' + errorMessage + '\n')
+    if errorMessage:
+        sys.stderr.write('Fatal Error: ' + errorMessage + '\n')
     else:
-        sys.stderr.write ('Fatal Error: something went wrong.\n')
-    sys.exit (exitCode)
+        sys.stderr.write('Fatal Error: something went wrong.\n')
+    sys.exit(exitCode)
     return
 
 def sex2deg(sex, sep=':'):
     """
     Convert angles in sexagesimal format (sex) to decimal format.
-    
+
     Input
     sex     value in sexagesimal format (string)
-    sep     separator for degrees, minutes and seconds (char). 
+    sep     separator for degrees, minutes and seconds (char).
             Defaults to ':'
-    
+
     Return
     Decimal value corresponding to sex (float)
     """
@@ -210,74 +202,74 @@ def sex2deg(sex, sep=':'):
     except:
         (dd, mm) = string.split(string.strip(sex), sep)
         ss = '0'
-    if(float(dd) >= 0):
-        return(float(dd) + float(mm) / 60.0 + float(ss) / 3600.0)
+    if float(dd) >= 0:
+        return float(dd) + float(mm) / 60.0 + float(ss) / 3600.0
     else:
-        return(float(dd) - float(mm) / 60.0 - float(ss) / 3600.0)
+        return float(dd) - float(mm) / 60.0 - float(ss) / 3600.0
 
 
-def deg2sex (deg, sep=':'):
+def deg2sex(deg, sep=':'):
     """
     Convert angles in decimal format (deg) to sexagesimal format.
-    
+
     Input
     deg     value in decimal format (float)
     sep     separator for degrees, minutes and seconds for output
             formatting (char). Defaults to ':'
-    
+
     Return
     Sexagesimal value corresponding to deg (string)
     """
     try:
-        deg = float (deg)
+        deg = float(deg)
     except:
-        return ('')
-    
-    degrees = int (deg)
-    if(degrees >= 0):
+        return ''
+
+    degrees = int(deg)
+    if degrees >= 0:
         temp = (deg - degrees) * 60
-        minutes = int (temp)
-        seconds = int ((temp - minutes) * 60)
+        minutes = int(temp)
+        seconds = int((temp - minutes) * 60)
     else:
         temp = - (deg - degrees) * 60
-        minutes = int (temp)
-        seconds = int ((temp - minutes) * 60)
-    
+        minutes = int(temp)
+        seconds = int((temp - minutes) * 60)
+
     sex = "%02d%c%02d%c%05.2f" % (degrees, sep, minutes, sep, seconds)
-    return (sex)
+    return sex
 
 
-def readConfFile (fileName):
+def readConfFile(fileName):
     """
     Parse the configuration file (fileName) and return a dictionary of
     the content of the file.
-    
+
     fileName must be an ASCII file containing a list of key = value
     pairs, one pair per line. Comments are identified by a '#' and can
-    be anywhere in the file. Everything following a '#' (up to the 
-    carriage return/new line) is considered to be a comment and 
+    be anywhere in the file. Everything following a '#' (up to the
+    carriage return/new line) is considered to be a comment and
     ignored.
-    
-    The dictionary has the form {key: value} where value is a simple 
-    number if and only if key appears only one time in fileName. 
+
+    The dictionary has the form {key: value} where value is a simple
+    number if and only if key appears only one time in fileName.
     Otherwise, value is an array.
-    
-    Value can have '=' sign in it: each non-comment line is split 
-    using the '=' character as delimiter, only once and starting from 
+
+    Value can have '=' sign in it: each non-comment line is split
+    using the '=' character as delimiter, only once and starting from
     the left. Extra white spaces and '\n' characters are stripped from
     both key and value.
-    
-    An attempt is made to convert value into a float. If that fails, 
+
+    An attempt is made to convert value into a float. If that fails,
     value is assumed to be a string.
-    
-    
+
+
     Input
     fileName:   the name (with path) of the configuration file.
-    
+
     Return
     A dictionary of key = value elements.
     A 2d array of key, value pairs.
-    
+
     Raise
     IOError if fileName cannot be opened for reading.
     """
@@ -285,52 +277,47 @@ def readConfFile (fileName):
     pairs = []
     index = 0
 
-    # Try and read the file fileName (raise IOError if something bad 
+    # Try and read the file fileName (raise IOError if something bad
     # happens).
-    lines = file (fileName).readlines ()
-    
+    lines = file(fileName).readlines()
+
     for line in lines:
         line = line.strip()
         if not line:			# skip blank line
             continue
-        if line[0]=='#': 		# skip comment line
+        if line[0] == '#': 		# skip comment line
             continue
 
         comment = ""
-        m = re.search (_config_line_re, line)
+        m = re.search(_config_line_re, line)
         if m:
             good, comment = m.group(1), m.group(2)
 
-        m = re.search (_config_item_re, good)
+        m = re.search(_config_item_re, good)
         if m:
             key, val = m.group(1), m.group(2)
 
             # store "key = value" string
-            pairs.append({
-                    'key' : key,
-                    'val' : val,
-                    'index' : index,
-            })
+            pairs.append({'key': key, 'val': val, 'index': index})
             index += 1
 
             # Try and convert val to a float
             try:
-                val = float (val)
+                val = float(val)
             except:
                 # Ops, must be a string, then
                 pass
-            
-            if not conf.has_key (key):
+
+            if key not in conf:
                 conf[key] = val
-            elif (isinstance (conf[key], list)):
-                conf[key].append (val)
+            elif isinstance(conf[key], list):
+                conf[key].append(val)
             else:
                 conf[key] = [conf[key], val]
     return conf, pairs
 
 
-def storeParam (lsstDB, sessionID, propID, moduleName, paramIndex, paramName,
-                    paramValue, comment=""):
+def storeParam(lsstDB, sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment=""):
 
 #    sql = 'insert into Config values (NULL, '
 #    sql += '"%d", ' % (sessionID)
@@ -367,14 +354,14 @@ def storeParam (lsstDB, sessionID, propID, moduleName, paramIndex, paramName,
 #    return (date, mjd, lst_RAD)
 
 _secmap = {
-    's' : 1,
-    'm' : 60,
-    'min' : 60,
-    'h' : 3600,
-    'd' : 86400,
-    'w' : 86400 * 7,
-    'mon' : 86400 * 30,
-    'y' : 86400 * 365
+    's': 1,
+    'm': 60,
+    'min': 60,
+    'h': 3600,
+    'd': 86400,
+    'w': 86400 * 7,
+    'mon': 86400 * 30,
+    'y': 86400 * 365
 }
 
 
@@ -400,7 +387,7 @@ def timeStr2Sec(time_str):
     all_matches = re.findall(_timeStr_re, time_str)
     sec = 0
     if not all_matches:
-        raise Exception("strange timeStr: " + str(time_str));
+        raise Exception("strange timeStr: " + str(time_str))
 
     for s, u in all_matches:
         if u:
@@ -409,7 +396,7 @@ def timeStr2Sec(time_str):
             sec += float(s)                             # no unit suffix; assume sec
     return sec
 
-def compareWinners (a, b):
+def compareWinners(a, b):
     # Sort top proposal targets by lowest airmass, then darkest sky brightness,
     # then fieldID.  Should parameterize to allow user to choose criteria.
     if a.airmass < b.airmass:
@@ -430,20 +417,19 @@ def compareWinners (a, b):
 
 # Memory usage debug routines from  Active State Programmer Network
 #           http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/286222
-# Compliments of 
+# Compliments of
 #           Submitter: Jean Brouwers (other recipes)
 #           Last Updated: 2004/07/11
 #           Version no: 1.0
 #           Category: System
 #           Description:
 #
-#       This recipe provides a number of functions to get the memory usage 
+#       This recipe provides a number of functions to get the memory usage
 #       of a Python application on Linux.
 #
 #   Use:    m0 = memory(); r0 = resident(); s0 = stacksize()
 #           ....
 #           m1 = memory(m1); r1 = resident(r0); s1 = stacksize(s0)
-import os
 
 _proc_status = '/proc/%d/status' % os.getpid()
 
@@ -493,22 +479,24 @@ def stacksize(since=0.0):
 
 if __name__ == '__main__':
     import unittest
-    class TestTimeStr2Sec (unittest.TestCase):
+
+    class TestTimeStr2Sec(unittest.TestCase):
         """Test various time string conversions to seconds"""
         _testvals = {
-                "0" : 0,
-                "30" : 30,
-                "30s" : 30,
-                "1d" : 86400,
-                "1w" : 86400 * 7,
-                "0.5y" : 86400 * 365 / 2,
-                "20m" : 60 * 20,
-                "20min" : 60 * 20,
-                "1h20m" : 3600 + 60 * 20,
-                "3mon" : 86400 * 30 * 3,
+            "0": 0,
+            "30": 30,
+            "30s": 30,
+            "1d": 86400,
+            "1w": 86400 * 7,
+            "0.5y": 86400 * 365 / 2,
+            "20m": 60 * 20,
+            "20min": 60 * 20,
+            "1h20m": 3600 + 60 * 20,
+            "3mon": 86400 * 30 * 3,
         }
-        def testStuff (self):
+
+        def testStuff(self):
             for k, v in self._testvals.items():
-                self.assertEqual (timeStr2Sec(k), v)
-        
+                self.assertEqual(timeStr2Sec(k), v)
+
     unittest.main()
