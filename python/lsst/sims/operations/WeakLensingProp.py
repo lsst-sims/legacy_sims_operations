@@ -160,7 +160,7 @@ class WeakLensingProp(Proposal):
         except:
             self.minTransparency = 9.
 
-        if 'userRegion' in config.has_key:
+        if 'userRegion' in config:
             self.userRegion = config["userRegion"]
         else:
             self.userRegion = None
