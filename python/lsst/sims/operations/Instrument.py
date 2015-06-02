@@ -249,7 +249,7 @@ class InstrumentState(InstrumentPosition):
         self.ADC_Pos = 0.0
 
         self.InsOptics_Total = len(config_dict["InsOptics_Speed"])
-        self.InsOptics_Pos = [0.0]*self.InsOptics_Total
+        self.InsOptics_Pos = [0.0] * self.InsOptics_Total
 
         self.GuiderPos_X = 0.0
         self.GuiderPos_Y = 0.0
@@ -362,8 +362,8 @@ class InstrumentState(InstrumentPosition):
             # leaving the last space for the new one
             oldf = self.Filter_MountedList[0]
             oldidx = -1
-            for idx in range(len(self.Filter_MountedList)-1):
-                self.Filter_MountedList[idx] = self.Filter_MountedList[idx+1]
+            for idx in range(len(self.Filter_MountedList) - 1):
+                self.Filter_MountedList[idx] = self.Filter_MountedList[idx + 1]
 
         self.Filter_MountedList[oldidx] = newf
         if self.Filter_Pos == oldf:
@@ -401,7 +401,7 @@ class InstrumentState(InstrumentPosition):
         self.TelAlt_Pos_RAD = self.ALT_RAD
         self.TelAz_Pos_RAD = initstate.GetTelAzDistanceWithWrap(self.AZ_RAD)[1]
         if initstate.GetFilter() == self.GetFilter():
-            self.Rotator_Pos_RAD = initstate.GetRotatorDistanceWithWrap(self.PA_RAD-self.ANG_RAD)[1]
+            self.Rotator_Pos_RAD = initstate.GetRotatorDistanceWithWrap(self.PA_RAD - self.ANG_RAD)[1]
         else:
             self.Rotator_Pos_RAD = 0.0
 
@@ -506,7 +506,7 @@ class InstrumentState(InstrumentPosition):
     def StopTracking(self, stoptime):
 
         if self.Tracking:
-        # computes ALT AZ from RA DEC TIME at given new time.
+            # computes ALT AZ from RA DEC TIME at given new time.
             RA_RAD = self.RA_RAD
             DEC_RAD = self.DEC_RAD
             #TIME = self.TIME
@@ -631,7 +631,7 @@ class Instrument(object):
     def __init__(self, lsstDB, sessionID, dbTableDict, obsProfile, instrumentConf=DefaultConfigFile,
                  log=False, logfile="./Instrument.log", verbose=0):
 
-#        Simulation.Process.__init__ (self)
+        # Simulation.Process.__init__ (self)
         """
         Standard initializer.
         inputs:
@@ -747,17 +747,17 @@ class Instrument(object):
         distance_DEG = abs(distance_RAD * RAD2DEG)
 
         # supposing maximum speed is not reached
-        Vpeak = (2.0 * distance_DEG / (1.0 / accel + 1.0 / decel))**0.5
+        Vpeak = (2.0 * distance_DEG / (1.0 / accel + 1.0 / decel)) ** 0.5
 
         # checking the supposition
         if Vpeak <= maxspeed:
-        # applies triangular formula
+            # applies triangular formula
             delay = Vpeak / accel + Vpeak / decel
 
         else:
-        # applies trapezoidal formula
-            d1 = 0.5 * (maxspeed**2) / accel
-            d3 = 0.5 * (maxspeed**2) / decel
+            # applies trapezoidal formula
+            d1 = 0.5 * (maxspeed ** 2) / accel
+            d3 = 0.5 * (maxspeed ** 2) / decel
             d2 = distance_DEG - d1 - d3
 
             t1 = maxspeed / accel
@@ -837,13 +837,13 @@ class Instrument(object):
 
         distance_RAD = target_state.TelAlt_Pos_RAD - prev_state.TelAlt_Pos_RAD
 
-        delay = abs(distance_RAD*RAD2DEG)*self.slew_params.TelOpticsOL_Slope
+        delay = abs(distance_RAD * RAD2DEG) * self.slew_params.TelOpticsOL_Slope
 
         return delay
 
     def GetDelayFor_TelOpticsCL(self, target_state, prev_state):
 
-        distance_DEG = abs(target_state.TelAlt_Pos_RAD - prev_state.TelAlt_Pos_RAD)*RAD2DEG
+        distance_DEG = abs(target_state.TelAlt_Pos_RAD - prev_state.TelAlt_Pos_RAD) * RAD2DEG
 
         delay = 0.0
         for k in range(self.slew_params.TelOpticsCL_Total):
@@ -883,7 +883,7 @@ class Instrument(object):
     def GetDelayFor_ADC(self, target_state, prev_state):
 
         d = target_state.ADC_Pos - prev_state.ADC_Pos
-        delay = abs(d)/self.slew_params.ADC_Speed
+        delay = abs(d) / self.slew_params.ADC_Speed
 
         return delay
 
@@ -891,8 +891,8 @@ class Instrument(object):
 
         delay = 0.0
         for k in range(prev_state.InsOptics_Total):
-            d = target_state.InsOptics_Pos[k]-prev_state.InsOptics_Pos[k]
-            t = abs(d)/self.slew_params.InsOptics_Speed[k]
+            d = target_state.InsOptics_Pos[k] - prev_state.InsOptics_Pos[k]
+            t = abs(d) / self.slew_params.InsOptics_Speed[k]
 
             delay = max(t, delay)
 
@@ -1182,7 +1182,7 @@ class Instrument(object):
         else:
             angle_RAD = pa_RAD - self.current_state.Rotator_Pos_RAD
 
-        self.targetposition.Set(ra_RAD,	dec_RAD, angle_RAD, filter, exposureTime, date, alt_RAD, az_RAD,
+        self.targetposition.Set(ra_RAD, dec_RAD, angle_RAD, filter, exposureTime, date, alt_RAD, az_RAD,
                                 pa_RAD)
 
         delay = self.Slew(self.targetposition)
@@ -1197,7 +1197,7 @@ class Instrument(object):
         #slewDistance = slalib.sla_dsep(ra_RAD, dec_RAD, init_state.RA_RAD, init_state.DEC_RAD)
         slewDistance = pal.dsep(ra_RAD, dec_RAD, init_state.RA_RAD, init_state.DEC_RAD)
 
-        slewdata = dataSlew(self.slewCount, date, date+delay, delay, slewDistance)
+        slewdata = dataSlew(self.slewCount, date, date + delay, delay, slewDistance)
 
 #        sql = 'INSERT INTO %s VALUES (NULL, ' % ('SlewHistory')
 #        sql += '%d, ' % (self.sessionID)
@@ -1225,7 +1225,7 @@ class Instrument(object):
             #(n, dummy) = self.lsstDB.executeSQL(sql)
 
         self.next_state = copy.deepcopy(self.current_state)
-        self.next_state.UpdateState(date+delay+exposureTime)
+        self.next_state.UpdateState(date + delay + exposureTime)
 
         return (delay, rotator_skypos, rotator_telpos, altitude, azimuth, slewdata, slewInitState,
                 slewFinalState, slewMaxSpeeds, listSlewActivities)

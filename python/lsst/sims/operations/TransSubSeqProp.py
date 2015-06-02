@@ -11,7 +11,7 @@ from Proposal import *
 from SeqHistory import *
 import copy
 
-class TransSubSeqProp (Proposal):
+class TransSubSeqProp(Proposal):
     """
     This class is here to describe a Transient Objects case scenario.
     """
@@ -104,7 +104,7 @@ class TransSubSeqProp (Proposal):
         # Removes the subsequences that require 0 events
         N = len(self.subSeqName)
         for n in range(N):
-            ix = N-n-1
+            ix = N - n - 1
             if self.subSeqEvents[ix] == 0:
                 self.subSeqName.pop(ix)
                 self.subSeqNested.pop(ix)
@@ -141,7 +141,7 @@ class TransSubSeqProp (Proposal):
                     T.append(tk)
                 print T
 
-                numIdxToCheck = nfilters-1
+                numIdxToCheck = nfilters - 1
                 if numIdxToCheck >= filterBurstNumber:
                     for startIdx in range(0, numIdxToCheck - filterBurstNumber + 1):
                         tt = 0
@@ -168,7 +168,7 @@ class TransSubSeqProp (Proposal):
         # in the region for starting new sequences.
         notstarted = 0
         for fieldID in self.sequences.keys():
-            if not fieldID in self.targetsNewSeq.keys():
+            if fieldID not in self.targetsNewSeq.keys():
                 if self.sequences[fieldID].IsIdle():
                     # self.log.info('%sProp: startNight() deleted sequence field=%d at progress=%.3f%% '
                     #               'state=%d nevents=%d' % (self.propFullName, fieldID,
@@ -206,7 +206,7 @@ class TransSubSeqProp (Proposal):
             listOfNewFields.remove(fieldID)
 
             # create a new sequence object
-            if not fieldID in self.sequences.keys():
+            if fieldID not in self.sequences.keys():
                 self.SeqCount += 1
                 self.sequences[fieldID] = SuperSequence(self.propID, fieldID, self.SeqCount, self.WLtype,
                                                         self.masterSubSequence, self.subSeqName,
@@ -283,7 +283,7 @@ class TransSubSeqProp (Proposal):
                           'restartedlost=%i restartedcomplete=%i total=%i targetprogress=%.3f%% '
                           'runprogress=%.3f%%' % (self.propFullName, self.propID, newseq, notstarted,
                                                   restartedlost, restartedcomplete, keptsequences,
-                                                  100*self.globalProgress, 100*runProgress))
+                                                  100 * self.globalProgress, 100 * runProgress))
 
         return
 
@@ -319,7 +319,7 @@ class TransSubSeqProp (Proposal):
         if self.log:
             for subseq in coaddedSubseqProgress.keys():
                 self.log.info('%sProp: GetProgressPerFilter() propID=%d Sub-Sequence progress: %20s = %.3f%%'
-                              % (self.propFullName, self.propID, subseq, 100*coaddedSubseqProgress[subseq]))
+                              % (self.propFullName, self.propID, subseq, 100 * coaddedSubseqProgress[subseq]))
 
 #	progressFilter = {}
 #	numsubseFilter = {}
@@ -339,7 +339,7 @@ class TransSubSeqProp (Proposal):
         if self.log:
             for filter in progressFilter.keys():
                 self.log.info('%sProp: GetProgressPerFilter() propID=%d Filter progress: %10s = %.3f%%' %
-                              (self.propFullName, self.propID, filter, 100*progressFilter[filter]))
+                              (self.propFullName, self.propID, filter, 100 * progressFilter[filter]))
 
         return progressFilter
 
@@ -351,10 +351,11 @@ class TransSubSeqProp (Proposal):
             t_mins = (date % 3600) / 60
             t_hour = (date % 86400) / 3600
             t_days = date / 86400
+            progress = 100 * self.sequences[fieldID].GetProgress()
             self.log.info('%sProp: suggestObs() subevent MISSED for propID=%d field=%i subseq=%s '
                           't=%dd%02dh%02dm%02ds progress=%i%%' % (self.propFullName, self.propID, fieldID,
                                                                   subseq, t_days, t_hour, t_mins, t_secs,
-                                                                  100*self.sequences[fieldID].GetProgress()))
+                                                                  progress))
 
         filter = self.sequences[fieldID].GetNextFilter(subseq)
         obs = self.obsPool[fieldID][filter]
@@ -411,7 +412,7 @@ class TransSubSeqProp (Proposal):
             # proposal originated request, it should re-suggest observation.
             if exclusiveObservation is not None:
                 # adjust counter for one obs
-#                self.reuseRanking -= 1
+                # self.reuseRanking -= 1
                 if exclusiveObservation.propID == self.propID:
 
                     # The exclusive block is for this proposal so we just suggest our exclusive observation
@@ -471,9 +472,9 @@ class TransSubSeqProp (Proposal):
             else:
                 # Normal observation block, all proposals competing
                 # If not time to rerank fields, return no suggestions.
-#                if self.reuseRanking > 1:
-#                    self.reuseRanking -= 1
-#                    return []
+                # if self.reuseRanking > 1:
+                #     self.reuseRanking -= 1
+                #     return []
 
                 #listOfFieldsToEvaluate = self.tonightTargets.keys()
                 listOfFieldsToEvaluate = sorted(self.tonightTargets.iterkeys())
@@ -558,7 +559,7 @@ class TransSubSeqProp (Proposal):
 
                     allfiltersavailable = True
                     for f in self.sequences[fieldID].GetFilterListForSubseq(subseq):
-                        if not f in allowedFilterList:
+                        if f not in allowedFilterList:
                             allfiltersavailable = False
                             events_nofilter += 1
                         elif filterSeeingList[f] > self.FilterMaxSeeing[f]:
@@ -817,7 +818,7 @@ class TransSubSeqProp (Proposal):
                                                                                      obs.filter, obs.propRank,
                                                                                      obs.finRank, t_days,
                                                                                      t_hour, t_mins, t_secs,
-                                                                                     int(100*progress),
+                                                                                     int(100 * progress),
                                                                                      progrmod))
 
             if obs.exclusiveBlockRequired:

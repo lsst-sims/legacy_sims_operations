@@ -309,8 +309,8 @@ class SchedulingData(LSSTObject):
                 elif ix == 0:
                     next_time = self.lookAhead_times[n][ix]
                     foundTime = True
-                elif (t - self.lookAhead_times[n][ix-1]) < (self.lookAhead_times[n][ix] - t):
-                    next_time = self.lookAhead_times[n][ix-1]
+                elif (t - self.lookAhead_times[n][ix - 1]) < (self.lookAhead_times[n][ix] - t):
+                    next_time = self.lookAhead_times[n][ix - 1]
                     foundTime = True
                 else:
                     next_time = self.lookAhead_times[n][ix]
@@ -403,7 +403,7 @@ class SchedulingData(LSSTObject):
 
         print ("night %i" % (initNight))
         print self.lookAhead_nights
-        for n in range(initNight, self.lookAhead_nights[-1]+1):
+        for n in range(initNight, self.lookAhead_nights[-1] + 1):
             # print("SchedulingData:: night=%i propID=%i" % (n, propID))
             computed = 0
             vis = 0
@@ -437,11 +437,12 @@ class SchedulingData(LSSTObject):
                             self.visible[t][field][propID] = []
                             for filter in listOfFilters:
                                 if self.airmass[t][field] < maxAirmass:
+                                    brightness = self.brightness[t][field]
                                     if filter == "u" and self.moonProfile[n][2] > self.newMoonThreshold:
                                         # visible = False
                                         # delta = 0
                                         pass
-                                    elif dictFilterMinBrig[filter] < self.brightness[t][field] < dictFilterMaxBrig[filter]:
+                                    elif dictFilterMinBrig[filter] < brightness < dictFilterMaxBrig[filter]:
                                         # visible = True
                                         # delta   = self.dt
                                         self.visible[t][field][propID].append(filter)

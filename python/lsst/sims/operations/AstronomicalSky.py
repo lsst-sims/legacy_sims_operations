@@ -150,7 +150,7 @@ class AstronomicalSky(LSSTObject):
             self.twilightBrightness = float(config['TwilightBrightness'])
         except:
             self.twilightBrightness = 17.5
-        self.fluxTwilight = 10.**((-self.twilightBrightness) / 2.5)
+        self.fluxTwilight = 10. ** ((-self.twilightBrightness) / 2.5)
 
         # store config to DB
         # for line in pairs:
@@ -295,11 +295,11 @@ class AstronomicalSky(LSSTObject):
         # Following set to nauticalTwilight
         (sunRise, sunSet) = s.__sunriset__(yy, mm, dd, self.longitude_RAD * RAD2DEG,
                                            self.latitude_RAD * RAD2DEG, self.sunAltitudeNightLimit, 0)
-                                # -12.0, 0)
+        # -12.0, 0)
         (sunRiseTwil, sunSetTwil) = s.__sunriset__(yy, mm, dd, self.longitude_RAD * RAD2DEG,
                                                    self.latitude_RAD * RAD2DEG, self.sunAltitudeTwilightLimit,
                                                    0)
-                                # -18.0, 0)
+        # -18.0, 0)
 
         # Compute MJD values for sunrise and sunset
         sunSetMJD = int(mjd) + (sunSet / 24.)
@@ -358,7 +358,7 @@ class AstronomicalSky(LSSTObject):
         if sunSetMJD > sunRiseMJD:
             midpointMJD = sunRiseMJD + (sunSetMJD - sunRiseMJD) / 2
         else:
-            midpointMJD = sunRiseMJD + ((sunSetMJD+1) - sunRiseMJD) / 2
+            midpointMJD = sunRiseMJD + ((sunSetMJD + 1) - sunRiseMJD) / 2
 
         midpoint = (midpointMJD - self.simEpoch) * float(DAY)
         self.log.info("getNightMidPoint:date:%d mjd:%f sunrise:%f sunset:%f sunriseMJD:%f sunsetMJD:%f "
@@ -672,7 +672,7 @@ class AstronomicalSky(LSSTObject):
 
         # We are in twilight so correct brightness
         if date < sunsetTwilDate or date > sunriseTwilDate:
-            totBr = -2.5 * math.log10(10.**((-totBr) / 2.5) + self.fluxTwilight)
+            totBr = -2.5 * math.log10(10. ** ((-totBr) / 2.5) + self.fluxTwilight)
 
         brightProfile = alpha, k, rs, ms, i, moonBr, skyBr
 
@@ -732,11 +732,11 @@ class AstronomicalSky(LSSTObject):
 #        key = '%.02f_%.02f_%d' % (ra_RND, dec_RND, t)
 #        try:
 #            (airmass,alt_RAD,az_RAD) = self.airmassCache[key]
-             # print 'AstronomicalSky::airmass() cache hit: %s ra:%f dec:%f date:%f am:%f' % \
-             #    (key, ra, dec, date, airmass)
+        # print 'AstronomicalSky::airmass() cache hit: %s ra:%f dec:%f date:%f am:%f' % \
+        #    (key, ra, dec, date, airmass)
 #            return (airmass,alt_RAD,az_RAD)
 #        except:
-            # print ('AstronomicalSky::airmass() cache miss')
+        # print ('AstronomicalSky::airmass() cache miss')
 #            pass
 
         # Compute local Hour angle  (radian)
@@ -901,20 +901,20 @@ if (__name__ == '__main__'):
         ctioEpoch = 53371.              # 2005-01-01T00:00:00.0
 
         knownIsVisibleValues = (((58.8264, -2.3188, 53371.), True),
-                               ((276.4457, 32.0771, 53451.), False),
-                               ((40.7232, 57.6051, 53531.), False),
-                               ((53.1727, 26.8857, 53611.), False),
-                               ((114.9067, 61.2719, 53691.), False),
-                               ((17.6506, 67.2208, 53771.), False),
-                               ((287.6387, 39.6601, 53851.), False),
-                               ((269.3325, -77.3260, 53931.), True),
-                               ((102.8912, 24.9691, 54011.), False),
-                               ((191.2703, 33.9905, 54091.), False),
-                               ((150.9973, 36.0769, 54171.), False),
-                               ((2.9198, -64.8521, 54251.), False),
-                               ((307.8593, 43.8667, 54331.), False),
-                               ((30.6832, -84.1524, 54411.), True),
-                               ((174.6318, -17.9298, 54491.), False))
+                                ((276.4457, 32.0771, 53451.), False),
+                                ((40.7232, 57.6051, 53531.), False),
+                                ((53.1727, 26.8857, 53611.), False),
+                                ((114.9067, 61.2719, 53691.), False),
+                                ((17.6506, 67.2208, 53771.), False),
+                                ((287.6387, 39.6601, 53851.), False),
+                                ((269.3325, -77.3260, 53931.), True),
+                                ((102.8912, 24.9691, 54011.), False),
+                                ((191.2703, 33.9905, 54091.), False),
+                                ((150.9973, 36.0769, 54171.), False),
+                                ((2.9198, -64.8521, 54251.), False),
+                                ((307.8593, 43.8667, 54331.), False),
+                                ((30.6832, -84.1524, 54411.), True),
+                                ((174.6318, -17.9298, 54491.), False))
         knownPositionValues = ((('Sun', 53371.), (281.5976, -23.0108)),
                                (('Sun', 53451.), (1.3424, 0.5843)),
                                (('Sun', 53531.), (78.2791, 23.0045)),
@@ -945,8 +945,7 @@ if (__name__ == '__main__'):
                                       (307.8593, 43.8667),
                                       (30.6832, -84.1524),
                                       (174.6318, -17.9298)), 53931.),
-                                     [(269.3325, -77.3260),
-                                      (174.6318, -17.9298)])
+                                    [(269.3325, -77.3260), (174.6318, -17.9298)])
         knownDistanceValues = ((([58.8256, -2.3205], [276.4457, 32.0771]), 133.7969),
                                (([276.4457, 32.0771], [40.7232, 57.6051]), 78.8871),
                                (([40.7232, 57.6051], [53.1727, 26.8857]), 31.9572),

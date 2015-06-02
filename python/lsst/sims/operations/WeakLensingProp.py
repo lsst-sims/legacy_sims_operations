@@ -291,7 +291,7 @@ class WeakLensingProp(Proposal):
         if self.log:
             for filter in progressFilter.keys():
                 self.log.info('%sProp: GetProgressPerFilter() propID=%d Filter progress: %10s = %.3f%%' %
-                              (self.propFullName, self.propID, filter, 100*progressFilter[filter]))
+                              (self.propFullName, self.propID, filter, 100 * progressFilter[filter]))
 
         return progressFilter
 
@@ -530,7 +530,7 @@ class WeakLensingProp(Proposal):
                               (self.propConf, self.propID, field))
 
         for target in listOfProposedTargets:
-            target.propRank = target.propRank/maxTargetNeed
+            target.propRank = target.propRank / maxTargetNeed
             self.addToSuggestList(target)
 
         if self.log and self.verbose > 0:
@@ -581,16 +581,16 @@ class WeakLensingProp(Proposal):
 
         self.minDistance2Moon = minDistance2Moon
 
-        # If in an exclusive block, no new observation candidates. Return null.
-#        if (exclusiveObservation != None):
-            # adjust counter for one obs
-#            self.reuseRanking -= 1
-#            return []
-#        else:
-            # If not time to rerank fields, return no suggestions.
-#            if self.reuseRanking > 1:
-#                self.reuseRanking -= 1
-#                return []
+        # # If in an exclusive block, no new observation candidates. Return null.
+        # if (exclusiveObservation != None):
+        #     adjust counter for one obs
+        #     self.reuseRanking -= 1
+        #     return []
+        # else:
+        #     # If not time to rerank fields, return no suggestions.
+        #     if self.reuseRanking > 1:
+        #        self.reuseRanking -= 1
+        #        return []
 
         if exclusiveObservation is not None:
             if exclusiveObservation.fieldID in self.targets.keys():

@@ -152,7 +152,7 @@ class ObsScheduler(LSSTObject):
         self.schedulingData.newMoonThreshold = self.NewMoonPhaseThreshold
 
         try:
-            self.minDistance2Moon = float(config_dict["MinDistance2Moon"])*DEG2RAD
+            self.minDistance2Moon = float(config_dict["MinDistance2Moon"]) * DEG2RAD
         except:
             self.minDistance2Moon = 0.0
 
@@ -418,16 +418,16 @@ class ObsScheduler(LSSTObject):
             # Build proximity array betwn cur tel position & potential fields
             # first: build FieldPosition (peerFields) list ordered identically
             #   to FieldID (targets) list
-#          sortedFieldID = []
-#          sortedFieldRaDec = []
-#	  for aField in sorted(self.targets.iterkeys()):
-#            sortedFieldID.append(aField)
-#            sortedFieldRaDec.append((self.targets[aField][0]*DEG2RAD,
-#                                     self.targets[aField][1]*DEG2RAD))
-          # Second: build proximity array
-#          (ra_RAD,dec_RAD) = self.telescope.GetCurrentTelescopePosition\
-#                                                (dateProfile)
-#          proximity = distance((ra_RAD,dec_RAD), sortedFieldRaDec)
+            # sortedFieldID = []
+            # sortedFieldRaDec = []
+            # for aField in sorted(self.targets.iterkeys()):
+            # sortedFieldID.append(aField)
+            # sortedFieldRaDec.append((self.targets[aField][0]*DEG2RAD,
+            #                         self.targets[aField][1]*DEG2RAD))
+            # # Second: build proximity array
+            # (ra_RAD,dec_RAD) = self.telescope.GetCurrentTelescopePosition\
+            #                                    (dateProfile)
+            # proximity = distance((ra_RAD,dec_RAD), sortedFieldRaDec)
 
             totPotentialTargets = 0
 
@@ -687,6 +687,7 @@ class ObsScheduler(LSSTObject):
                       (winner.solarElong, winner.sunAlt, winner.sunAz, winner.moonAlt, winner.moonAz,
                        winner.moonBright, winner.darkBright))
 
+        # need to ask Francisco about rawSeeing, sending 0.0 right now and also about wind and humidity
         obsHist = self.lsstDB.addObservation(slewdata.slewCount, winner.filter, winner.date, winner.mjd,
                                              winner.night, winner.visitTime, winner.exposureTime,
                                              winner.finRank, winner.seeing, winner.transparency,
@@ -698,8 +699,6 @@ class ObsScheduler(LSSTObject):
                                              winner.phaseAngle, winner.rScatter, winner.mieScatter,
                                              winner.moonIllum, winner.moonBright, winner.darkBright,
                                              winner.rawSeeing, 0.0, 0.0, self.sessionID, winner.fieldID)
-                                             # need to ask Francisco about rawSeeing, sending 0.0 right now
-                                             # and also about wind and humidity
         slewHist = self.lsstDB.addSlewHistory(slewdata.slewCount, slewdata.startDate, slewdata.endDate,
                                               slewdata.slewTime, slewdata.slewDist, obsHist.obsHistID,
                                               obsHist.Session_sessionID)
@@ -738,7 +737,7 @@ class ObsScheduler(LSSTObject):
                 # print "ObsScheduler.closeObs(): FOUND: fieldID: %d date: %d propID: %d" %\
                 #     (obs.fieldID, t, proposal.propID)
 
-                    # serendipitious obs will not be in proposal top targets
+                # # serendipitious obs will not be in proposal top targets
                 #                    if fieldFilter in self.masterTargets[obs.propID]:
                 #                        del self.masterTargets[obs.propID][fieldFilter]
         self.targetRank[winner.fieldID][winner.filter] = 0.0

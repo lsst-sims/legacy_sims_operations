@@ -263,7 +263,7 @@ class IvezicDistribution(Distribution):
         # Number of full atomic sequences
         if duration > 0.0:
             self.nSequences = int(float(duration) / float(self.seqDelay + self.delayNext))
-            if duration-(self.nSequences * (self.seqDelay+self.delayNext)) >= (self.seqDelay):
+            if duration - (self.nSequences * (self.seqDelay + self.delayNext)) >= (self.seqDelay):
                 self.nSequences += 1
         else:
             self.nSequences = max(repeats, 1)

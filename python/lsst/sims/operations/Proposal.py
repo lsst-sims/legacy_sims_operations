@@ -341,7 +341,7 @@ class Proposal(object):
         """
 
         if self.StartTime is not None:
-            if self.StartTime > date+24*3600:
+            if self.StartTime > date + 24 * 3600:
                 return False
         if self.StopTime is not None:
             if self.StopTime < date:
@@ -403,7 +403,7 @@ class Proposal(object):
 
             ra_rad = float(ra_deg) * DEG2RAD
             dec_rad = float(dec_deg) * DEG2RAD
-            diameter_div2_rad = float(diameter_deg) * DEG2RAD/2
+            diameter_div2_rad = float(diameter_deg) * DEG2RAD / 2
 
             # for each entry in FieldDB
             closestField = None
@@ -618,7 +618,6 @@ class Proposal(object):
         """
         return self.weather.getSeeing(now())
 
-
     # Ranker Functionality
 #    def applyCuts (self):
 #        """
@@ -779,93 +778,88 @@ class Proposal(object):
             #               "darkBright=%f" % (winner.solarElong, winner.sunAlt, winner.sunAz, winner.moonAlt,
             #                                  winner.moonAz, winner.moonBright, winner.darkBright))
 
-
-
             # Update suggested Observation with actual observing conditions
-#            obsfound.date = obs.date
-#            obsfound.mjd = obs.mjd
-#            obsfound.lst = obs.lst
-#            obsfound.finRank = obs.finRank
-#            obsfound.slewTime = obs.slewTime
-#            obsfound.rotatorSkyPos = obs.rotatorSkyPos
-#            obsfound.rotatorTelPos = obs.rotatorTelPos
-#            obsfound.altitude = obs.altitude
-#            obsfound.azimuth = obs.azimuth
-#            obsfound.sunAlt = obs.sunAlt
-#            obsfound.sunAz = obs.sunAz
-#            obsfound.exposureTime = obs.exposureTime
-#            obsfound.night = obs.night
+            # obsfound.date = obs.date
+            # obsfound.mjd = obs.mjd
+            # obsfound.lst = obs.lst
+            # obsfound.finRank = obs.finRank
+            # obsfound.slewTime = obs.slewTime
+            # obsfound.rotatorSkyPos = obs.rotatorSkyPos
+            # obsfound.rotatorTelPos = obs.rotatorTelPos
+            # obsfound.altitude = obs.altitude
+            # obsfound.azimuth = obs.azimuth
+            # obsfound.sunAlt = obs.sunAlt
+            # obsfound.sunAz = obs.sunAz
+            # obsfound.exposureTime = obs.exposureTime
+            # obsfound.night = obs.night
 
             # get most current skyBrightness
-#            dateProfile = obs.date, obs.mjd, obs.lst
-#            moonProfile = (obsfound.moonRA_RAD, obsfound.moonDec_RAD,
-#                           obsfound.moonPhase)
-#            (skyBright,distance2moon,moonAlt_RAD,brightProfile) = \
-#                        self.sky.getSkyBrightness (obsfound.fieldID,
-#                                      obsfound.ra, obsfound.dec,
-#                                      obsfound.altitude,
-#                                      dateProfile,
-#                                      moonProfile,
-#                                      twilightProfile)
+            # dateProfile = obs.date, obs.mjd, obs.lst
+            # moonProfile = (obsfound.moonRA_RAD, obsfound.moonDec_RAD,
+            #               obsfound.moonPhase)
+            # (skyBright,distance2moon,moonAlt_RAD,brightProfile) = \
+            #            self.sky.getSkyBrightness (obsfound.fieldID,
+            #                          obsfound.ra, obsfound.dec,
+            #                          obsfound.altitude,
+            #                          dateProfile,
+            #                          moonProfile,
+            #                          twilightProfile)
 
             #print "latest skyBright = %f\toriginal skyBright = %f" % (skyBright, obsfound.skyBrightness)
 
-#            (obsfound.phaseAngle, obsfound.extinction, obsfound.rScatter,
-#                 obsfound.mieScatter, obsfound.moonIllum,
-#                 obsfound.moonBright, obsfound.darkBright) = brightProfile
+            # (obsfound.phaseAngle, obsfound.extinction, obsfound.rScatter,
+            #     obsfound.mieScatter, obsfound.moonIllum,
+            #     obsfound.moonBright, obsfound.darkBright) = brightProfile
 
             # store new value since it is most accurate
-#            obsfound.skyBrightness = skyBright
-#            obsfound.distance2moon = distance2moon
-#            obsfound.moonAlt = moonAlt_RAD
+            # obsfound.skyBrightness = skyBright
+            # obsfound.distance2moon = distance2moon
+            # obsfound.moonAlt = moonAlt_RAD
 
             # calculate airmass of actual observation
-#            obsfound.airmass = 1/math.cos(1.5708 - obsfound.altitude)
+            # obsfound.airmass = 1/math.cos(1.5708 - obsfound.altitude)
 
             # calculate current solar elongation in DEGREES
-#            target = (obsfound.ra*DEG2RAD, obsfound.dec*DEG2RAD)
-#            solarElong_RAD = self.sky.getPlanetDistance ('Sun',target, obs.date)
-#            obsfound.solarElong = math.degrees(solarElong_RAD)
+            # target = (obsfound.ra*DEG2RAD, obsfound.dec*DEG2RAD)
+            # solarElong_RAD = self.sky.getPlanetDistance ('Sun',target, obs.date)
+            # obsfound.solarElong = math.degrees(solarElong_RAD)
 
             # Derive skyBrightness for filter.  Interpolate if needed. - MM
-#            (sunrise, sunset) = twilightProfile
+            # (sunrise, sunset) = twilightProfile
 
             # set y skybrightness for any kind of sky
-#            if (obsfound.filter == 'y'):
-#               obsfound.filterSkyBright = 17.3
-#            else:      # g,r,i,z,u
-               # If moon below horizon, use new moon offset for filter
-               # brightness - MM
-#               if (math.degrees(obsfound.moonAlt) <= -6.0):
-#                  adjustBright = filterOffset[obsfound.filter,0.]
+            # if (obsfound.filter == 'y'):
+            #   obsfound.filterSkyBright = 17.3
+            # else:      # g,r,i,z,u
+            # If moon below horizon, use new moon offset for filter brightness - MM
+            # if (math.degrees(obsfound.moonAlt) <= -6.0):
+            #  adjustBright = filterOffset[obsfound.filter,0.]
 
-               # Interpolate if needed. Note: moonPhase is a float not int
-#               elif (obsfound.moonPhase not in skyBrightKeys):
-#                  i = 0
-#                  while (skyBrightKeys[i] < obsfound.moonPhase):
-#                     i = i+1
+            # Interpolate if needed. Note: moonPhase is a float not int
+            # elif (obsfound.moonPhase not in skyBrightKeys):
+            #  i = 0
+            #  while (skyBrightKeys[i] < obsfound.moonPhase):
+            #     i = i+1
 
-                  # find upper and lower bound
-#                  upperMoonPhase = skyBrightKeys[i]
-#                  lowerMoonPhase = skyBrightKeys[i-1]
-#                  lowerAdjustBright = filterOffset[obsfound.filter,lowerMoonPhase]
-#                  upperAdjustBright = filterOffset[obsfound.filter,upperMoonPhase]
-                  # linear interpolation
-#                  adjustBright = lowerAdjustBright + (((obsfound.moonPhase - lowerMoonPhase) *
-#                    (upperAdjustBright - lowerAdjustBright))/(upperMoonPhase - lowerMoonPhase))
-
-#               else:          # moon not set and moon phase is key
-#                  adjustBright = filterOffset[obsfound.filter, obsfound.moonPhase]
-#               obsfound.filterSkyBright = obsfound.skyBrightness + adjustBright
-
-               # z sky brightness should never be under 17.0
-#               if (obsfound.filter == 'z') and (obsfound.filterSkyBright < 17.0):
-#                  obsfound.filterSkyBright = 17.0
+            # find upper and lower bound
+            # upperMoonPhase = skyBrightKeys[i]
+            # lowerMoonPhase = skyBrightKeys[i-1]
+            # lowerAdjustBright = filterOffset[obsfound.filter,lowerMoonPhase]
+            # upperAdjustBright = filterOffset[obsfound.filter,upperMoonPhase]
+            # linear interpolation
+            # adjustBright = lowerAdjustBright + (((obsfound.moonPhase - lowerMoonPhase) *
+            # (upperAdjustBright - lowerAdjustBright))/(upperMoonPhase - lowerMoonPhase))
+            # else:          # moon not set and moon phase is key
+            #  adjustBright = filterOffset[obsfound.filter, obsfound.moonPhase]
+            # obsfound.filterSkyBright = obsfound.skyBrightness + adjustBright
+            # #z sky brightness should never be under 17.0
+            # if (obsfound.filter == 'z') and (obsfound.filterSkyBright < 17.0):
+            #  obsfound.filterSkyBright = 17.0
 
             # If twilight, set brightness for z and y
-#            if ( obs.date < sunset) or (obs.date > sunrise):
-#	       if (obsfound.filter == 'z') or (obsfound.filter == 'y'):
-#		   obsfound.filterSkyBright = 17.0
+            # if ( obs.date < sunset) or (obs.date > sunrise):
+            # if (obsfound.filter == 'z') or (obsfound.filter == 'y'):
+            # obsfound.filterSkyBright = 17.0
 
             # build visit history
             fieldID = obs.fieldID
@@ -877,7 +871,7 @@ class Proposal(object):
             winner.fieldVisits = self.fieldVisits[fieldID]
 
             try:
-                winner.fieldInterval = obs.date-self.lastFieldVisit[fieldID]
+                winner.fieldInterval = obs.date - self.lastFieldVisit[fieldID]
             except:
                 winner.fieldInterval = 0
             self.lastFieldVisit[fieldID] = obs.date
@@ -895,7 +889,7 @@ class Proposal(object):
             self.lastTarget = (winner.ra * DEG2RAD, winner.dec * DEG2RAD)
 
             # update the ObsHistory DB with the new observation
-#            self.obsHistory.addObservation (obsfound, self.sessionID)
+            # self.obsHistory.addObservation (obsfound, self.sessionID)
 
         return winner
 
@@ -915,7 +909,7 @@ class Proposal(object):
 
         # Compute an internal rank considering proximity and use it as
         # the sorting key to the heap.
-#        rankProximity = self.maxProximityBonus/(proximity+0.1)/0.1
+        # rankProximity = self.maxProximityBonus/(proximity+0.1)/0.1
         rankInternal = observation.propRank
 
         # Add the relative proposal priority coefficient.

@@ -75,7 +75,7 @@ class SubSequence(LSSTObject):
 #	print self.subExposures
 
         visitIntervals = []
-        for i in range(self.subEvents-1):
+        for i in range(self.subEvents - 1):
             visitIntervals.append(eval(str(self.subInterval)))
 
         self.distribution = IvezicDistribution(date=0, duration=0.0, intervals=visitIntervals, repeats=1,
@@ -135,7 +135,7 @@ class SubSequence(LSSTObject):
         else:
             self.state = SEQ_ACTIVE
 
-        if (self.exposuresLeft == 1) and (self.subeventIndex == self.Nsubevents-1):
+        if (self.exposuresLeft == 1) and (self.subeventIndex == self.Nsubevents - 1):
             self.exclusiveBlockNeeded = False
         else:
             self.exclusiveBlockNeeded = True
@@ -201,8 +201,8 @@ class SubSequence(LSSTObject):
         i = len(history)
 
         if i > 0:
-            delta = self.distribution.eventTime(i) - self.distribution.eventTime(i-1)
-            nextdate = history[i-1] + delta
+            delta = self.distribution.eventTime(i) - self.distribution.eventTime(i - 1)
+            nextdate = history[i - 1] + delta
         else:
             delta = self.GetNextInterval()
             nextdate = self.date + delta
@@ -216,9 +216,9 @@ class SubSequence(LSSTObject):
             i = len(self.allHistory)
 
         if i > 0:
-            interval = self.distribution.eventTime(i) - self.distribution.eventTime(i-1)
+            interval = self.distribution.eventTime(i) - self.distribution.eventTime(i - 1)
         else:
-            interval = self.distribution.eventTime(i+1) - self.distribution.eventTime(i)
+            interval = self.distribution.eventTime(i + 1) - self.distribution.eventTime(i)
 
         return interval
 
@@ -473,7 +473,7 @@ class SuperSequence(LSSTObject):
             del self.subSequence[nested]
             self.subSeqName.remove(nested)
 
-        if not self.masterSubSequence in self.subSeqName:
+        if self.masterSubSequence not in self.subSeqName:
             self.masterSubSequence = None
 
         self.Restart(seqNum)

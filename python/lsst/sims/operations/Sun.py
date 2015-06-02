@@ -38,12 +38,11 @@ import calendar
 class Sun:
 
     def __init__(self):
-	""""""
+        """"""
     	# Some conversion factors between radians and degrees
-    	self.RADEG = 180.0 / pi
-    	self.DEGRAD = pi / 180.0
-    	self.INV360 = 1.0 / 360.0
-
+        self.RADEG = 180.0 / pi
+        self.DEGRAD = pi / 180.0
+        self.INV360 = 1.0 / 360.0
 
     def daysSince2000Jan0(self, y, m, d):
         """A macro to compute the number of days elapsed since 2000 Jan 0.0
@@ -164,7 +163,7 @@ class Sun:
                 degrees for astronomical twilight.
         upper_limb: non-zero -> upper limb, zero -> center
 		      Set to non-zero (e.g. 1) when computing rise/set
-		      times, and to zero when computing start/end of
+              times, and to zero when computing start/end of
 		      twilight.
 	      *rise = where to store the rise time
 	      *set  = where to store the set  time
@@ -188,39 +187,39 @@ class Sun:
         sidtime = self.revolution(self.GMST0(d) + 180.0 + lon)
 
         # Compute Sun's RA + Decl at this moment
-    	res = self.sunRADec(d)
-    	sRA = res[0]
-    	sdec = res[1]
-    	sr = res[2]
+        res = self.sunRADec(d)
+        sRA = res[0]
+        sdec = res[1]
+        sr = res[2]
 
-    	# Compute time when Sun is at south - in hours UT
-    	tsouth = 12.0 - self.rev180(sidtime - sRA) / 15.0;
+        # Compute time when Sun is at south - in hours UT
+        tsouth = 12.0 - self.rev180(sidtime - sRA) / 15.0;
 
-    	# Compute the Sun's apparent radius, degrees
-    	sradius = 0.2666 / sr;
+        # Compute the Sun's apparent radius, degrees
+        sradius = 0.2666 / sr;
 
-    	# Do correction to upper limb, if necessary
-    	if upper_limb:
+        # Do correction to upper limb, if necessary
+        if upper_limb:
             altit = altit - sradius
 
-    	# Compute the diurnal arc that the Sun traverses to reach
-    	# the specified altitude altit:
+        # Compute the diurnal arc that the Sun traverses to reach
+        # the specified altitude altit:
 
-    	cost = (self.sind(altit) - self.sind(lat) * self.sind(sdec)) / (self.cosd(lat) * self.cosd(sdec))
+        cost = (self.sind(altit) - self.sind(lat) * self.sind(sdec)) / (self.cosd(lat) * self.cosd(sdec))
 
-    	if cost >= 1.0:
+        if cost >= 1.0:
     	    rc = -1
     	    t = 0.0           # Sun always below altit
 
-    	elif cost <= -1.0:
+        elif cost <= -1.0:
     	    rc = +1
     	    t = 12.0;         # Sun always above altit
 
-    	else:
+        else:
     	    t = self.acosd(cost) / 15.0   # The diurnal arc, hours
 
-    	# Store rise and set times - in hours UT
-    	return (tsouth - t, tsouth + t)
+        # Store rise and set times - in hours UT
+        return (tsouth - t, tsouth + t)
 
     def __daylen__(self, year, month, day, lon, lat, altit, upper_limb):
     	"""
@@ -240,13 +239,13 @@ class Sun:
 
     	"""
 
-    	# Compute d of 12h local mean solar time
+        # Compute d of 12h local mean solar time
     	d = self.daysSince2000Jan0(year,month,day) + 0.5 - (lon / 360.0)
 
-    	# Compute obliquity of ecliptic (inclination of Earth's axis)
+        # Compute obliquity of ecliptic (inclination of Earth's axis)
     	obl_ecl = 23.4393 - 3.563E-7 * d
 
-    	# Compute Sun's position
+        # Compute Sun's position
     	res = self.sunpos(d)
     	slon = res[0]
     	sr = res[1]
@@ -255,13 +254,12 @@ class Sun:
     	sin_sdecl = self.sind(obl_ecl) * self.sind(slon)
     	cos_sdecl = math.sqrt(1.0 - sin_sdecl * sin_sdecl)
 
-    	# Compute the Sun's apparent radius, degrees
+        # Compute the Sun's apparent radius, degrees
     	sradius = 0.2666 / sr
 
-    	# Do correction to upper limb, if necessary
+        # Do correction to upper limb, if necessary
     	if upper_limb:
     	    altit = altit - sradius
-
 
     	cost = (self.sind(altit) - self.sind(lat) * sin_sdecl) / (self.cosd(lat) * cos_sdecl)
     	if cost >= 1.0:
@@ -283,12 +281,12 @@ class Sun:
     	computed, since it's always very near 0.
     	"""
 
-    	# Compute mean elements
+        # Compute mean elements
     	M = self.revolution(356.0470 + 0.9856002585 * d)
     	w = 282.9404 + 4.70935E-5 * d
     	e = 0.016709 - 1.151E-9 * d
 
-    	# Compute true longitude and radius vector
+        # Compute true longitude and radius vector
     	E = M + e * self.RADEG * self.sind(M) * (1.0 + e * self.cosd(M))
     	x = self.cosd(E) - e
     	y = math.sqrt(1.0 - e * e) * self.sind(E)
@@ -307,23 +305,23 @@ class Sun:
         for a given day d.
         """
 
-    	# Compute Sun's ecliptical coordinates
+        # Compute Sun's ecliptical coordinates
     	res = self.sunpos(d)
     	lon = res[0]  # True solar longitude
     	r = res[1]    # Solar distance
 
-    	# Compute ecliptic rectangular coordinates (z=0)
+        # Compute ecliptic rectangular coordinates (z=0)
     	x = r * self.cosd(lon)
     	y = r * self.sind(lon)
 
-    	# Compute obliquity of ecliptic (inclination of Earth's axis)
+        # Compute obliquity of ecliptic (inclination of Earth's axis)
     	obl_ecl = 23.4393 - 3.563E-7 * d
 
-    	# Convert to equatorial rectangular coordinates - x is unchanged
+        # Convert to equatorial rectangular coordinates - x is unchanged
     	z = y * self.sind(obl_ecl)
     	y = y * self.cosd(obl_ecl)
 
-    	# Convert to spherical coordinates
+        # Convert to spherical coordinates
     	RA = self.atan2d(y, x)
     	dec = self.atan2d(z, math.sqrt(x * x + y * y))
 
@@ -370,11 +368,11 @@ class Sun:
     	(if we neglect aberration, which amounts to 20 seconds of arc
     	or 1.33 seconds of time)
     	"""
-    	# Sidtime at 0h UT = L (Sun's mean longitude) + 180.0 degr
-    	# L = M + w, as defined in sunpos().  Since I'm too lazy to
-    	# add these numbers, I'll let the C compiler do it for me.
-    	# Any decent C compiler will add the constants at compile
-    	# time, imposing no runtime or code overhead.
+        # Sidtime at 0h UT = L (Sun's mean longitude) + 180.0 degr
+        # L = M + w, as defined in sunpos().  Since I'm too lazy to
+        # add these numbers, I'll let the C compiler do it for me.
+        # Any decent C compiler will add the constants at compile
+        # time, imposing no runtime or code overhead.
 
     	sidtim0 = self.revolution((180.0 + 356.0470 + 282.9404) + (0.9856002585 + 4.70935E-5) * d)
     	return sidtim0;
@@ -497,19 +495,19 @@ class Sun:
 
         dVar = 1. / (1.0 - 9.464e-4 * math.sin(dAlf) - 0.01671 * math.cos(dAlf) - \
                     + 1.489e-4 * math.cos(2.0 * dAlf) - 2.917e-5 * math.sin(3.0 * dAlf) - \
-                    + 3.438e-4 * math.cos(4.0 * dAlf))**2
+                    + 3.438e-4 * math.cos(4.0 * dAlf)) ** 2
         return dVar
 
     def Julian(self, year, month, day):
         """
         Return julian day.
         """
-        if calendar.isleap(year): # Bissextil year, 366 days
+        if calendar.isleap(year):   # Bissextil year, 366 days
             lMonth = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
-        else: # Normal year, 365 days
+        else:   # Normal year, 365 days
             lMonth = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365]
 
-        nJulian = lMonth[month-1] + day
+        nJulian = lMonth[month - 1] + day
         return nJulian
 
 if __name__ == "__main__":

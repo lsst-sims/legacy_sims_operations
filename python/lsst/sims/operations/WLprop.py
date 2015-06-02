@@ -290,22 +290,18 @@ class WLprop (TransSubSeqProp):
 
         return True
 
-#    def RankFilters(self, fieldID, filterSeeingList, allowedFilterList):
+    # def RankFilters(self, fieldID, filterSeeingList, allowedFilterList):
+    #     rankForFilters = {}
+    #     for filter in allowedFilterList:
+    #         if (filterSeeingList[filter] > self.maxSeeing):
+    #             continue
+    #         # Check if the proposed filter is in the list
+    #         # of allowed filters for the SuperNova configuration.
+    #         if not filter in self.subSeqFilters:
+    #             continue
 
-#	rankForFilters = {}
-
-#        for filter in allowedFilterList:
-
-#            if (filterSeeingList[filter] > self.maxSeeing):
-#                continue
-            # Check if the proposed filter is in the list
-            # of allowed filters for the SuperNova configuration.
-#            if not filter in self.subSeqFilters:
-#                continue
-
-#	    rankForFilters[filter] = 1.0
-
-#        return rankForFilters
+    #     rankForFilters[filter] = 1.0
+    #     return rankForFilters
 
     def closeObservation(self, observation, obsHistID, twilightProfile):
         """

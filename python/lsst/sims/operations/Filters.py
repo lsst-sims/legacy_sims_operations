@@ -148,13 +148,13 @@ class Filters(object):
             if self.filterMinBrigSorted[-ix - 2] > self.filterMinBrigSorted[-ix - 1]:
                 self.filterRank[-ix - 2] = self.filterRank[-ix - 1] + 1.0
             else:
-                self.filterRank[-ix - 2] = self.filterRank[-ix-1]
+                self.filterRank[-ix - 2] = self.filterRank[-ix - 1]
 
         self.relativeRankForFilter = {}
         self.basefilterWavelenSorted = {}
         self.ExposureFactor = {}
         for ix in range(numFilters):
-            self.relativeRankForFilter[self.filterNamesSorted[ix]] = self.filterRank[ix]/self.filterRank[0]
+            self.relativeRankForFilter[self.filterNamesSorted[ix]] = self.filterRank[ix] / self.filterRank[0]
             self.basefilterWavelenSorted[ix] = math.pow((0.50 / float(self.filterWavelenSorted[ix])), 0.2)
             self.ExposureFactor[self.filterNamesSorted[ix]] = self.filterExpFactorSorted[ix]
         return
@@ -226,7 +226,7 @@ class Filters(object):
 
                 # find upper and lower bound
                 upperMoonPhase = skyBrightKeys[i]
-                lowerMoonPhase = skyBrightKeys[i-1]
+                lowerMoonPhase = skyBrightKeys[i - 1]
                 lowerAdjustBright = filterOffset[filter, lowerMoonPhase]
                 upperAdjustBright = filterOffset[filter, upperMoonPhase]
                 # linear interpolation
@@ -249,4 +249,3 @@ class Filters(object):
                 filterSkyBright = 17.0
 
         return filterSkyBright
-
