@@ -334,7 +334,7 @@ class InstrumentState(InstrumentPosition):
     def IsFilterMounted(self, filter):
 
         try:
-            #idx = self.Filter_MountedList.index(filter)
+            self.Filter_MountedList.index(filter)
             mounted = True
         except:
             mounted = False
