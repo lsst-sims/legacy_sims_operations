@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-#try:
-#    import psyco
-#    psyco.full()
-#except:
-#    pass
+import logging
+import requests
+import time
 
 from lsst.sims.operations import __version__
 OPSIM_VERSION = __version__
@@ -12,15 +10,12 @@ from lsst.sims.operations.utilities import *
 from lsst.sims.operations.Simulator import *
 #from LSSTDatabase import *
 from lsst.sims.operations.Database import *
-import binascii
-
-import requests
 
 # globals
 USAGE_STR = '[--profile=yes] [--verbose=yes] [--track=no] [--config=conf/survey/LSST.conf] '\
             '[--startup_comment="comment"]'
 
-def getSessionID (lsstDB, sessionTbl, code_test, track_run, startup_comment):
+def getSessionID(lsstDB, sessionTbl, code_test, track_run, startup_comment):
     """
     Create an entry in the the Session table and fetch the key which
     have been assigned to us.
@@ -41,7 +36,7 @@ def getSessionID (lsstDB, sessionTbl, code_test, track_run, startup_comment):
         host = socket.gethostname()
     host = host.split('.')[0]
     user = os.getenv('USER')
-    (yy, mm, dd, h, m, s, wday, yday, dst) = time.gmtime ()
+    (yy, mm, dd, h, m, s, wday, yday, dst) = time.gmtime()
     date = '%d-%d-%d %02d:%02d:%02d' % (yy, mm, dd, h, m, s)
     # Remove data from the previous run where user, host and date are
     # the same. This would only happen is the same user restarts the
@@ -83,22 +78,23 @@ def getSessionID (lsstDB, sessionTbl, code_test, track_run, startup_comment):
 
 
 def track(sessionID, hostname, user, startup_comment, code_test, status_id):
-	url = "http://opsimcvs.tuc.noao.edu/tracking/tracking.php";
-	#params = urllib.urlencode({'sessionID': sessionID,
+    url = "http://opsimcvs.tuc.noao.edu/tracking/tracking.php"
+    #params = urllib.urlencode({'sessionID': sessionID,
         #                       'hostname': hostname,
         #                       'user': user,
         #                       'startup_comment': startup_comment,
         #                       'code_test': code_test,
         #                       'status_id': status_id,
         #                       'run_version': OPSIM_VERSION})
-	#url = "%s?%s" % (url, params);
-	#result = urllib.urlopen(url).read();
-        payload = {'sessionID': sessionID,'hostname': hostname,'user': user,'startup_comment': startup_comment,'code_test': code_test,'status_id': status_id,'run_version': OPSIM_VERSION}
-        result = requests.get(url, params=payload, timeout=3.0)
-        print("    Tracking:%s" % (result))
+    #url = "%s?%s" % (url, params);
+    #result = urllib.urlopen(url).read();
+    payload = {'sessionID': sessionID, 'hostname': hostname, 'user': user, 'startup_comment': startup_comment,
+               'code_test': code_test, 'status_id': status_id, 'run_version': OPSIM_VERSION}
+    result = requests.get(url, params=payload, timeout=3.0)
+    print("    Tracking:%s" % (result))
 
 
-def startLsst( args ):
+def startLsst(args):
     """
     Begin LSST telescope observing simulation.
 
@@ -111,7 +107,7 @@ def startLsst( args ):
 
         [--profile=yes]
 
-	[--startup_comment="blah"]
+        [--startup_comment="blah"]
 
     Return
         None
@@ -121,54 +117,53 @@ def startLsst( args ):
     """
 
     # Startup comment
-    if (args.has_key ('startup_comment')):
-        startup_comment = args['startup_comment'];
+    if 'startup_comment' in args:
+        startup_comment = args['startup_comment']
     else:
-        startup_comment = "No comment was entered";
+        startup_comment = "No comment was entered"
 
     # Verbose?
-    if (args.has_key ('verbose') and
-        args['verbose'].lower () == 'yes'):
+    if 'verbose' in args and args['verbose'].lower() == 'yes':
         VERBOSE = 1
     else:
         VERBOSE = 0
 
-    if args.has_key('track') and args['track'].lower() == 'no':
+    if 'track' in args and args['track'].lower() == 'no':
         track_run = False
     else:
         track_run = True
 
     # Alternate configuration file?
-    if (args.has_key ('config') ):
+    if 'config' in args:
         confLSST = args['config']
     else:
         confLSST = DefaultLSSTConfigFile
 
     # Fetch the DB table names so Session DB can be accessed immediately
-    configDict, pairs =  readConfFile(confLSST)
+    configDict, pairs = readConfFile(confLSST)
 
-    if ( configDict.has_key ('dbWrite')) :
-	if configDict["dbWrite"] == 'True':
-	    dbWrite = True
-	else:
-	    dbWrite = False
+    if 'dbWrite' in configDict:
+        if configDict["dbWrite"]:
+            dbWrite = True
+        else:
+            dbWrite = False
     else:
-	dbWrite = True
+        dbWrite = True
 
-    if ( configDict.has_key ('sessionTbl')) :
-        sessionTbl =  configDict["sessionTbl"]
+    if 'sessionTbl' in configDict:
+        sessionTbl = configDict["sessionTbl"]
         print("    sessionTbl:%s" % (sessionTbl))
-    else :
-        sessionTbl =  "Session"
+    else:
+        sessionTbl = "Session"
         print("    sessionTbl:%s default" % (sessionTbl))
 
     # Get whether this is a code test
-    if ( configDict.has_key ('code_test')) :
-    	code_test = configDict['code_test']
-    	print("    code_test:%s" % (code_test))
-    else :
-    	code_test = '1'
-    	print("    code_test:%s" % (code_test))
+    if 'code_test' in configDict:
+        code_test = configDict['code_test']
+        print("    code_test:%s" % (code_test))
+    else:
+        code_test = '1'
+        print("    code_test:%s" % (code_test))
 
     # Instantiate DB Object
     # lsstDB = LSSTDatabase()
@@ -176,278 +171,278 @@ def startLsst( args ):
 
     # Get a Session ID
     try:
-        SID = getSessionID (lsstDB, sessionTbl, code_test, track_run, startup_comment)
+        SID = getSessionID(lsstDB, sessionTbl, code_test, track_run, startup_comment)
     except:
-        fatalError ('Unable to acquire a Session ID. Please check ',
-                    'that the DB is up and running on the localhost.')
+        fatalError('Unable to acquire a Session ID. Please check ',
+                   'that the DB is up and running on the localhost.')
 
     print ('Session ID: %d' % (SID))
 
-	# Adding lsstConf
+    # Adding lsstConf
     storeParam(lsstDB, SID, 0, 'File', 0, "lsstConf", confLSST)
 
-	# Adding startupComment
+    # Adding startupComment
     storeParam(lsstDB, SID, 0, 'Comment', 0, "startupComment", startup_comment)
 
     # store config in DB
     for line in pairs:
-        storeParam (lsstDB, SID, 0, 'LSST', line['index'], line['key'], line['val'])
+        storeParam(lsstDB, SID, 0, 'LSST', line['index'], line['key'], line['val'])
 
     # Overlay the user's simulation parameters
     print ("Overarching user-defined parameters")
 
-    if ( configDict.has_key ('nRun')) :
-        nRun =  configDict["nRun"]
+    if 'nRun' in configDict:
+        nRun = configDict["nRun"]
         print("    nRun:%f" % (nRun))
-    else :
-	fatalError('no nRun parameter defined for length of simulation run')
+    else:
+        fatalError('no nRun parameter defined for length of simulation run')
 
-    if ( configDict.has_key ('fov')) :
-        fov =  configDict["fov"]
+    if 'fov' in configDict:
+        fov = configDict["fov"]
         print("    fov:%f" % (fov))
-    else :
-        fov =  3.5
-        print("    fov:%f default" %(fov) )
+    else:
+        fov = 3.5
+        print("    fov:%f default" % (fov))
 
-    if ( configDict.has_key ('idleDelay')) :
-        idleDelay =  configDict["idleDelay"]
+    if 'idleDelay' in configDict:
+        idleDelay = configDict["idleDelay"]
         print("    idleDelay:%f" % (idleDelay))
-    else :
-        idleDelay =  30
-        print("    idleDelay:%f default" %(idleDelay) )
+    else:
+        idleDelay = 30
+        print("    idleDelay:%f default" % (idleDelay))
 
-    if ( configDict.has_key ('simStartDay')) :
-        simStartDay =  configDict["simStartDay"]
+    if 'simStartDay' in configDict:
+        simStartDay = configDict["simStartDay"]
         print("    simStartDay:%f" % (simStartDay))
-    else :
+    else:
         simStartDay = 0.5
         print("    simStartDay:%f default: 0.5" % (simStartDay))
 
-    if ( configDict.has_key ('targetList')) :
-        targetList =  configDict["targetList"]
+    if 'targetList' in configDict:
+        targetList = configDict["targetList"]
         print("    targetList: %s" % (targetList))
     else:
-        targetList =  './Targets.txt'
-        print("    targetList:%s default" % (targetList ))
+        targetList = './Targets.txt'
+        print("    targetList:%s default" % (targetList))
 
-    if ( configDict.has_key ('maxCloud')) :
-        maxCloud =  configDict["maxCloud"]
+    if 'maxCloud' in configDict:
+        maxCloud = configDict["maxCloud"]
         print("    maxCloud: %f" % (maxCloud))
     else:
         maxCloud = 0.7
         print("    maxCloud: %f default" % (maxCloud))
 
-    if ( configDict.has_key ('telSeeing')) :
-        telSeeing =  configDict["telSeeing"]
+    if 'telSeeing' in configDict:
+        telSeeing = configDict["telSeeing"]
         print("    telSeeing:%f" % (telSeeing))
-    else :
+    else:
         print "telSeeing has no setting"
-        sys.exit (1)
+        sys.exit(1)
 
-    if ( configDict.has_key ('opticalDesSeeing')) :
-        opticalDesSeeing =  configDict["opticalDesSeeing"]
+    if 'opticalDesSeeing' in configDict:
+        opticalDesSeeing = configDict["opticalDesSeeing"]
         print("    opticalDesSeeing:%f" % (opticalDesSeeing))
     else:
         print "opticalDesSeeing has no setting - exiting"
-        sys.exit (1)
+        sys.exit(1)
 
-    if ( configDict.has_key ('cameraSeeing')) :
-        cameraSeeing =  configDict["cameraSeeing"]
+    if 'cameraSeeing' in configDict:
+        cameraSeeing = configDict["cameraSeeing"]
         print("    cameraSeeing:%f" % (cameraSeeing))
     else:
         print "cameraSeeing has no setting - exiting"
-        sys.exit (1)
+        sys.exit(1)
 
-    if ( configDict.has_key ('filtersConf')) :
-        filtersConf =  configDict["filtersConf"]
+    if 'filtersConf' in configDict:
+        filtersConf = configDict["filtersConf"]
         print("    filtersConf:%s" % (filtersConf))
-    else :
+    else:
         filtersConf = DefaultFiltersConfigFile
         print("    filtersConf:%s default" % (filtersConf))
 
-    if ( configDict.has_key ('schedulerConf')) :
-        schedulerConf =  configDict["schedulerConf"]
+    if 'schedulerConf' in configDict:
+        schedulerConf = configDict["schedulerConf"]
         print("    schedulerConf:%s" % (schedulerConf))
-    else :
+    else:
         schedulerConf = DefaultSchedulerConfigFile
         print("    schedulerConf:%s default" % (schedulerConf))
 
-    if ( configDict.has_key ('schedulingDataConf')) :
-        schedulingDataConf =  configDict["schedulingDataConf"]
+    if 'schedulingDataConf' in configDict:
+        schedulingDataConf = configDict["schedulingDataConf"]
         print("    schedulindDataConf:%s" % (schedulingDataConf))
-    else :
+    else:
         schedulingDataConf = DefaultSchedulingDataConfigFile
         print("    schedulingDataConf:%s default" % (schedulingDataConf))
 
-    if ( configDict.has_key ('schedDownConf')) :
-        schedDownConf =  configDict["schedDownConf"]
-        print("    schedDownConf:%s" % (schedDownConf ))
-    else :
+    if 'schedDownConf' in configDict:
+        schedDownConf = configDict["schedDownConf"]
+        print("    schedDownConf:%s" % (schedDownConf))
+    else:
         print "schedDownConf has no setting"
 
-    if ( configDict.has_key ('unschedDownConf')) :
-        unschedDownConf =  configDict["unschedDownConf"]
-        print("    unschedDownConf:%s" % (unschedDownConf ))
-    else :
+    if 'unschedDownConf' in configDict:
+        unschedDownConf = configDict["unschedDownConf"]
+        print("    unschedDownConf:%s" % (unschedDownConf))
+    else:
         print "unschedDownConf has no setting"
 
-    if ( configDict.has_key ('instrumentConf')) :
-        instrumentConf =  configDict["instrumentConf"]
+    if 'instrumentConf' in configDict:
+        instrumentConf = configDict["instrumentConf"]
         print("    instrumentConf:%s" % (instrumentConf))
-    else :
-        instrumentConf =  DefaultInstrumentConfigFile
+    else:
+        instrumentConf = DefaultInstrumentConfigFile
         print("    instrumentConf:%s default" % (instrumentConf))
 
-    if ( configDict.has_key ('weakLensConf')) :
-        weakLensConf =  configDict["weakLensConf"]
+    if 'weakLensConf' in configDict:
+        weakLensConf = configDict["weakLensConf"]
         print("    weakLensConf:%s" % (weakLensConf))
-    else :
-        weakLensConf =  None
+    else:
+        weakLensConf = None
         print("    weakLensConf:%s default" % (weakLensConf))
 
-    if (not isinstance(weakLensConf,list)):
+    if not isinstance(weakLensConf, list):
         # turn it into a list with one entry
         weakLensConf = [weakLensConf]
 
-    if ( configDict.has_key ('WLpropConf')) :
-        WLpropConf =  configDict["WLpropConf"]
+    if 'WLpropConf' in configDict:
+        WLpropConf = configDict["WLpropConf"]
         print("    WLpropConf:%s" % (WLpropConf))
-    else :
-        WLpropConf =  None
+    else:
+        WLpropConf = None
         print("    WLpropConf:%s default" % (WLpropConf))
-    if (not isinstance(WLpropConf,list)):
+    if not isinstance(WLpropConf, list):
         # turn it into a list with one entry
         saveConf = WLpropConf
         WLpropConf = []
         WLpropConf.append(saveConf)
 
-    if ( configDict.has_key ('nearEarthConf')) :
-        nearEarthConf =  configDict["nearEarthConf"]
+    if 'nearEarthConf' in configDict:
+        nearEarthConf = configDict["nearEarthConf"]
         print("    nearEarthConf:%s" % (nearEarthConf))
-    else :
-        nearEarthConf =  None
+    else:
+        nearEarthConf = None
         print("    nearEarthConf:%s default" % (nearEarthConf))
 
-    if ( not isinstance(nearEarthConf,list)):
+    if not isinstance(nearEarthConf, list):
         # turn it into a list with one entry
         saveConf = nearEarthConf
         nearEarthConf = []
         nearEarthConf.append(saveConf)
 
-    if ( configDict.has_key ('superNovaConf')) :
-        superNovaConf =  configDict["superNovaConf"]
+    if 'superNovaConf' in configDict:
+        superNovaConf = configDict["superNovaConf"]
         print("    superNovaConf:%s" % (superNovaConf))
-    else :
-        superNovaConf =  None
+    else:
+        superNovaConf = None
         print("    superNovaConf:%s default" % (superNovaConf))
 
-    if (not isinstance(superNovaConf,list)):
+    if not isinstance(superNovaConf, list):
         # turn it into a list with one entry
         saveConf = superNovaConf
         superNovaConf = []
         superNovaConf.append(saveConf)
 
-    if ( configDict.has_key ('superNovaSubSeqConf')) :
-        superNovaSubSeqConf =  configDict["superNovaSubSeqConf"]
+    if 'superNovaSubSeqConf' in configDict:
+        superNovaSubSeqConf = configDict["superNovaSubSeqConf"]
         print("    superNovaSubSeqConf:%s" % (superNovaSubSeqConf))
-    else :
-        superNovaSubSeqConf =  None
+    else:
+        superNovaSubSeqConf = None
         print("    superNovaSubSeqConf:%s default" % (superNovaSubSeqConf))
 
-    if (not isinstance(superNovaSubSeqConf,list)):
+    if not isinstance(superNovaSubSeqConf, list):
         # turn it into a list with one entry
         saveConf = superNovaSubSeqConf
         superNovaSubSeqConf = []
         superNovaSubSeqConf.append(saveConf)
 
-    if ( configDict.has_key ('kuiperBeltConf')) :
-        kuiperBeltConf =  configDict["kuiperBeltConf"]
+    if 'kuiperBeltConf' in configDict:
+        kuiperBeltConf = configDict["kuiperBeltConf"]
         print("    kuiperBeltConf:%s" % (kuiperBeltConf))
-    else :
-        kuiperBeltConf =  None
+    else:
+        kuiperBeltConf = None
         print("    kuiperBeltConf:%s default" % (kuiperBeltConf))
 
-    if (not isinstance(kuiperBeltConf,list)):
+    if not isinstance(kuiperBeltConf, list):
         # turn it into a list with one entry
         saveConf = kuiperBeltConf
         kuiperBeltConf = []
         kuiperBeltConf.append(saveConf)
 
-    if ( configDict.has_key ('logfile')) :
-        logfile =  configDict["logfile"]
+    if 'logfile' in configDict:
+        logfile = configDict["logfile"]
         print("    logfile:%s" % (logfile))
-    else :
+    else:
         logfile = 'lsst.log_%s' % (SID)
         if os.path.exists('log'):
             logfile = os.path.join('log', logfile)
         print("    logfile:%s default" % (logfile))
 
-    if ( configDict.has_key ('verbose')) :
-        verbose =  configDict["verbose"]
+    if 'verbose' in configDict:
+        verbose = configDict["verbose"]
         print("    verbose:%d" % (verbose))
-    else :
-        verbose =  0
+    else:
+        verbose = 0
         print("    verbose:%d default" % (verbose))
 
-    if ( configDict.has_key ('downHistTbl')) :
-        downHistTbl =  configDict["downHistTbl"]
+    if 'downHistTbl' in configDict:
+        downHistTbl = configDict["downHistTbl"]
         print("    downHistTbl:%s" % (downHistTbl))
-    else :
-        downHistTbl =  "DownHist"
+    else:
+        downHistTbl = "DownHist"
         print("    downHistTbl:%s default" % (downHistTbl))
 
-    if ( configDict.has_key ('obsHistTbl')) :
-        obsHistTbl =  configDict["obsHistTbl"]
+    if 'obsHistTbl' in configDict:
+        obsHistTbl = configDict["obsHistTbl"]
         print("    obsHistTbl:%s" % (obsHistTbl))
-    else :
-        obsHistTbl =  "ObsHistory"
+    else:
+        obsHistTbl = "ObsHistory"
         print("    obsHistTbl:%s default" % (obsHistTbl))
 
-    if ( configDict.has_key ('timeHistTbl')) :
-        timeHistTbl =  configDict["timeHistTbl"]
+    if 'timeHistTbl' in configDict:
+        timeHistTbl = configDict["timeHistTbl"]
         print("    timeHistTbl:%s" % (timeHistTbl))
-    else :
-        timeHistTbl =  "TimeHistory"
+    else:
+        timeHistTbl = "TimeHistory"
         print("    timeHistTbl:%s default" % (timeHistTbl))
 
-    if ( configDict.has_key ('proposalTbl')) :
-        proposalTbl =  configDict["proposalTbl"]
+    if 'proposalTbl' in configDict:
+        proposalTbl = configDict["proposalTbl"]
         print("    proposalTbl:%s" % (proposalTbl))
-    else :
-        proposalTbl =  "Proposal"
+    else:
+        proposalTbl = "Proposal"
         print("    proposalTbl:%s default" % (proposalTbl))
 
-    if ( configDict.has_key ('seqHistoryTbl')) :
-        seqHistoryTbl =  configDict["seqHistoryTbl"]
+    if 'seqHistoryTbl' in configDict:
+        seqHistoryTbl = configDict["seqHistoryTbl"]
         print("    seqHistoryTbl:%s" % (seqHistoryTbl))
-    else :
-        seqHistoryTbl =  "SeqHistory"
+    else:
+        seqHistoryTbl = "SeqHistory"
         print("    seqHistoryTbl:%s default" % (seqHistoryTbl))
 
-    if ( configDict.has_key ('fieldTbl')) :
-        fieldTbl =  configDict["fieldTbl"]
+    if 'fieldTbl' in configDict:
+        fieldTbl = configDict["fieldTbl"]
         print("    fieldTbl:%s" % (fieldTbl))
-    else :
-        fieldTbl =  "Field"
+    else:
+        fieldTbl = "Field"
         print("    fieldTbl:%s default" % (fieldTbl))
 
-    if ( configDict.has_key ('userRegionTbl')) :
-        userRegionTbl =  configDict["userRegionTbl"]
+    if 'userRegionTbl' in configDict:
+        userRegionTbl = configDict["userRegionTbl"]
         print("    userRegionTbl:%s" % (userRegionTbl))
-    else :
-        userRegionTbl =  "UserRegion"
+    else:
+        userRegionTbl = "UserRegion"
         print("    userRegionTbl:%s default" % (userRegionTbl))
 
-    if ( configDict.has_key ('siteConf')) :
-        siteConf =  configDict["siteConf"]
+    if 'siteConf' in configDict:
+        siteConf = configDict["siteConf"]
         print("    siteConf:%s" % (siteConf))
-    else :
-        siteConf =  "./SiteCP.conf"
+    else:
+        siteConf = "./SiteCP.conf"
         print("    siteConf:%s default" % (siteConf))
 
     try:
         # Fetch Site Specific Configuration file
-        configDict, pairs =  readConfFile(siteConf)
+        configDict, pairs = readConfFile(siteConf)
     except IOError:
         message = []
         message.append("Please make sure you have copied LSST.conf from $SIMS_OPERATIONS_DIR/conf/survey")
@@ -457,110 +452,110 @@ def startLsst( args ):
 
     # store config in DB
     for line in pairs:
-        storeParam (lsstDB, SID, 0, 'site', line['index'], line['key'], line['val'])
+        storeParam(lsstDB, SID, 0, 'site', line['index'], line['key'], line['val'])
 
-    if ( configDict.has_key ('seeingEpoch')) :
-        seeingEpoch =  configDict["seeingEpoch"]
+    if 'seeingEpoch' in configDict:
+        seeingEpoch = configDict["seeingEpoch"]
         print("    seeingEpoch:%f" % (seeingEpoch))
-    else :
-        seeingEpoch =  49353.
+    else:
+        seeingEpoch = 49353.
         print("    seeingEpoch:%f default: 1994-01-01T00:00:00.0" % (seeingEpoch))
 
-    if ( configDict.has_key ('latitude')) :
-        latitude =  configDict["latitude"]
+    if 'latitude' in configDict:
+        latitude = configDict["latitude"]
         print("    latitude:%f" % (latitude))
-    else :
-        latitude =  -30.16527778
-        print("    latitude:%f default (CTIO)" % (latitude) )
+    else:
+        latitude = -30.16527778
+        print("    latitude:%f default (CTIO)" % (latitude))
 
-    if ( configDict.has_key ('longitude')) :
-        longitude =  configDict["longitude" ]
+    if 'longitude' in configDict:
+        longitude = configDict["longitude"]
         print("    longitude:%f" % (longitude))
-    else :
-        longitude =  -70.815
+    else:
+        longitude = -70.815
         print("    longitude:%f default (CTIO)" % (longitude))
 
-    if ( configDict.has_key ('height')) :
-        height =  configDict["height"]
+    if 'height' in configDict:
+        height = configDict["height"]
         print("    height:%f " % (height))
-    else :
-        height =  2215.
+    else:
+        height = 2215.
         print("    height:%f default (CTIO)" % (height))
 
-    if ( configDict.has_key ('pressure')) :
-        pressure =  configDict["pressure"]
+    if 'pressure' in configDict:
+        pressure = configDict["pressure"]
         print("    pressure:%f " % (pressure))
-    else :
-        pressure =  1010.
+    else:
+        pressure = 1010.
         print("    pressure:%f default (CTIO)" % (pressure))
 
-    if ( configDict.has_key ('temperature')) :
-        temperature =  configDict["temperature"]
+    if 'temperature' in configDict:
+        temperature = configDict["temperature"]
         print("    temperature:%f " % (temperature))
-    else :
-        temperature =  12.
+    else:
+        temperature = 12.
         print("    temperature:%f default (CTIO)" % (temperature))
 
-    if ( configDict.has_key ('relativeHumidity')) :
-        relativeHumidity =  configDict["relativeHumidity"]
+    if 'relativeHumidity' in configDict:
+        relativeHumidity = configDict["relativeHumidity"]
         print("    relativeHumidity:%f " % (relativeHumidity))
-    else :
-        relativeHumidity =  0.
+    else:
+        relativeHumidity = 0.
         print("    relativeHumidity:%f default (CTIO)" % (relativeHumidity))
 
-    if ( configDict.has_key ('weatherSeeingFudge')) :
-        weatherSeeingFudge =  configDict["weatherSeeingFudge"]
+    if 'weatherSeeingFudge' in configDict:
+        weatherSeeingFudge = configDict["weatherSeeingFudge"]
         print("    weatherSeeingFudge:%f" % (weatherSeeingFudge))
-    else :
-        weatherSeeingFudge =  1.
+    else:
+        weatherSeeingFudge = 1.
         print("    weatherSeeingFudge:%f default" % (weatherSeeingFudge))
 
-    if ( configDict.has_key ('seeingTbl')) :
-        seeingTbl =  configDict["seeingTbl"]
+    if 'seeingTbl' in configDict:
+        seeingTbl = configDict["seeingTbl"]
         print("    seeingTbl:%s" % (seeingTbl))
-    else :
-        seeingTbl =  "SeeingPachon"
+    else:
+        seeingTbl = "SeeingPachon"
         print("    seeingTbl:%s default" % (seeingTbl))
 
-    if ( configDict.has_key ('cloudTbl')) :
-        cloudTbl =  configDict["cloudTbl"]
+    if 'cloudTbl' in configDict:
+        cloudTbl = configDict["cloudTbl"]
         print("    cloudTbl:%s" % (cloudTbl))
-    else :
-        cloudTbl =  "CloudPachon"
+    else:
+        cloudTbl = "CloudPachon"
         print("    cloudTbl:%s default" % (cloudTbl))
 
-    if ( configDict.has_key ('misHistTbl')) :
-        misHistTbl =  configDict["misHistTbl"]
+    if 'misHistTbl' in configDict:
+        misHistTbl = configDict["misHistTbl"]
         print("    misHistTbl:%s" % (misHistTbl))
-    else :
-        misHistTbl =  "MissedHistory"
+    else:
+        misHistTbl = "MissedHistory"
         print("    misHistTbl:%s default" % (misHistTbl))
 
-
-    dbTables =  '{"obsHist":"%s","timeHist":"%s","proposal":"%s","session":"%s","seqHistory":"%s","field":"%s","userRegion":"%s","seeing":"%s","cloud":"%s","misHist":"%s", "downHist":"%s"}' %(obsHistTbl,timeHistTbl,proposalTbl,sessionTbl,seqHistoryTbl,fieldTbl,userRegionTbl,seeingTbl,cloudTbl,misHistTbl,downHistTbl)
-    print "dbTables: %s" %(dbTables)
-    dbTableDict = eval(dbTables)
+    dbTablesKeys = ["obsHist", "timeHist", "proposal", "session", "seqHistory", "field", "userRegion",
+                    "seeing", "cloud", "misHist", "downHist"]
+    dbTables = (obsHistTbl, timeHistTbl, proposalTbl, sessionTbl, seqHistoryTbl, fieldTbl, userRegionTbl,
+                seeingTbl, cloudTbl, misHistTbl, downHistTbl)
+    import itertools
+    dbTableDict = dict((key, value) for key, value in itertools.izip(dbTablesKeys, dbTables))
     for key in dbTableDict:
-         print "    Database tables: " + key,dbTableDict[key]
+        print "    Database tables: " + key, dbTableDict[key]
 
     # ensure that at least one proposal is enabled
-    if ( (nearEarthConf == None) & (weakLensConf == None) &
-         (superNovaConf == None) & (superNovaSubSeqConf == None) &
-	 (kuiperBeltConf == None) & (WLpropConf == None)):
+    if nearEarthConf is None and weakLensConf is None and superNovaConf is None and \
+            superNovaSubSeqConf is None and kuiperBeltConf is None and WLpropConf is None:
         fatalError("At least one proposal type must be defined")
 
     # rename in order someday
     runSeeingFudge = weatherSeeingFudge
 
-    simEpoch = seeingEpoch + simStartDay;
+    simEpoch = seeingEpoch + simStartDay
 
-    print ('Session ID: %d' % (SID))
-
+    print('Session ID: %d' % (SID))
 
     # Setup logging
-    if ( verbose < 0 ) :
+    if verbose < 0:
         logfile = "/dev/null"
-        log=False
+        log = False
     else:
         log = logging.getLogger("lsst")
         hdlr = logging.FileHandler(logfile)
@@ -569,46 +564,27 @@ def startLsst( args ):
         log.addHandler(hdlr)
         log.setLevel(logging.INFO)
 
-    if ( log ):
+    if log:
         log.info('main:  SessionID:%d' % (SID))
 
     # init SimPy.
-    if (VERBOSE):
-        t0 = time.time ()
+    if VERBOSE:
+        t0 = time.time()
 #    Simulation.initialize ()
 
-    obsProfile = (longitude *DEG2RAD, latitude *DEG2RAD, height, simEpoch,pressure,temperature,relativeHumidity)
+    obsProfile = (longitude * DEG2RAD, latitude * DEG2RAD, height, simEpoch, pressure, temperature,
+                  relativeHumidity)
     # Create a Simulator instance
-    sim = Simulator (lsstDB=lsstDB,
-		     obsProfile=obsProfile,
-                     sessionID=SID,
-                     nRun=nRun,
-                     seeingEpoch=seeingEpoch,
-                     simStartDay=simStartDay,
-                     fov=fov,
-                     idleDelay=idleDelay,
-                     targetList=targetList,
-                     maxCloud=maxCloud,
-                     runSeeingFudge=runSeeingFudge,
-                     telSeeing=telSeeing,
-                     opticalDesSeeing=opticalDesSeeing,
-                     cameraSeeing=cameraSeeing,
-                     filtersConf=filtersConf,
-                     schedDownConf=schedDownConf,
-                     unschedDownConf=unschedDownConf,
-                     nearEarthConf=nearEarthConf,
-                     weakLensConf=weakLensConf,
-                     superNovaConf=superNovaConf,
-                     superNovaSubSeqConf=superNovaSubSeqConf,
-		     kuiperBeltConf=kuiperBeltConf,
-		     WLpropConf=WLpropConf,
-                     instrumentConf=instrumentConf,
-                     schedulerConf=schedulerConf,
-		     schedulingDataConf=schedulingDataConf,
-                     dbTableDict=dbTableDict,
-                     log=log,
-                     logfile=logfile,
-                     verbose=verbose)
+    sim = Simulator(lsstDB=lsstDB, obsProfile=obsProfile, sessionID=SID, nRun=nRun, seeingEpoch=seeingEpoch,
+                    simStartDay=simStartDay, fov=fov, idleDelay=idleDelay, targetList=targetList,
+                    maxCloud=maxCloud, runSeeingFudge=runSeeingFudge, telSeeing=telSeeing,
+                    opticalDesSeeing=opticalDesSeeing, cameraSeeing=cameraSeeing, filtersConf=filtersConf,
+                    schedDownConf=schedDownConf, unschedDownConf=unschedDownConf, nearEarthConf=nearEarthConf,
+                    weakLensConf=weakLensConf, superNovaConf=superNovaConf,
+                    superNovaSubSeqConf=superNovaSubSeqConf, kuiperBeltConf=kuiperBeltConf,
+                    WLpropConf=WLpropConf, instrumentConf=instrumentConf, schedulerConf=schedulerConf,
+                    schedulingDataConf=schedulingDataConf, dbTableDict=dbTableDict, log=log, logfile=logfile,
+                    verbose=verbose)
 
     # Activate the Simulator
 #    Simulation.activate (sim, sim.start (), 0.0)
@@ -623,10 +599,10 @@ def startLsst( args ):
     # for example, recording in the DB the unfinished sequences.
 
     sim.closeProposals(end)
-    if (VERBOSE):
-        print ('main: done simulating %f seconds' % (end) )
-        dt = time.time () - t0
-        print ('      simulation took %.02fs' % (dt))
+    if VERBOSE:
+        print('main: done simulating %f seconds' % (end))
+        dt = time.time() - t0
+        print('      simulation took %.02fs' % (dt))
 
     #lsstDB.closeConnection()
 
@@ -635,19 +611,19 @@ def startLsst( args ):
 if (__name__ == '__main__'):
     # Parse the command line args
     try:
-        args = parseArgs (sys.argv[1:])
+        args = parseArgs(sys.argv[1:])
     except:
-        usage (USAGE_STR)
-        sys.stderr.write ('Syntax error\n')
-        sys.exit (1)
+        usage(USAGE_STR)
+        sys.stderr.write('Syntax error\n')
+        sys.exit(1)
 
     # Profiling?
-    if (args.has_key ('profile') and args['profile'].lower () == 'yes'):
-        print ("Profile data sent to file 'ProfileData'")
+    if 'profile' in args and args['profile'].lower() == 'yes':
+        print("Profile data sent to file 'ProfileData'")
         import hotshot
         profiler = hotshot.Profile("ProfileData")
-        profiler.runcall(startLsst,args)
+        profiler.runcall(startLsst, args)
     else:
         startLsst(args)
 
-    sys.exit (0)
+    sys.exit(0)
