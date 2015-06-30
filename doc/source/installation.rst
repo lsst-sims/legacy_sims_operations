@@ -24,7 +24,7 @@ Installation Instructions
     # script below will ask some questions. Unless you know what you're doing,
     # and you need a fine tuned setup, please answer 'yes' everywhere.
     bash newinstall.sh
-    . loadLSST.bash
+    source loadLSST.bash
 
 * Install the OpSim code
 
@@ -74,39 +74,47 @@ Running OpSim
 -------------
 
 The above installation sets up the necessary environment for running the OpSim
-code. However, the database is not in a running state, but this can be easily
+code, however, the database is not in a running state. It can be easily
 started by executing the following command::
 
 	$OPSIM_RUN_DIR/etc/init.d/mysqld start
 
-Once OpSim is installed on a machine, it is recommended to setup a directory to
+Once OpSim is installed on a machine you can start a simulation from any 
+directory. It is recommended that you create a directory to
 run from that is not located with the installed code. You can call this
-directory whatever you like. The documentation will refer to this directory as
-``$RUN_DIR``. For your convenience, make sure to create a ``log`` and
-``output`` directory for easy organization of outputs from OpSim. Before
-running the simulation, the configuration may be done by reviewing and
+directory whatever you like, and this documentation will refer to this directory
+as ``$RUN_DIR``. For your convenience, make sure to create a ``log`` and
+``output`` directory at this location for easy organization of outputs
+from OpSim. Before running the simulation, the configuration may be done by 
+reviewing and
 customizing values for the parameters defined in the configuration files,
 which are located in ``$SIMS_OPERATIONS_DIR/conf`` and are described in the
-:ref:`configuration` section. As you will at least need to modify the
+:ref:`configuration` section. As you will most likely need to modify the
 ``LSST.conf`` file, it should be copied from the
-``$SIMS_OPERATIONS_DIR/conf/survey`` directory to your ``$RUN_DIR``.
+``$SIMS_OPERATIONS_DIR/conf/survey`` directory to a similar directory
+structure in ``$RUN_DIR``. Note that ``LSST.conf`` drives the simulation
+by pointing to other configuration files, and these path names may need to
+be changed to point to files you copied to your ``$RUN_DIR``.
 
-The OpSim code can be run as follows::
+::
 
-	opsim.py --track=no --startup_comment="Startup comment"
+	opsim.py --conf="myLSST.conf" --track=no --startup_comment="Startup comment"
 
+The ``conf`` option specifies the location of your modified LSST.conf file. 
 The ``track`` option is necessary to avoid adding an entry into the official
-run tracking DB. To shutdown the database, execute the following command::
+run tracking DB. 
+
+If it is ever necessary to shutdown the database, execute the following 
+command::
 
 	$OPSIM_RUN_DIR/etc/init.d/mysqld stop
 
-However, the OpSim code will not connect to the database if it is shutdown, so
-only do this if necessary.
+Note that the OpSim code will not connect to the database if it is shutdown.
 
 Getting the Source
 ------------------
 
-If one requires using the bleeding edge code, it can be obtained from the LSST
+If you require the bleeding edge code, it can be obtained from the LSST
 Github repository. Check out the following repositories in a
 designated LSST directory. For the purpose of this documentation we shall use
 ``/lsst`` ::
@@ -117,7 +125,7 @@ If you have write permission to the repository, you will be able to push changes
 back to the remote. If you do not have write permission, you can still make
 local changes but you will not be able to push them to the remote.
 
-Alternatively, one can setup SSH keys to handle source code control. Please
+Alternatively, you can setup SSH keys to handle source code control. Please
 follow Github's
 `procedure <https://help.github.com/articles/generating-ssh-keys>`_. In this
 case, the clone URL looks like::
@@ -132,7 +140,7 @@ locally by running the following command from the checkout directory::
 
 **NOTE**: You can run the scons ``tests`` and ``doc`` targets without issue. If
 you are modifying python code, nothing special needs to be done. If you are
-changing the DB setup/configuration files, one needs to run the following
+changing the DB setup/configuration files, you needs to run the following
 command before running the OpSim configuration step::
 
   scons install-cfg
@@ -164,11 +172,11 @@ If you are using your own python, also run the following::
 
   eups declare mysqlpython system -m none -r none -c
 
-After this, one can execute the ``eups distrib install`` and ``setup`` calls
+After this, you can execute the ``eups distrib install`` and ``setup`` calls
 as is from the :ref:`install-instruct` section. Then, continue following the
 instructions here.
 
-Since a database install already exists, one just needs to create a ``.my.cnf``
+Since a database install already exists, you just needs to create a ``.my.cnf``
 file and place it in you home directory. That file looks like::
 
   [client]
@@ -187,14 +195,14 @@ password in the database table setup script described below.
 
   **DO NOT** run the ``opsim-configure.py`` command above as is it unnecessary.
 
-To finish the setup, one needs to create the OpsimDB and populate some tables.
+To finish the setup you need to create the OpsimDB and populate some tables.
 Copy the ``setup_db.sh`` script from the ``$SIMS_OPERATIONS_DIR/tools``
 directory and edit the password variable at the top. Then execute the
 following::
 
   sh setup_db.sh
 
-This should create the OpsimDB and populate some initial tables. One should
+This should create the OpsimDB and populate some initial tables. You should
 now be able to run OpSim by following the :ref:`running-opsim` section above.
-However, one can ignore the ``mysql`` start and stop commands as the existing
+However, you can ignore the ``mysql`` start and stop commands as the existing
 installation will probably already be running.

@@ -90,12 +90,12 @@ def create_output_table(cursor, database, hname, sessionID):
     sql += 'where Session_sessionID = %d;' %(sessionID)
     ret = getDbData(cursor, sql)
 
-    ctioHeight = 2215.;
-    ctioLat = -30.16527778;
-    ctioLon = 70.815;
-    extC = .172;
-    DEG2RAD = 0.0174532925;
-    RAD2DEG = 57.2957795;
+#    ctioHeight = 2215.;
+#    ctioLat = -30.16527778;
+#    ctioLon = 70.815;
+#    extC = .172;
+#    DEG2RAD = 0.0174532925;
+#    RAD2DEG = 57.2957795;
 
     # For each observation, add the relevant additional information from other tables.
     # Note that the summary table is not one-to-one with the ObsHistory table (observations used for multiple proposals

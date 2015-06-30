@@ -1,71 +1,25 @@
 .. _scheduler:
 
-Scheduler 
+Scheduler
 ==========
 
-The directory /lsst/opsim/conf/scheduler contains the configuration files which govern look-ahead calculations and details of how ranked observations are chosen, as well as  what filters are available and when, and by how much to avoid various astronomical objects, such as the Moon.
+The directory $SIMS_OPERATIONS_DIR/conf/scheduler contains the configuration
+files which govern look-ahead calculations and details of how ranked
+observations are chosen, as well as  what filters are available and when, and
+by how much to avoid various astronomical objects, such as the Moon.
 
 
 Scheduler.conf
 --------------
 
-.. code-block:: python
+.. include:: ../../conf/scheduler/Scheduler.conf
+   :literal:
+   :code: python
 
-    ######################################################################
-    ########### Configuration for   Scheduler   ##########################
-    ######################################################################
-    # Slew time bonus for rank observations from any proposal.
-    # units are [rank*sec]
-    #       Bonus to add to Observations which are in close proximity to the current
-    #           telescope location
-    #       Units = none; Format = floast  Default = 0.5
-    MaxSlewTimeBonus = 5.0
-    
-    #       Count of Observations which the Proposals provide to ObsScheduler for
-    #           final ranking and selection
-    #       Units = none; Format = integer  Default = 100
-    NumSuggestedObsPerProposal = 500 
-    #NumSuggestedObsPerProposal = 50
-    
-    #       Count of Observations to take using precalculated science quantities
-    #       Units = none; Format = integer  Default = 20
-    recalcSkyCount = 10
-    
-    #       Count of Observations to take using precalculated science quantities
-    #       Units = none; Format = integer  Default = 20
-    #reuseRankingCount = 1
-    reuseRankingCount = 10
-    
-    
-    #       Value for which provided seeing is "Too Good To Be True" and is
-    #           thereafter set/capped to tooGoodSeeingLimit.
-    #       Units = arcseconds; Format = float  Default = .4
-    tooGoodSeeingLimit = 0.25
-    
-    #randomizeSequencesSelection = True
-    randomizeSequencesSelection = False
-    
-    # Filters Swap parameters
-    # moon phase threshold in percentage
-    NewMoonPhaseThreshold = 20.0
-    # minimum and maximum  number of filters to swap at start of new moon phase
-    NminFiltersToSwap = 1
-    NmaxFiltersToSwap = 1
-    
-    # minimum angle-distance in degrees to the moon allowed
-    MinDistance2Moon = 30
-    
-    
+
 SchedulingData.conf
 -------------------
 
-.. code-block:: python
-
-    ######################################################################
-    ########### Configuration for SchedulingData #########################
-    ######################################################################
-    
-    lookAheadNights = 3
-    lookAheadInterval = 300
-    
-            
+.. include:: ../../conf/scheduler/SchedulingData.conf
+   :literal:
+   :code: python
