@@ -30,9 +30,9 @@ with the default (maxCloud < .7), observations will be taken when
 :math:`\frac{5}{8}\rm ths`  or more of the sky is clear.
 
 
-There are two classes of observing mode - weakLensConf (or WLProp), and
+There are two classes of observing mode - weakLensConf (or WL), and
 WLpropConf (or WLTSS). Only observing programs specified in the following way
-are included.  WLprop observing modes only consider how many field/filter
+are included.  WL observing modes only consider how many field/filter
 combinations are requested versus how many have been accumulated. WLpropConf
 observing modes can have complex cadence requirements in addition to
 field/filter observations requirements.  A typical simulation with design area

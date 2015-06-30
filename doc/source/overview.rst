@@ -4,17 +4,14 @@
 Overview
 ********
 
-The Operations Simulator (OpSim) is a tool that creates a simulated survey of
-the Large Synoptic Survey Telescope (LSST) given science driven requirements, a
-model of the telescope and its control system and models of weather and other
-environmental variables. The output of such a simulation is an "observations
-history", which is a record of times, pointings and record of associated
-environmental data throughout the simulated survey.
+The Operations Simulator (OpSim) is an application that simulates the path of the Large Synoptic Survey Telescope (LSST) as it acquires images over the 10-year life of the planned survey.  Each visit or image of a field in a particular filter is selected by combining science program requirements, the mechanics of the telescope design and the modelled environmental conditions. The output of the simulator is a detailed record of the telescope movements and a complete description of the observing conditions and characteristics of each image.
+
+A technical description of how the Operations Simulator works is described in this `SPIE paper <http://dx.doi.org/10.1117/12.2056898>`_.
 
 General information about the LSST Project and its science goals is located on
-the publicly accessible `website <http://www.lsst.org>`_. Information and
-datasets released to the Science Collaborations can be accessed
-`here <https://confluence.lsstcorp.org/display/SIM/Operations+%28Observatory%29+Simulation+Gateway>`_.
+the `public LSST website <http://www.lsst.org>`_. Information and
+datasets released to the Science Collaborations can be accessed at the 
+`Operations Simulation Gateway <https://confluence.lsstcorp.org/display/SIM/Operations+%28Observatory%29+Simulation+Gateway>`_.
 
-Questions and comments should be directed to lsst-opsim@lsstcorp.org. The
-appropriate team member will respond to your request.
+Questions and comments should be directed to lsst-opsim@lsstcorp.org, and
+a member of the OpSim Team will respond to your request.
