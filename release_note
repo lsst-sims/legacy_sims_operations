@@ -1,3 +1,22 @@
+Release Notes for OpSim3.3                               Jul 2, 2015
+==================================
+Code features:
+  * Implemented filter change constraints
+  * Added ability to run OpSim outside source code directory
+  * Added flag to turn off run tracking of OpSim in tracking DB
+  * Added HOSTNAME override capability
+  * Added documentation publishing system for developers
+  * Updated documentation to be commensurate with latest developments
+
+Code bug fixes:
+  * Fixed formatting of ScienceType tags in configuration files
+  * Fixed mixed tabs and spaces in OpSim module files
+  * Corrected site information to OSS-REQ-0008 in LSE-30
+
+Tools bug fixes:
+  * Added rotTelPos back to Summary table
+  * Fixed issue with too many DB connections
+
 Release Notes for OpSim3.2.1                             Dec 26, 2014
 ==================================
 Bug Fixes:

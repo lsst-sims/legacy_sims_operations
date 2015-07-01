@@ -10,7 +10,7 @@ class TestInstrument(unittest.TestCase):
         """
         Setup necessary objects for creating an Instrument.
         """
-        self.db = DB.Database(False)
+        self.db = DB.Database(False, dbConnect=False)
 
         # Setup observatory profile
         configDict, pairs = utilities.readConfFile("conf/system/SiteCP.conf")

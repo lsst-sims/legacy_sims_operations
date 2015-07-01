@@ -67,9 +67,11 @@ class Opsim_TimeHistory(object):
     pass
 
 class Database:
-    def __init__(self, dbWrite):
+    def __init__(self, dbWrite, dbConnect=True):
 
         self.dbWrite = dbWrite
+        # This is used for unit testing so as not to need a DB connection when running
+        self.dbConnect = dbConnect
         print "dbWrite = "
         print dbWrite
 
@@ -127,6 +129,9 @@ class Database:
 
             Raise exception in case of error.
         """
+        # Mainly using this for unit testing.
+        if not self.dbConnect:
+            return None
         # Use configuration file with EUPS install otherwise use old way.
         conf_file = os.path.join(os.getenv("HOME"), ".my.cnf")
         if os.path.isfile(conf_file):
@@ -187,6 +192,8 @@ class Database:
         return (n, res)
 
     def closeConnection(self):
+        if not self.dbConnect:
+            return
         # Close the cursor
         self.cur.close()
         del (self.cur)
@@ -216,6 +223,8 @@ class Database:
         return oSession
 
     def addConfig(self, sessionID, propID, moduleName, paramIndex, paramName, paramValue, comment):
+        if not self.dbConnect:
+            return
         try:
             oConfig = Opsim_Config()
             oConfig.Session_sessionID = sessionID
