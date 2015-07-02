@@ -209,6 +209,7 @@ class TransSubSeqProp(Proposal):
             if fieldID not in self.sequences.keys():
                 self.SeqCount += 1
                 self.sequences[fieldID] = SuperSequence(self.propID, fieldID, self.SeqCount, self.WLtype,
+                                                        self.numGroupedVisits,
                                                         self.masterSubSequence, self.subSeqName,
                                                         self.subSeqNested, self.subSeqFilters,
                                                         self.subSeqExposures, self.subSeqEvents,

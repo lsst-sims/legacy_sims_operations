@@ -39,12 +39,13 @@ class SubSequence(LSSTObject):
     """
     Base class for the Sequence hiarchy.
     """
-    def __init__(self, propID, field, WLtype, subName, subNested, subFilters, subExposures, subEvents,
-                 subMaxMissed, subInterval, subWindowStart, subWindowMax, subWindowEnd):
+    def __init__(self, propID, field, WLtype, numGroupedVisits, subName, subNested, subFilters, subExposures,
+                 subEvents, subMaxMissed, subInterval, subWindowStart, subWindowMax, subWindowEnd):
 
         self.propID = propID
         self.field = field
         self.WLtype = WLtype
+        self.numGroupedVisits = numGroupedVisits
         self.subName = subName
         self.subNested = subNested
         self.subEvents = int(subEvents)
@@ -141,7 +142,7 @@ class SubSequence(LSSTObject):
             self.exclusiveBlockNeeded = True
 
         if self.CollectPairs():
-            self.pairNum = self.nAllEvents / 2 + 1
+            self.pairNum = self.nAllEvents / self.numGroupedVisits + 1
 
         return self.state
 
@@ -236,7 +237,7 @@ class SubSequence(LSSTObject):
             return True
         elif self.subInterval == 0:
             return False
-        elif (len(self.allHistory) % 2) == 0:
+        elif (len(self.allHistory) % self.numGroupedVisits) == 0:
             return False
         else:
             return True
@@ -393,8 +394,8 @@ class SuperSequence(LSSTObject):
     """
     Base class for the Sequence hiarchy.
     """
-    def __init__(self, propID, field, seqNum, WLtype, masterSubSequence, subSeqName, subSeqNested,
-                 subSeqFilters, subSeqExposures, subSeqEvents, subSeqMaxMissed, subSeqInterval,
+    def __init__(self, propID, field, seqNum, WLtype, numGroupedVisits, masterSubSequence, subSeqName,
+                 subSeqNested, subSeqFilters, subSeqExposures, subSeqEvents, subSeqMaxMissed, subSeqInterval,
                  subSeqWindowStart, subSeqWindowMax, subSeqWindowEnd, overflowLevel=0.0,
                  progressToStartBoost=1.0, maxBoostToComplete=0.0, log=None, logfile='./SuperSequence.log',
                  verbose=0):
@@ -422,6 +423,7 @@ class SuperSequence(LSSTObject):
         self.propID = propID
         self.field = field
         self.WLtype = WLtype
+        self.numGroupedVisits = numGroupedVisits
         self.masterSubSequence = masterSubSequence
         self.subSeqName = list(subSeqName)
         self.subSeqNested = list(subSeqNested)
@@ -448,6 +450,7 @@ class SuperSequence(LSSTObject):
             self.subSequence[name] = SubSequence(self.propID,
                                                  self.field,
                                                  WLtype,
+                                                 numGroupedVisits,
                                                  name,
                                                  nested,
                                                  self.subSeqFilters[n],
