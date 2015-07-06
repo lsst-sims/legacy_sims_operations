@@ -176,6 +176,10 @@ class WLprop (TransSubSeqProp):
         except:
             self.WLtype = False
         try:
+            self.numGroupedVisits = eval(str(config_dict['NumGroupedVisits']))
+        except:
+            self.numGroupedVisits = 2
+        try:
             self.overflowLevel = eval(str(config_dict['OverflowLevel']))
         except:
             self.overflowLevel = 0.0
