@@ -277,8 +277,8 @@ during a simulated survey.
 	| ObsHistory_Session_sessionID | int(10) unsigned | NO   |     | NULL    |                |
 	+------------------------------+------------------+------+-----+---------+----------------+
 
-This is a  many-to-many relationship table that keeps track of which visits
-fulfilled which proposals. 
+This table maps visits to a field to the proposal or proposals that 
+requested or required it. 
 
 **MissedHistory**
 ::
@@ -296,9 +296,20 @@ fulfilled which proposals.
 	| Field_fieldID     | int(10) unsigned | NO   | MUL | NULL    |                |
 	+-------------------+------------------+------+-----+---------+----------------+
 
-This table contains messages that are 
-generated when a sequence of visits to a field is started, but fails to 
-complete.  
+
+When a sequence of visits is requested the acquired visits are recorded in the 
+ObsHistory table, but if a subsequent visit in the sequence is missed - 
+meaning the target
+window of time for that visit has closed (or the simulation ends) - that visit 
+is recorded in this table.  The time is the point at which the simulator detects
+that the visit was not acquired, so it could be substantially different from 
+the end of the target window of time if the night ends or weather delays
+observing.
+WLtype=True proposals attempt to preferentially collect visits within specific
+time intervals, but the initial visit still contributes usefully to the end
+goal. For this reason if a subsequent visit to a field is not acquired within 
+the target window of time, it is not considered to be "missed" and will not
+appear in this table.
 
 **SeqHistory** 
 ::
@@ -320,10 +331,11 @@ complete.
 	| Proposal_propID   | int(10) unsigned | NO   | MUL | NULL    |                |
 	+-------------------+------------------+------+-----+---------+----------------+
 
-This table keeps track of the heirarchical information of 
-the various sequences requested for each field in a proposal. 
-A record for each field in the proposal requesting a sequence is updated with 
-the status of the sequence as the simulation progresses.
+The status of each sequence of visits to a field requested by a proposal is
+recorded in this table, and it is populated when either the sequence has 
+completed or is lost due to either missing the requested time window or the end of the simulation.
+If RestartCompleteSequences = True or RestartLostSequences = True, then a
+new record for the next sequence of visits to that field is created.
 
 
 **SeqHistory_MissedHistory** 
@@ -338,8 +350,9 @@ the status of the sequence as the simulation progresses.
 	| MissedHistory_Session_sessionID | int(10) unsigned | NO   |     | NULL    |                |
 	+---------------------------------+------------------+------+-----+---------+----------------+
 
-This table keeps track of visits to a field which were missed, or started 
-and not completed, in a sequence (a many-to-many relationship).  
+This table maps the visits to a field which were missed (in MissedHistory)
+to the sequence of which it was a member (a many-to-many relationship).  
+
 
 **SeqHistory_ObsHistory** 
 ::
@@ -353,8 +366,7 @@ and not completed, in a sequence (a many-to-many relationship).
 	| ObsHistory_Session_sessionID | int(10) unsigned | NO   |     | NULL    |                |
 	+------------------------------+------------------+------+-----+---------+----------------+
 
-This table maps visits to a field to the sequence for which they were acquired
-(a many-to-many relationship). 
+This table maps visits to a field (ObsHistory_obsHistID) to the particular sequence (SeqHistory_sequenceID) for which they were acquired (a many-to-many relationship). 
 
 **SlewActivities** 
 ::
