@@ -1,8 +1,8 @@
 .. _configuration:
 
-**************************************
+************************************
 Working with the Configuration Files
-**************************************
+************************************
 
 The cadence for any simulated survey is controlled by setting the values for
 parameters contained in the configuration files. These files are located in

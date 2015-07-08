@@ -1,10 +1,14 @@
 .. _overview:
 
+
 ********
 Overview
 ********
 
-The Operations Simulator (OpSim) is an application that simulates the path of the Large Synoptic Survey Telescope (LSST) as it acquires images over the 10-year life of the planned survey.  Each visit or image of a field in a particular filter is selected by combining science program requirements, the mechanics of the telescope design and the modelled environmental conditions. The output of the simulator is a detailed record of the telescope movements and a complete description of the observing conditions and characteristics of each image.
+The Operations Simulator (OpSim) is an application that simulates the field selection and image 
+acquisition process of the Large Synoptic Survey Telescope (LSST) over the 10-year life of the 
+planned survey.  
+Each visit or image of a field in a particular filter is selected by combining science program requirements, the mechanics of the telescope design and the modelled environmental conditions. The output of the simulator is a detailed record of the telescope movements and a complete description of the observing conditions as well as the characteristics of each image.
 
 A technical description of how the Operations Simulator works is described in this `SPIE paper <http://dx.doi.org/10.1117/12.2056898>`_.
 
