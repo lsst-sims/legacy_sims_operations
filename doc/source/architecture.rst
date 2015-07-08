@@ -50,15 +50,6 @@ Input Tables
 ------------
 
 **Cloud**
-::
-
-   +---------+------------+------+-----+---------+----------------+
-   | Field   | Type       | Null | Key | Default | Extra          |
-   +---------+------------+------+-----+---------+----------------+
-   | cloudID | int(11)    | NO   | PRI | NULL    | auto_increment |
-   | c_date  | bigint(20) | NO   |     | NULL    |                |
-   | cloud   | double     | NO   |     | NULL    |                |
-   +---------+------------+------+-----+---------+----------------+
 
 The model for the weather is based on 10 years of cloud data 
 from Cerro Tololo where four times per night a telescope operator estimated 
@@ -71,17 +62,17 @@ value does not
 exceed a specification in the configuration files (usually set to 0.7). If 
 ``cloud`` exceeds the specified value, then observing pauses for 300 seconds,
 after which it is re-evaluated.
-
-**Seeing**
 ::
 
-	+----------+------------+------+-----+---------+----------------+
-	| Field    | Type       | Null | Key | Default | Extra          |
-	+----------+------------+------+-----+---------+----------------+
-	| seeingID | int(11)    | NO   | PRI | NULL    | auto_increment |
-	| s_date   | bigint(20) | NO   |     | NULL    |                |
-	| seeing   | double     | NO   |     | NULL    |                |
-	+----------+------------+------+-----+---------+----------------+
+   +---------+------------+------+-----+---------+----------------+
+   | Field   | Type       | Null | Key | Default | Extra          |
+   +---------+------------+------+-----+---------+----------------+
+   | cloudID | int(11)    | NO   | PRI | NULL    | auto_increment |
+   | c_date  | bigint(20) | NO   |     | NULL    |                |
+   | cloud   | double     | NO   |     | NULL    |                |
+   +---------+------------+------+-----+---------+----------------+
+
+**Seeing**
 
 The seeing model is based on seeing observations taken on Cerro Pachon for a 
 total of one year.  A semi-analytic technique
@@ -94,8 +85,30 @@ The simulator implements this
 model by chosing the value after the time of observation until the time of the 
 next observation, and observing proceeds unless this value exceeds a 
 specification in the configuration files (typically 1.5 arcsec). 
+::
+
+	+----------+------------+------+-----+---------+----------------+
+	| Field    | Type       | Null | Key | Default | Extra          |
+	+----------+------------+------+-----+---------+----------------+
+	| seeingID | int(11)    | NO   | PRI | NULL    | auto_increment |
+	| s_date   | bigint(20) | NO   |     | NULL    |                |
+	| seeing   | double     | NO   |     | NULL    |                |
+	+----------+------------+------+-----+---------+----------------+
 
 **Field**
+
+OpSim simulates observing by "visiting" fields on the sky whose coordinates
+are defined in this table.  The field centers are determined from a tesselation
+(or tiling) of the celestial sphere which results in a closest-packed set of 
+5280 hexagons and 12 pentagons inscribed in circular fields having a 
+3.5-degree diameter (R. H. Hardin, N. J. A. Sloane and W. D. Smith, "Tables of spherical codes with icosahedral symmetry," published electronically at http://NeilSloane.com/icosahedral.codes/). These coordinates are stored in this table 
+during the installation of OpSim, however, any other set of field centers may 
+be substituted.  During a simulation, each configuration file (or observing 
+program) specifies either a list of field centers or a region on the sky to 
+observe, and these are mapped to the corresponding fields from this
+table.  The column ``fieldID`` is a unique field identifier, ``fieldRA`` is the 
+Right Ascension (J2000) of the field, and ``fieldDec`` is the Declination
+(J2000) of the field.
 ::
 
 	+----------+------------------+------+-----+---------+----------------+
@@ -111,23 +124,18 @@ specification in the configuration files (typically 1.5 arcsec).
 	| fieldEB  | double           | NO   |     | NULL    |                |
 	+----------+------------------+------+-----+---------+----------------+
 
-OpSim simulates observing by "visiting" fields on the sky whose coordinates
-are defined in this table.  The field centers are determined from a tesselation
-(or tiling) of the celestial sphere which results in a closest-packed set of 
-5280 hexagons and 12 pentagons inscribed in circular fields having a 
-3.5-degree diameter (R. H. Hardin, N. J. A. Sloane and W. D. Smith, "Tables of spherical codes with icosahedral symmetry," published electronically at http://NeilSloane.com/icosahedral.codes/). These coordinates are stored in this table 
-during the installation of OpSim, however, any other set of field centers may 
-be substituted.  During a simulation, each configuration file (or observing 
-program) specifies either a list of field centers or a region on the sky to 
-observe, and these are mapped to the corresponding fields from this
-table.  The column ``fieldID`` is a unique field identifier, ``fieldRA`` is the 
-Right Ascension (J2000) of the field, and ``fieldDec`` is the Declination
-(J2000) of the field.
-
 Output Tables
 -------------
 
 **Session** 
+
+This table is the log of all simulations that have been created and stored in this
+database, and it links the 
+information in all the tables for each simulation together.
+Every OpSim simulation generates a ``sessionID`` and an entry in this table 
+which is unique for each database.  All of the output tables 
+have a foreign key relationship with this table, and output data is identified 
+primarily using the ``sessionID`` column from this table.
 ::
 
 	+-------------+------------------+------+-----+---------+----------------+
@@ -141,14 +149,10 @@ Output Tables
 	| runComment  | varchar(200)     | YES  |     | NULL    |                |
 	+-------------+------------------+------+-----+---------+----------------+
 
-This table is the hub for all OpSim runs and ties all the tables together.
-Every OpSim simulation generates a ``sessionID`` and an entry in this table 
-which is unique for each database.
-All of the output tables 
-have a foreign key relationship with this table, and output data is identified 
-primarily using the ``sessionID`` column from this table.
-
 **Config**
+
+All of the parameters and their values from all configuration files used to
+specify a simulation are stored in this table.
 ::
 
 	+-------------------+------------------+------+-----+---------+----------------+
@@ -164,10 +168,11 @@ primarily using the ``sessionID`` column from this table.
 	| nonPropID         | int(10)          | YES  |     | NULL    |                |
 	+-------------------+------------------+------+-----+---------+----------------+
 
-All of the parameters and their values from all configuration files used to
-specify a simulation are stored in this table.
-
 **Config_File**
+
+This table is intended to store a complete copy of the contents of
+all configuration files including commented lines. It has not yet been
+implemented.
 ::
 
 	+-------------------+------------------+------+-----+---------+----------------+
@@ -179,11 +184,10 @@ specify a simulation are stored in this table.
 	| Session_sessionID | int(10) unsigned | NO   | MUL | NULL    |                |
 	+-------------------+------------------+------+-----+---------+----------------+
 
-This table is intended to store a complete copy of the contents of
-all configuration files including commented lines. It has not yet been
-implemented.
-
 **Proposal** 
+
+The names of all proposals ``propConf`` and their identifier ``propID`` which 
+were used to drive a simulation are listed for each ``SessionID`` in this table.
 ::
 
 	+-------------------+------------------+------+-----+---------+----------------+
@@ -197,10 +201,11 @@ implemented.
 	| Session_sessionID | int(10) unsigned | NO   | MUL | NULL    |                |
 	+-------------------+------------------+------+-----+---------+----------------+
 
-The names of all proposals ``propConf`` and their identifier ``propID`` which 
-were used to drive a simulation are listed for each ``SessionID`` in this table.
-
 **Proposal_Field** 
+
+This is a many-to-many relationship table that stores the fields ``fieldID`` 
+from the Field table which were mapped to the field centers
+or regions specified for each proposal ``propID``.
 ::
 
 	+-------------------+------------------+------+-----+---------+----------------+
@@ -212,11 +217,10 @@ were used to drive a simulation are listed for each ``SessionID`` in this table.
 	| Field_fieldID     | int(10) unsigned | NO   | MUL | NULL    |                |
 	+-------------------+------------------+------+-----+---------+----------------+
 
-This is a many-to-many relationship table that stores the fields ``fieldID`` 
-from the Field table which were mapped to the field centers
-or regions specified for each proposal ``propID``.
-
 **ObsHistory** 
+
+This table stores a record of each visit made by the telescope 
+during a simulated survey.
 ::
 
 	+-------------------+------------------+------+-----+---------+-------+
@@ -261,10 +265,10 @@ or regions specified for each proposal ``propID``.
 	| Field_fieldID     | int(10) unsigned | NO   | MUL | NULL    |       |
 	+-------------------+------------------+------+-----+---------+-------+
 
-This table stores a record of each visit made by the telescope 
-during a simulated survey.
-
 **ObsHistory_Proposal** 
+
+This table maps visits to a field to the proposal or proposals that 
+requested or required it. 
 ::
 
 	+------------------------------+------------------+------+-----+---------+----------------+
@@ -277,10 +281,21 @@ during a simulated survey.
 	| ObsHistory_Session_sessionID | int(10) unsigned | NO   |     | NULL    |                |
 	+------------------------------+------------------+------+-----+---------+----------------+
 
-This table maps visits to a field to the proposal or proposals that 
-requested or required it. 
-
 **MissedHistory**
+
+When a sequence of visits is requested the acquired visits are recorded in the 
+ObsHistory table, but if a subsequent visit in the sequence is missed - 
+meaning the target
+window of time for that visit has closed (or the simulation ends) - that visit 
+is recorded in this table.  The time is the point at which the simulator detects
+that the visit was not acquired, so it could be substantially different from 
+the end of the target window of time if the night ends or weather delays
+observing.
+``WLtype = True`` proposals attempt to preferentially collect visits within specific
+time intervals, but the initial visit still contributes usefully to the end
+goal. For this reason if a subsequent visit to a field is not acquired within 
+the target window of time, it is not considered to be "missed" and will not
+appear in this table.
 ::
 
 	+-------------------+------------------+------+-----+---------+----------------+
@@ -296,22 +311,13 @@ requested or required it.
 	| Field_fieldID     | int(10) unsigned | NO   | MUL | NULL    |                |
 	+-------------------+------------------+------+-----+---------+----------------+
 
-
-When a sequence of visits is requested the acquired visits are recorded in the 
-ObsHistory table, but if a subsequent visit in the sequence is missed - 
-meaning the target
-window of time for that visit has closed (or the simulation ends) - that visit 
-is recorded in this table.  The time is the point at which the simulator detects
-that the visit was not acquired, so it could be substantially different from 
-the end of the target window of time if the night ends or weather delays
-observing.
-WLtype=True proposals attempt to preferentially collect visits within specific
-time intervals, but the initial visit still contributes usefully to the end
-goal. For this reason if a subsequent visit to a field is not acquired within 
-the target window of time, it is not considered to be "missed" and will not
-appear in this table.
-
 **SeqHistory** 
+
+The status of each sequence of visits to a field requested by a proposal is
+recorded in this table, and it is populated when either the sequence has 
+completed or is lost due to either missing the requested time window or the end of the simulation.
+If ``RestartCompleteSequences = True`` or ``RestartLostSequences = True``, then a
+new record for the next sequence of visits to that field is created.
 ::
 
 	+-------------------+------------------+------+-----+---------+----------------+
@@ -331,14 +337,10 @@ appear in this table.
 	| Proposal_propID   | int(10) unsigned | NO   | MUL | NULL    |                |
 	+-------------------+------------------+------+-----+---------+----------------+
 
-The status of each sequence of visits to a field requested by a proposal is
-recorded in this table, and it is populated when either the sequence has 
-completed or is lost due to either missing the requested time window or the end of the simulation.
-If RestartCompleteSequences = True or RestartLostSequences = True, then a
-new record for the next sequence of visits to that field is created.
-
-
 **SeqHistory_MissedHistory** 
+
+This table maps the visits to a field which were missed (in MissedHistory)
+to the sequence of which it was a member (a many-to-many relationship).  
 ::
 
 	+---------------------------------+------------------+------+-----+---------+----------------+
@@ -350,11 +352,9 @@ new record for the next sequence of visits to that field is created.
 	| MissedHistory_Session_sessionID | int(10) unsigned | NO   |     | NULL    |                |
 	+---------------------------------+------------------+------+-----+---------+----------------+
 
-This table maps the visits to a field which were missed (in MissedHistory)
-to the sequence of which it was a member (a many-to-many relationship).  
-
-
 **SeqHistory_ObsHistory** 
+
+This table maps visits to a field ``ObsHistory_obsHistID`` to the particular sequence ``SeqHistory_sequenceID`` for which they were acquired (a many-to-many relationship). 
 ::
 
 	+------------------------------+------------------+------+-----+---------+----------------+
@@ -366,9 +366,43 @@ to the sequence of which it was a member (a many-to-many relationship).
 	| ObsHistory_Session_sessionID | int(10) unsigned | NO   |     | NULL    |                |
 	+------------------------------+------------------+------+-----+---------+----------------+
 
-This table maps visits to a field (ObsHistory_obsHistID) to the particular sequence (SeqHistory_sequenceID) for which they were acquired (a many-to-many relationship). 
+**TimeHistory** 
+
+This table notes the time of certain events: the start of a night (event=0), a 
+new lunation or waning moon (event=1), a waxing moon (event=2), the beginning 
+of a new year (event=3), the end of dusk (event=4), the beginning of dawn 
+(event=5), and the end of a night (event=6).
+::
+
+	+-------------------+------------------+------+-----+---------+----------------+
+	| Field             | Type             | Null | Key | Default | Extra          |
+	+-------------------+------------------+------+-----+---------+----------------+
+	| timeHistID        | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+	| date              | int(10) unsigned | NO   |     | NULL    |                |
+	| mjd               | double           | NO   |     | NULL    |                |
+	| night             | int(10) unsigned | NO   |     | NULL    |                |
+	| event             | int(10) unsigned | NO   | MUL | NULL    |                |
+	| Session_sessionID | int(10) unsigned | NO   | MUL | NULL    |                |
+	+-------------------+------------------+------+-----+---------+----------------+
+
+**Log** 
+
+This table is intended to store code-level log statements to be used
+primarily for debugging purposes. It has not yet been implemented.
+::
+
+	+-------------------+------------------+------+-----+---------+----------------+
+	| Field             | Type             | Null | Key | Default | Extra          |
+	+-------------------+------------------+------+-----+---------+----------------+
+	| logID             | int(10)          | NO   | PRI | NULL    | auto_increment |
+	| log_name          | varchar(64)      | NO   |     | NULL    |                |
+	| log_value         | varchar(512)     | NO   |     | NULL    |                |
+	| Session_sessionID | int(10) unsigned | NO   | MUL | NULL    |                |
+	+-------------------+------------------+------+-----+---------+----------------+
 
 **SlewActivities** 
+
+This table keeps track of the various slew activities for a slew. 
 ::
 
 	+--------------------+-------------+------+-----+---------+----------------+
@@ -381,10 +415,10 @@ This table maps visits to a field (ObsHistory_obsHistID) to the particular seque
 	| SlewHistory_slewID | bigint(20)  | NO   | MUL | NULL    |                |
 	+--------------------+-------------+------+-----+---------+----------------+
 
-This table keeps track of the various slew activities 
-for a slew. 
-
 **SlewHistory** 
+
+This is one-to-one relationship table between the SlewHistory table and the ObsHistory
+table. It keeps track of the slew associated with each visit.
 ::
 
 	+------------------------------+------------------+------+-----+---------+----------------+
@@ -400,11 +434,11 @@ for a slew.
 	| ObsHistory_Session_sessionID | int(10) unsigned | NO   |     | NULL    |                |
 	+------------------------------+------------------+------+-----+---------+----------------+
 
-This is
-one-to-one relationship table between the SlewHistory table and the ObsHistory
-table. It keeps track of the slew associated with each visit.
-
 **SlewMaxSpeeds** 
+
+This table is a one-to-one relationship table between the SlewHistory table and the
+SlewMaxSpeeds table. This table keeps of the various speeds of the instrument
+during a slew. 
 ::
 
 	+--------------------+------------+------+-----+---------+----------------+
@@ -419,12 +453,10 @@ table. It keeps track of the slew associated with each visit.
 	| SlewHistory_slewID | bigint(20) | NO   | MUL | NULL    |                |
 	+--------------------+------------+------+-----+---------+----------------+
 
-This table is a one-to-one relationship table between the 
-SlewHistory table and the
-SlewMaxSpeeds table. This table keeps of the various speeds of the instrument
-during a slew. 
-
 **SlewState** 
+
+This table keeps track of the initial and the final slew states and the 
+various instrument parameters for a slew. 
 ::
 
 	+--------------------+-------------+------+-----+---------+----------------+
@@ -448,41 +480,4 @@ during a slew.
 	| SlewHistory_slewID | bigint(20)  | NO   | MUL | NULL    |                |
 	+--------------------+-------------+------+-----+---------+----------------+
 
-This table keeps
-track of the initial and the final slew states and the various instrument
-parameters for a slew. 
-
-**TimeHistory** 
-::
-
-	+-------------------+------------------+------+-----+---------+----------------+
-	| Field             | Type             | Null | Key | Default | Extra          |
-	+-------------------+------------------+------+-----+---------+----------------+
-	| timeHistID        | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
-	| date              | int(10) unsigned | NO   |     | NULL    |                |
-	| mjd               | double           | NO   |     | NULL    |                |
-	| night             | int(10) unsigned | NO   |     | NULL    |                |
-	| event             | int(10) unsigned | NO   | MUL | NULL    |                |
-	| Session_sessionID | int(10) unsigned | NO   | MUL | NULL    |                |
-	+-------------------+------------------+------+-----+---------+----------------+
-
-This table notes the time of certain events: the start of a night (event=0), a 
-new lunation or waning moon (event=1), a waxing moon (event=2), the beginning 
-of a new year (event=3), the end of dusk (event=4), the beginning of dawn 
-(event=5), and the end of a night (event=6).
-
-**Log** 
-::
-
-	+-------------------+------------------+------+-----+---------+----------------+
-	| Field             | Type             | Null | Key | Default | Extra          |
-	+-------------------+------------------+------+-----+---------+----------------+
-	| logID             | int(10)          | NO   | PRI | NULL    | auto_increment |
-	| log_name          | varchar(64)      | NO   |     | NULL    |                |
-	| log_value         | varchar(512)     | NO   |     | NULL    |                |
-	| Session_sessionID | int(10) unsigned | NO   | MUL | NULL    |                |
-	+-------------------+------------------+------+-----+---------+----------------+
-
-This table is intended to store code level log statements to be used
-primarily for debugging purposes. It has not yet been implemented.
 

@@ -3,7 +3,7 @@
 System
 ==========
 
-The directory $SIMS_OPERATIONS_DIR/conf/system/ contains configuration files
+The directory ``$SIMS_OPERATIONS_DIR/conf/system/`` contains configuration files
 which govern the specifications of the telescope, the details for the site,
 downtime parameters and details of the granularity of the sky movement, sky
 brightness and moon calculations.

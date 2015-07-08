@@ -1,8 +1,10 @@
 .. _installation.rst:
+    
 
 *************************
 Installing the OpSim Code
 *************************
+
 The current source code is in the LSST Simulations sims_operations git (Github)
 repository. However, the code is now available as an EUPS package.
 
@@ -84,8 +86,8 @@ directory. It is recommended that you create a directory to
 run from that is not located with the installed code. You can call this
 directory whatever you like, and this documentation will refer to this directory
 as ``$RUN_DIR``. For your convenience, make sure to create a ``log`` and
-``output`` directory at this location for easy organization of outputs
-from OpSim. Before running the simulation, the configuration may be done by 
+``output`` directory at this location for easy organization of OpSim output.
+Before running the simulation, the configuration may be done by 
 reviewing and
 customizing values for the parameters defined in the configuration files,
 which are located in ``$SIMS_OPERATIONS_DIR/conf`` and are described in the

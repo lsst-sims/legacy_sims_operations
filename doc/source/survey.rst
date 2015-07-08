@@ -3,10 +3,13 @@
 Survey
 ==========
 
-The directory $SIMS_OPERATIONS_DIR/conf/survey/ contains configuration files
+The directory ``$SIMS_OPERATIONS_DIR/conf/survey/`` contains configuration files
 which govern the survey programs and master control of the survey. The only
 parameters you should change in LSST.conf are the run length and what observing
-modes/proposals are going to be used in the simulation.
+modes/proposals are going to be used in the simulation.  Below are descriptions 
+of common configuration files (LSST.conf is always neeeded), but there are many
+variations in the release survey directory and a few subdirectories which have
+variants pre-set for specific science goals and simulation investigations.
 
 LSST.conf
 ---------
@@ -41,12 +44,12 @@ the following proposals::
 
     weakLensConf = ../conf/survey/GalacticPlaneProp.conf
     weakLensConf = ../conf/survey/SouthCelestialPole-18.conf
-    weakLensConf = ../conf/survey/Standby.conf
 
     WLpropConf = ../conf/survey/Universal-18-0824.conf
     WLpropConf = ../conf/survey/NorthEclipticSpur-18.conf
+    WLpropConf = ../conf/survey/DDcosmology1.conf
 
-The following configuration files should not be modified without great caution::
+The following configuration files should be modified with great caution::
 
     instrumentConf = ../conf/system/Instrument.conf
     schedDownConf = ../conf/system/schedDown.conf
@@ -56,6 +59,8 @@ The following configuration files should not be modified without great caution::
 The configuration files in ``$SIMS_OPERATIONS_DIR/conf/scheduler/`` can be used
 to fine tune simulations, but should only be modified with care.  The default
 values have been derived over years and hundreds of simulations.
+
+Since the simulator can (and should be) run from a directory tree other than ``$SIMS_OPERATIONS_DIR``, the paths to the configuration files in LSST.conf should be absolute.
 
 .. include:: ../../conf/survey/LSST.conf
    :literal:
@@ -67,7 +72,7 @@ Universal-18-0824.conf
 
 This proposal is the primary way the WFD observing program has been simulated.
 It currently cannot use look ahead.  The ``WLtype = True`` statement makes the
-proposal collect field/filter visits in pairs (with the separation set by the
+proposal collect field/filter visits in tuples set with ``NumGroupedVisits = n``, where the default is 2 (with the separation set by the
 window parameters), but otherwise does not consider cadence.  Advice from early
 LSST NEO people was that u and y were not useful for NEOs, so we have been
 running those filters without collecting in pairs (note the window parameters).
@@ -80,7 +85,8 @@ slows down the simulation due to the constant reevaluation of the field/filters
 ranking.  We have found a value of 10 works well. This means that all possible
 ld/filter combinations are ranked based on the internal proposal logic, the
 relative importance of each proposal and the slew time to reach them.  The top
-10 are chosen; number 1 is observed.
+10 are chosen; number 1 is observed.  The remaining 9 are reranked and the top
+field observed and so on until the 10 are exhausted.
 
 Embedded comments explain most of the parameters well, but a few comments might
 be helpful.
@@ -90,11 +96,9 @@ be helpful.
 
 - **RestartLostSequences** is more relevant to WLpropConf proposals without
   ``WLtype = True``.  ``RestartLostSequences`` will restart a sequence which is
-  lost due to its missing too many observations.  It is set to False here,
-  because it is not critical that field/filter visits be collected in pairs, just
-  useful.  If set to True, it would probably result in collecting too many visits
-  per unit time for some fields as the proposal continues to try and get the
-  appropriately spaced pair.
+  lost due to its missing too many observations.  It is irrelevant for ``WLtype = true`` proposals.
+
+- **RestartCompleteSequences** is relevant to restart a time sequence when too many epoch have been lost and the sequence dies.  It is also relevant for a ``WLtype = true`` proposal where it will restart collection of field/filter pairs after the requested number have been collected.
 
 - **OverflowLevel, ProgressToStartBoost** and **MaxBoostToComplete** are
   parameters which were developed to help deliver the maximum number of fields
@@ -108,7 +112,8 @@ be helpful.
 
 Selection of the fields to be observed can be done in two ways: 1) define
 limits on the sky or 2) explicitly define the fields from the field table to be
-used.  The simulator currently will only observe at defined field centers
+used.  Defining limits on the sky is done with the maxReach parameter to control
+the declination limits and ``maxAbsRA and minAbsRA`` to control the RA range.  Examples of the RA control can be found in the Rolling subdirectory configuration files. The simulator currently will only observe at defined field centers
 chosen to tile the sky with no gaps (kind of hexagonal close packing for the
 inscribed hexagon of the circular FOV).  Dithering is currently added in a
 postprocessing step.  The ``userRegions`` found in the default configuration
@@ -120,9 +125,8 @@ seeing limits and sky brightness limits.  Seeing is calculated from 500nm
 zenith seeing values corrected for airmass and wavelength.  Sky brightness is
 calculated using the Krisciunus and Schafer algoritm for V band brightness and
 corrected to LSST bands.  A single value for z and y sky brightness is used for
-twilight observations.  In a post-processing step, the LSST ETC sky brightness
-is calculated and added to the output table and used for all calculations in
-the SSTAR output.  Clearly, this is inconsistent and we are working to fix this.
+twilight observations.  
+
 
 .. include:: ../../conf/survey/Universal-18-0824.conf
    :literal:
@@ -132,7 +136,7 @@ the SSTAR output.  Clearly, this is inconsistent and we are working to fix this.
 NorthEclipticSpur-18.conf
 -------------------------
 
-This proposal collects pairs of observations north of the limits for the WFD
+This proposal collects tuples of observations north of the limits for the WFD
 observing area and along the ecliptic north of the WFD area primarily for the
 purpose of detecting NEOs.  As such, it does not collect u or y data.  It is a
 variant of the Universal proposal.  Note the necessity to allow observations at
@@ -146,6 +150,9 @@ higher airmass and larger seeing.
 GalacticPlaneProp.conf
 ----------------------
 
+This proposal collects field/filter combinations with no regard for cadence (proposal type WL), but
+could easily be modified to be a WLprop proposal collecting in tuples.
+
 .. include:: ../../conf/survey/GalacticPlaneProp.conf
    :literal:
    :code: python
@@ -154,12 +161,22 @@ GalacticPlaneProp.conf
 SouthCelestialPole-18.conf
 --------------------------
 
+This proposal collects field/filter combinations with no regard for cadence (proposal type WL), but
+could easily be modified to be a WLprop proposal collecting in tuples.
+
+
 .. include:: ../../conf/survey/SouthCelestialPole-18.conf
    :literal:
    :code: python
 
 DDcosmology1.conf
 -----------------
+
+This is a sequence proposal collecting sequences of observations in 5 selected fields for deep
+cosmological studies.  There are two sets of sequences since the science wants all 6 filters and
+only 5 are mounted at any time.  This proposal needs a bit of modification, since as presented
+the parameters mean no main sequence will finish since the missed event parameter is set to zero
+and dark time (when u is mounted) is longer than the sequence interval.
 
 .. include:: ../../conf/survey/DDcosmology1.conf
    :literal:

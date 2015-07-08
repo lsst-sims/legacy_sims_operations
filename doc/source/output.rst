@@ -10,16 +10,18 @@ There are several ways to analyze the information in the output tables in
 order to understand how the configuration file parameters 
 have impacted the survey performance.
 
-It is recommended that you use the tool `modifySchema.sh` to create an extra 
-output table in the MySQL database called `summary_<hostname>_<sessionID>`.
+It is recommended that you use the tool ``modifySchema.sh`` to create an extra 
+output table in the MySQL database called ``summary_<hostname>_<sessionID>``.
+Each simulation is uniquely identified by the name of the machine where it was created 
+``<hostname>`` and an automatically incremented identifier ``<sessionID>``.
 This table contains
 the most commonly used fields from the output tables, and calculates and adds
-useful quantities such as `fiveSigmaDepth` and a set of dithered coordinates.
+useful quantities such as ``fiveSigmaDepth`` and a set of dithered coordinates.
 Here is a description of the `Summary table columns <https://confluence.lsstcorp.org/display/SIM/Summary+Table+Column+Descriptions>`_.  
 Additionally this script exports this table and  all the information from a 
-single `sessionID` to a MySQL (.sql) file and an SQLite (_sqlite.db) file.
-To run the script from the local directory you have set up to run the
-simulator, simply execute `$SIMS_OPERATIONS_DIR/tools/modifySchema.sh <sessionID>`.
+single ``sessionID`` to a MySQL (.sql) file and an SQLite (_sqlite.db) file.
+To run the script from the local directory from where you are running the
+simulator, simply execute ``$SIMS_OPERATIONS_DIR/tools/modifySchema.sh <sessionID>``.
 
 
 Metrics Analysis Framework
@@ -30,7 +32,7 @@ This framework provides tools for reading and interacting with the database,
 as well as many predefined analysis scripts that will help you gain insight 
 into a simulated survey. You can build on this tool by writing your 
 own customized analyses. Because MAF primarily uses the Summary table from
-the SQLite export file, you MUST run the `modifySchema.sh` script before 
+the SQLite export file, you MUST run the ``modifySchema.sh`` script before 
 using MAF.
 
 Queries using mySQL
