@@ -30,10 +30,9 @@ Installation Instructions
 
 * Install the OpSim code
 
-  **NOTE**: If you have an existing database installation (i.e. a system
-  installed mysql) and wish to use that, do not run the following commands
-  just yet. Please go to the :ref:`existing-db` section below. If you do not,
-  then continue on.
+  **NOTE**: If you have or wish to use a system installed MySQL database, do 
+  not run the following commands just yet. Please go to the :ref:`system-db` 
+  section below. If you do not, then continue on.
 
   .. code-block:: bash
 
@@ -147,14 +146,16 @@ command before running the OpSim configuration step::
 
   scons install-cfg
 
-.. _existing-db:
+.. _system-db:
 
-Using an Existing Database Installation
----------------------------------------
+Using a System Database Installation
+------------------------------------
 
 Before installing OpSim from EUPS, the following steps need to be accomplished.
-First, navigate to ``$EUPS_PATH/site`` and create a file called
-``manifest.remap``. Add the following line to the file::
+This section assumes that you have already installed the system MySQL database 
+via your operating system's standard installation methods. The first step is 
+to navigate to ``$EUPS_PATH/site`` and create a file called ``manifest.remap``. 
+Add the following line to the file::
 
   mysql system
 
@@ -178,7 +179,7 @@ After this, you can execute the ``eups distrib install`` and ``setup`` calls
 as is from the :ref:`install-instruct` section. Then, continue following the
 instructions here.
 
-Since a database install already exists, you just needs to create a ``.my.cnf``
+Since a database install already exists, you just need to create a ``.my.cnf``
 file and place it in you home directory. That file looks like::
 
   [client]
@@ -207,4 +208,5 @@ following::
 This should create the OpsimDB and populate some initial tables. You should
 now be able to run OpSim by following the :ref:`running-opsim` section above.
 However, you can ignore the ``mysql`` start and stop commands as the existing
-installation will probably already be running.
+installation will probably already be running. If it is not, please refer to 
+your operating system's documentation for handling the MySQL daemon.
