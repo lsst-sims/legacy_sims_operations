@@ -8,13 +8,16 @@ The :ref:`architecture.rst` section describes the input and output tables of the
 There are several ways to analyze the information in the output tables in order to understand 
 how the configuration file parameters have affected the survey performance.
 
-It is recommended that you use the tool ``modifySchema.sh`` to create an extra 
-output table in the MySQL database called ``Summary``.  This table contains
-the most commonly used fields from the output tables, and calculates and adds
-useful quantities such as ``fiveSigmaDepth`` and a set of dithered coordinates.
-Here is a description of the columns in this `summary table <https://confluence.lsstcorp.org/display/SIM/Summary+Table+Column+Descriptions>`_.  
-Additionally this script exports the Summary table as well as all the tables of information from a 
-single ``sessionID`` to a MySQL (.sql) file and to an SQLite (_sqlite.db) file.
+It is recommended that you use the tool ``modifySchema.sh`` which extracts all the information
+pertaining to a particular ``<sessionID>`` to a single file but in three different formats: 
+ASCII (.dat), MySQL (.sql), and SQLite (_sqlite.db). 
+Importantly, this script generates an extra table which contains the most 
+commonly used fields from the output tables, and calculates and adds additional useful 
+quantities such as ``fiveSigmaDepth`` and a set of dithered coordinates.
+In the MySQL database which OpSim writes to, and in the exported .sql file, this new table is 
+called ``summary_<hostname>_<sessionID>``. In the exported _sqlite.db file it is called 
+``Summary``. 
+Here is a description of the columns in this `table <https://confluence.lsstcorp.org/display/SIM/Summary+Table+Column+Descriptions>`_.  
 To run the script from the local directory from where you are running the
 simulator, simply execute ``$SIMS_OPERATIONS_DIR/tools/modifySchema.sh <sessionID>``.
 If a directory named ``output`` exists in the directory where you call this script, the 
