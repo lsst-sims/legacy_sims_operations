@@ -446,8 +446,8 @@ class Database:
                        moonBright, darkBright, rawSeeing, wind, humidity, sessionID, fieldID):
         # visitTime and visitExpTime are switched here to correct their incorrect use elsewhere. There are
         # too many places where visitExpTime (seen as 34 in the code and DB) are used to make changes in the
-        # code. visitTime (which is seen as zero in the code and DB) will be made to be 30 in the Observation
-        # class since it is never used anywhere else in the code.
+        # code. visitTime (which is seen as zero in the code and DB) will be made by subtracting 4 seconds
+        # from the visitExpTime before this call is made.
         try:
             oObs = Opsim_ObsHistory()
             oObs.obsHistID = obsHistID

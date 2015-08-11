@@ -674,6 +674,12 @@ class ObsScheduler(LSSTObject):
         solarElong_RAD = self.sky.getPlanetDistance('Sun', target, winner.date)
         winner.solarElong = math.degrees(solarElong_RAD)
 
+        # Fix Visit Exposure time (called visitTime below) for all variations of Exposure factor use as it
+        # is currently wired to use 2 x 15 sec exposures. The exposureTime below is 2 x N sec exposures plus
+        # readout and shutter time. Use of exposure factors not equal to 1 do not give precisely rounded
+        # values.
+        winner.visitTime = round(winner.exposureTime) - 4.0
+
         self.log.info("visit=%i night=%i date=%i field=%i filter=%s expTime=%f visitTime=%f lst=%f" %
                       (slewdata.slewCount, winner.night, winner.date, winner.fieldID, winner.filter,
                        winner.exposureTime, winner.visitTime, winner.lst))
