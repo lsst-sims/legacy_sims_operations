@@ -525,8 +525,8 @@ class TransSubSeqProp(Proposal):
                     if self.log and self.verbose > 2:
                         self.log.info('%sProp: suggestObs() propID=%d field=%i too low:%f' %
                                       (self.propFullName, self.propID, fieldID, airmass))
-                        fields_invisible += 1
-                        continue
+                    fields_invisible += 1
+                    continue
 
                 distance2moon = self.schedulingData.dist2moon[sdtime][fieldID]
                 if distance2moon < minDistance2Moon:
