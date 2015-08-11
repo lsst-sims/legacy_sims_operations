@@ -1,3 +1,15 @@
+Release Notes for Opsim3.3.2                             Aug 11, 2015
+==================================
+Code bug fixes:
+  * Fixed issue with visit exposure time when using exposure factors 
+    not equal to 1
+  * Fixed issue with WLTSS proposals not respecting airmass limits
+  * Fixed path issue for conda builds
+
+Documentation updates:
+  * Changed existing DB section in installation instructions to refer to a 
+    system DB instead
+
 Release Notes for Opsim3.3.1                             Jul 8, 2015
 ==================================
 Code features:
