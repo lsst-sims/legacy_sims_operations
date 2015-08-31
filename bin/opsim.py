@@ -316,6 +316,9 @@ def startLsst(args):
         WLpropConf = []
         WLpropConf.append(saveConf)
 
+    if None in weakLensConf and None in WLpropConf:
+        raise RuntimeError("Please uncomment proposals in the {0} file!".format(confLSST))
+
     if 'nearEarthConf' in configDict:
         nearEarthConf = configDict["nearEarthConf"]
         print("    nearEarthConf:%s" % (nearEarthConf))
