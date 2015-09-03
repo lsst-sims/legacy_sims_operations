@@ -86,24 +86,21 @@ run from that is not located with the installed code. You can call this
 directory whatever you like, and this documentation will refer to this directory
 as ``$RUN_DIR``. For your convenience, make sure to create a ``log`` and
 ``output`` directory at this location for easy organization of OpSim output.
-Before running the simulation, the configuration may be done by 
-reviewing and
-customizing values for the parameters defined in the configuration files,
-which are located in ``$SIMS_OPERATIONS_DIR/conf`` and are described in the
-:ref:`configuration` section. As you will most likely need to modify the
-``LSST.conf`` file, it should be copied from the
-``$SIMS_OPERATIONS_DIR/conf/survey`` directory to a similar directory
-structure in ``$RUN_DIR``. Note that ``LSST.conf`` drives the simulation
-by pointing to other configuration files, and these path names may need to
-be changed to point to files you copied to your ``$RUN_DIR``.
+Before running the simulation, the configuration files should be retrieved from 
+``$SIMS_OPERATIONS_DIR/conf`` by recursively copying the entire directory to 
+``$RUN_DIR``. The configuration for the survey run may be done by reviewing and
+customizing values for the parameters defined in the configuration files and 
+are described in the :ref:`configuration` section. Below is an example command 
+line invocation of OpSim.
 
 ::
 
-	opsim.py --conf="myLSST.conf" --track=no --startup_comment="Startup comment"
+	opsim.py --config=conf/survey/myLSST.conf --track=no --startup_comment="Startup comment"
 
-The ``conf`` option specifies the location of your modified LSST.conf file. 
+The ``config`` option specifies the location of your modified LSST.conf file. 
 The ``track`` option is necessary to avoid adding an entry into the official
-run tracking DB. 
+run tracking DB. The ``startup_comment`` should contain something descriptive 
+about the run you are performing.
 
 If it is ever necessary to shutdown the database, execute the following 
 command::
