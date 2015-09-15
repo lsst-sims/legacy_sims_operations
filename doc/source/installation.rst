@@ -6,12 +6,18 @@ Installing the OpSim Code
 *************************
 
 The current source code is in the LSST Simulations sims_operations git (Github)
-repository. However, the code is now available as an EUPS package.
+repository. However, the code is now available via :ref:`install-lsststack`, 
+:ref:`install-conda` and :ref:`install-docker`.
 
 .. _install-instruct:
 
 Installation Instructions
 -------------------------
+
+.. _install-lsststack:
+
+LSST Stack Install
+~~~~~~~~~~~~~~~~~~
 
 * Install the LSST Stack Setup
 
@@ -51,6 +57,8 @@ Installation Instructions
   configuration options. Please note the warnings about using special characters
   in the passwords.
 
+.. _opsim-config:
+
 * Run the OpSim Configuration
 
   The OpSim database is installed in a directory separate from the binary files.
@@ -68,6 +76,53 @@ Installation Instructions
 
 	  The above command will remove any previous configuration setup and database
 	  content!
+
+.. _install-conda:
+
+Conda Installation
+~~~~~~~~~~~~~~~~~~
+
+This installation assumes you have installed either the 
+`Anaconda Scientific Python Distribution <https://store.continuum.io/cshop/anaconda/>`_
+or `Miniconda <http://conda.pydata.org/miniconda.html>`_.
+
+First, add the LSST Conda channel to the configuration::
+
+  conda config --add channels http://eupsforge.net/conda/dev
+
+Next, create a Conda environment and activate it::
+
+  conda create -n opsim python
+  source activate opsim
+
+Next, install the package::
+
+  conda install lsst-sims-operations
+
+To finish the setup, run::
+
+  source eups-setups.sh
+  setup sims_operations
+
+If you need to get out if the environment::
+
+  source deactivate
+
+OpSim requires a database for running, so continue by following the directions 
+in the :ref:`OpSim Configuration<opsim-config>` and then the :ref:`running-opsim` sections.
+
+To update the package if a new release is issued::
+
+  conda update lsst-sims-operations
+
+.. _install-docker:
+
+Docker Image
+~~~~~~~~~~~~
+
+This installation assumes that you have Docker installed for your particular 
+OS of choice. The instructions for getting and using the image are found 
+`here <https://hub.docker.com/r/lsst/opsim/>`_.
 
 .. _running-opsim:
 
