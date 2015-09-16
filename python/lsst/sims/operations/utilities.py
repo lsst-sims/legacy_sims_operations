@@ -140,13 +140,15 @@ def parseArgs(args):
     in the command line args.
     """
     result = {}
+    # Short-circut check if help is being requested.
+    if "--help" in args or "-h" in args:
+        raise UserWarning
 
     for arg in args:
         try:
             (var, val) = string.split(arg, '=', 1)
         except:
             raise (SyntaxError, '%s is in the wrond format' % (arg))
-
         if (var[:2] != '--'):
             raise (SyntaxError, 'variable names must start with a ' +
                                 'double dash (%s)' % (var))
