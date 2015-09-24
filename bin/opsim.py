@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import logging
+import os
 import requests
 import time
 
@@ -12,8 +13,24 @@ from lsst.sims.operations.Simulator import *
 from lsst.sims.operations.Database import *
 
 # globals
-USAGE_STR = '[--profile=yes] [--verbose=yes] [--track=no] [--config=conf/survey/LSST.conf] '\
-            '[--startup_comment="comment"]'
+use = ["[options...]"]
+use.append("Options:")
+use.append("--startup_comment=<string>\tUse for a descriptive comment for the run.")
+use.append("\t" * 4 + "This goes into the run tracking DB.")
+use.append("\t" * 4 + "Default is \"No comment was entered\".")
+use.append("--config=<file>" + "\t" * 3 + "Path to the main configuration file.")
+use.append("\t" * 4 + "Default is $SIMS_OPERATIONS_DIR/conf/survey/LSST.conf.")
+use.append("--track=<val>" + "\t" * 3 + "Track simulation in OpSim Team run tracking DB.")
+use.append("\t" * 4 + "Default is yes. Adds an entry to tracking DB.")
+use.append("\t" * 4 + "Use --track=no to not track the run.")
+use.append("--verbose=<val>" + "\t" * 3 + "Print total time for the simulation to stdout.")
+use.append("\t" * 4 + "Default is no. ")
+use.append("--profile=<val>" + "\t" * 3 + "Profile the code. Default is no.")
+use.append("\t" * 4 + "Use --profile=yes to profile code.")
+use.append("\t" * 4 + "Only use with short runs.")
+use.append("-h, --help" + "\t" * 3 + "Print help and exit.")
+
+USAGE_STR = os.linesep.join(use)
 
 def getSessionID(lsstDB, sessionTbl, code_test, track_run, startup_comment):
     """
@@ -615,6 +632,9 @@ if (__name__ == '__main__'):
     # Parse the command line args
     try:
         args = parseArgs(sys.argv[1:])
+    except UserWarning:
+        usage(USAGE_STR)
+        sys.exit(0)
     except:
         usage(USAGE_STR)
         sys.stderr.write('Syntax error\n')
