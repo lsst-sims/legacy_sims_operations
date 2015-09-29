@@ -23,12 +23,9 @@ LSST Stack Install
 
   .. code-block:: bash
 
-    NEWINSTALL_URL=https://sw.lsstcorp.org/eupspkg/newinstall.sh
-    export EUPS_PKGROOT=${NEWINSTALL_URL}
-    INSTALL_DIR=root/directory/where/sims_operations/stack/will/be/installed
-    # e.g. ~/lsst Please note that $INSTALL_DIR must be empty
-    cd $INSTALL_DIR
-    curl -O ${NEWINSTALL_URL}
+    mkdir -p ~/lsst
+    cd ~/lsst
+    curl -O https://sw.lsstcorp.org/eupspkg/newinstall.sh
     # script below will ask some questions. Unless you know what you're doing,
     # and you need a fine tuned setup, please answer 'yes' everywhere.
     bash newinstall.sh
