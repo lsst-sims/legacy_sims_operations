@@ -267,7 +267,7 @@ class ObsScheduler(LSSTObject):
         coaddedNeedPerFilter = {}
         for filter in mountedFiltersList + unmountedFiltersList:
             coaddedNeedPerFilter[filter] = 0.0
-        coaddedPriority = 0.0
+
         (date, mjd, lst_RAD) = self.dateProfile
         # for proposal in self.interProposalRank.keys():
         for proposal in self.proposals_list:
@@ -276,7 +276,7 @@ class ObsScheduler(LSSTObject):
 
             ProgressPerFilter = proposal.GetProgressPerFilter()
             propPriority = proposal.GetPriority()
-            coaddedPriority += propPriority
+
             for filter in mountedFiltersList + unmountedFiltersList:
                 if filter in ProgressPerFilter.keys():
                     coaddedNeedPerFilter[filter] += propPriority * (1.0 - ProgressPerFilter[filter])
@@ -285,8 +285,8 @@ class ObsScheduler(LSSTObject):
                     coaddedNeedPerFilter[filter] += 0.0
         if self.log:
             for filter in coaddedNeedPerFilter.keys():
-                self.log.info('obsScheduler: SwapExtraFilterIn() Filter coadded need: %10s = %.3f%%' %
-                              (filter, 100.0 * coaddedNeedPerFilter[filter] / coaddedPriority))
+                self.log.info('obsScheduler: SwapExtraFilterIn() Filter coadded need: %10s = %.3f' %
+                              (filter, 100.0 * coaddedNeedPerFilter[filter]))
 
         # Creates a sorted queue for the removable filters, least needed first.
         removequeue = []
