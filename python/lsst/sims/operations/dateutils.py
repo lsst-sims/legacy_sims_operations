@@ -213,7 +213,13 @@ def dist(Ra1, Dec1, Ra2, Dec2):
     Output
         distance    distance between (Ra1,Dec1) and Ra2,Dec2), in radians
     """
-    dist = math.acos(math.sin(Dec1) * math.sin(Dec2) + math.cos(Dec1) * math.cos(Dec2) * math.cos(Ra1 - Ra2))
+    ia = math.sin(Dec1) * math.sin(Dec2) + math.cos(Dec1) * math.cos(Dec2) * math.cos(Ra1 - Ra2)
+    # Clamp to end ranges due to rounding issues.
+    if ia > 1.0:
+        ia = 1.0
+    if ia < -1.0:
+        ia = -1.0
+    dist = math.acos(ia)
     return dist
 
 if (__name__ == '__main__'):
