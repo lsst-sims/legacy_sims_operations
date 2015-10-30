@@ -67,7 +67,7 @@ Since the simulator can (and should be) run from a directory tree other than ``$
    :code: python
 
 
-Universal-18-0824.conf
+Universal-18-0824B.conf
 ----------------------
 
 This proposal is the primary way the WFD observing program has been simulated.
@@ -128,21 +128,23 @@ corrected to LSST bands.  A single value for z and y sky brightness is used for
 twilight observations.  
 
 
-.. include:: ../../conf/survey/Universal-18-0824.conf
+.. include:: ../../conf/survey/Universal-18-0824B.conf
    :literal:
    :code: python
 
 
-NorthEclipticSpur-18.conf
+NorthEclipticSpur-18c.conf
 -------------------------
 
 This proposal collects tuples of observations north of the limits for the WFD
 observing area and along the ecliptic north of the WFD area primarily for the
 purpose of detecting NEOs.  As such, it does not collect u or y data.  It is a
 variant of the Universal proposal.  Note the necessity to allow observations at
-higher airmass and larger seeing.
+higher airmass and larger seeing.  The NorthEclipticSpur-18c.conf has a reduced
+number of requested visits in the NES to optimize the WFD and other proposals
+for the whole survey.
 
-.. include:: ../../conf/survey/NorthEclipticSpur-18.conf
+.. include:: ../../conf/survey/NorthEclipticSpur-18c.conf
    :literal:
    :code: python
 
