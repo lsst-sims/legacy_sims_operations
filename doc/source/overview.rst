@@ -15,7 +15,7 @@ A technical description of how the Operations Simulator works is described in th
 General information about the LSST Project and its science goals is located on
 the `public LSST website <http://www.lsst.org>`_. Information and
 datasets released to the Science Collaborations can be accessed at the 
-`Operations Simulation Gateway <https://confluence.lsstcorp.org/display/SIM/Operations+%28Observatory%29+Simulation+Gateway>`_.
+`Operations Simulation Gateway <https://confluence.lsstcorp.org/display/SIM/Operations+Simulation+Gateway>`_.
 
 Questions and comments should be directed to lsst-opsim@lsstcorp.org, and
 a member of the OpSim Team will respond to your request.
