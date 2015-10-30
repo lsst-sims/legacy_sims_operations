@@ -1,3 +1,19 @@
+Release Notes for Opsim3.3.3                             Oct 30, 2015
+==================================
+Code bug fixes:
+  * Fixed crash building user regions that were equivalent to fields
+  * Fixed crash if no proposal was active before first dark time filter swap
+  * Made OpSim stop early if user specified no proposals
+  * Clarified OpSim command line usage message
+
+Code features:
+  * Updated many configuration files to current standards
+
+Documentation updates:
+  * Added Conda and Docker installation instructions
+  * OpSim installation and running directions made to match current practice
+  * Updates to DB architecture and configuration file documentation
+
 Release Notes for Opsim3.3.2                             Aug 11, 2015
 ==================================
 Code bug fixes:
