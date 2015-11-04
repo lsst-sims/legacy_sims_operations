@@ -85,7 +85,7 @@ or `Miniconda <http://conda.pydata.org/miniconda.html>`_.
 
 First, add the LSST Conda channel to the configuration::
 
-  conda config --add channels http://eupsforge.net/conda/dev
+  conda config --add channels http://eupsforge.net/conda/dev --add channels http://lsst-web.ncsa.illinois.edu/~mareuter/conda/dev
 
 Next, create a Conda environment and activate it::
 
