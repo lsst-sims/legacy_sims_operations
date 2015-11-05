@@ -270,6 +270,20 @@ def startLsst(args):
         print "cameraSeeing has no setting - exiting"
         sys.exit(1)
 
+    if 'scaleToNeff' in configDict:
+        scaleToNeff = configDict["scaleToNeff"]
+        print("    scaleToNeff:%f" % (scaleToNeff))
+    else:
+        print "scaleToNeff has no setting - exiting"
+        sys.exit(1)
+
+    if 'atmNeffFactor' in configDict:
+        atmNeffFactor = configDict["atmNeffFactor"]
+        print("    atmNeffFactor:%f" % (atmNeffFactor))
+    else:
+        print "atmNeffFactor has no setting - exiting"
+        sys.exit(1)
+
     if 'filtersConf' in configDict:
         filtersConf = configDict["filtersConf"]
         print("    filtersConf:%s" % (filtersConf))
@@ -598,7 +612,8 @@ def startLsst(args):
     sim = Simulator(lsstDB=lsstDB, obsProfile=obsProfile, sessionID=SID, nRun=nRun, seeingEpoch=seeingEpoch,
                     simStartDay=simStartDay, fov=fov, idleDelay=idleDelay, targetList=targetList,
                     maxCloud=maxCloud, runSeeingFudge=runSeeingFudge, telSeeing=telSeeing,
-                    opticalDesSeeing=opticalDesSeeing, cameraSeeing=cameraSeeing, filtersConf=filtersConf,
+                    opticalDesSeeing=opticalDesSeeing, cameraSeeing=cameraSeeing, scaleToNeff=scaleToNeff,
+                    atmNeffFactor=atmNeffFactor, filtersConf=filtersConf,
                     schedDownConf=schedDownConf, unschedDownConf=unschedDownConf, nearEarthConf=nearEarthConf,
                     weakLensConf=weakLensConf, superNovaConf=superNovaConf,
                     superNovaSubSeqConf=superNovaSubSeqConf, kuiperBeltConf=kuiperBeltConf,

@@ -48,7 +48,8 @@ from SchedulingData import *
 #class Simulator (Simulation.Process):
 class Simulator(object):
     def __init__(self, lsstDB, obsProfile, sessionID, nRun, seeingEpoch, simStartDay, fov, idleDelay,
-                 targetList, maxCloud, runSeeingFudge, telSeeing, opticalDesSeeing, cameraSeeing, filtersConf,
+                 targetList, maxCloud, runSeeingFudge, telSeeing, opticalDesSeeing, cameraSeeing,
+                 scaleToNeff, atmNeffFactor, filtersConf,
                  schedDownConf, unschedDownConf, nearEarthConf, weakLensConf, superNovaConf,
                  superNovaSubSeqConf, kuiperBeltConf, WLpropConf, instrumentConf, schedulerConf,
                  schedulingDataConf, dbTableDict, log=False, logfile='./Simulator.log', verbose=0):
@@ -73,6 +74,8 @@ class Simulator(object):
         targetList:
         runSeeingFudge:
         telSeeing:
+        scaleToNeff:
+        atmNeffFactor:
         filtersConf:
         schedDownConf:  Scheduled downtime config file
         unschedDownConf:  Unscheduled/random downtime config file
@@ -105,6 +108,8 @@ class Simulator(object):
         self.telSeeing = telSeeing
         self.opticalDesSeeing = opticalDesSeeing
         self.cameraSeeing = cameraSeeing
+        self.scaleToNeff = scaleToNeff
+        self.atmNeffFactor = atmNeffFactor
         self.filtersConf = filtersConf
         self.nearEarthConf = nearEarthConf     # NEA configuration file
         self.weakLensConf = weakLensConf       # Weak Lensing configuration file
@@ -702,6 +707,7 @@ class Simulator(object):
         self.filters = Filters(lsstDB=self.lsstDB, filtersConf=self.filtersConf, sessionID=self.sessionID,
                                dbTableDict=self.dbTableDict, telSeeing=self.telSeeing,
                                opticalDesSeeing=self.opticalDesSeeing, cameraSeeing=self.cameraSeeing,
+                               scaleToNeff=self.scaleToNeff, atmNeffFactor=self.atmNeffFactor,
                                log=self.log, logfile=self.logfile, verbose=self.verbose)
 
         # Init the Astronomical Sky
