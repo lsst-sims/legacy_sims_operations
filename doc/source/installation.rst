@@ -184,8 +184,9 @@ case, the clone URL looks like::
 
 You should have already installed and configured OpSim by following the
 instructions in the :ref:`install-instruct` section. The OpSim code can be setup
-locally by running the following command from the checkout directory::
+locally by running the following commands from the checkout directory::
 
+  eups declare -r . -t $USER sims_operations
   setup sims_operations -t $USER
 
 **NOTE**: You can run the scons ``tests`` and ``doc`` targets without issue. If
