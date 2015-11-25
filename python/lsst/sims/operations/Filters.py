@@ -66,7 +66,7 @@ filterOffset['z', 100.] = -1.16
 #class Filters(Simulation.Process):
 class Filters(object):
     def __init__(self, lsstDB, filtersConf, sessionID, dbTableDict, telSeeing, opticalDesSeeing, cameraSeeing,
-                 log=False, logfile='./Filters.log', verbose=0):
+                 scaleToNeff, atmNeffFactor, log=False, logfile='./Filters.log', verbose=0):
         """
         Standard initializer.
 
@@ -98,6 +98,11 @@ class Filters(object):
         self.telSeeing = telSeeing
         self.opticalDesSeeing = opticalDesSeeing
         self.cameraSeeing = cameraSeeing
+        self.scaleToNeff = scaleToNeff
+        self.atmNeffFactor = atmNeffFactor
+
+        self.seeing_fwhm_sys_zenith = math.sqrt(self.telSeeing**2 + self.opticalDesSeeing**2 +
+                                                self.cameraSeeing**2)
 
         if self.log and self.verbose > 1:
             self.log.info('Filters: init()')
@@ -155,7 +160,7 @@ class Filters(object):
         self.ExposureFactor = {}
         for ix in range(numFilters):
             self.relativeRankForFilter[self.filterNamesSorted[ix]] = self.filterRank[ix] / self.filterRank[0]
-            self.basefilterWavelenSorted[ix] = math.pow((0.50 / float(self.filterWavelenSorted[ix])), 0.2)
+            self.basefilterWavelenSorted[ix] = math.pow((0.50 / float(self.filterWavelenSorted[ix])), 0.3)
             self.ExposureFactor[self.filterNamesSorted[ix]] = self.filterExpFactorSorted[ix]
         return
 
@@ -183,10 +188,7 @@ class Filters(object):
                 # Layer on adjustments to seeing:
                 # entered with: raw -> tooGood
                 # adding on: wavelength -> airmass -> telescopeSystematics
-                wvSee = seeing * self.basefilterWavelenSorted[ix]
-                adjustSee = math.sqrt(math.pow(wvSee * air_3_5, 2) + math.pow(self.telSeeing * air_3_5, 2) +
-                                      math.pow(self.opticalDesSeeing, 2) + math.pow(self.cameraSeeing, 2))
-                filterList[self.filterNamesSorted[ix]] = adjustSee
+                self.computeFwhmEffSeeing(filterList, ix, seeing, air_3_5)
 
         return filterList
 
@@ -197,12 +199,16 @@ class Filters(object):
             # Layer on adjustments to seeing:
             # entered with: raw -> tooGood
             # adding on: wavelength -> airmass -> telescopeSystematics
-            wvSee = seeing * self.basefilterWavelenSorted[ix]
-            adjustSee = math.sqrt(math.pow(wvSee * air_3_5, 2) + math.pow(self.telSeeing * air_3_5, 2) +
-                                  math.pow(self.opticalDesSeeing, 2) + math.pow(self.cameraSeeing, 2))
-            filterList[self.filterNamesSorted[ix]] = adjustSee
+            self.computeFwhmEffSeeing(filterList, ix, seeing, air_3_5)
 
         return filterList
+
+    def computeFwhmEffSeeing(self, filterList, index, seeing, airmassCorr):
+            seeing_fwhm_atm = seeing * self.basefilterWavelenSorted[index] * airmassCorr
+            seeing_fwhm_sys = airmassCorr * self.seeing_fwhm_sys_zenith
+            seeing_fwhm_eff = self.scaleToNeff * math.sqrt(seeing_fwhm_sys**2 +
+                                                           self.atmNeffFactor * seeing_fwhm_atm**2)
+            filterList[self.filterNamesSorted[index]] = seeing_fwhm_eff
 
     def computeSkyBrightnessForFilter(self, filter, skyBrightness, date, twilightProfile, moonProfileAltAz):
 
