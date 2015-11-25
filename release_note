@@ -1,18 +1,23 @@
+Release Notes for Opsim3.3.4                             Nov 25, 2015
+==================================
+Code features:
+  * New seeing calculations (SIM-1599)
+
 Release Notes for Opsim3.3.3                             Oct 30, 2015
 ==================================
 Code bug fixes:
-  * Fixed crash building user regions that were equivalent to fields
-  * Fixed crash if no proposal was active before first dark time filter swap
-  * Made OpSim stop early if user specified no proposals
-  * Clarified OpSim command line usage message
+  * Fixed crash building user regions that were equivalent to fields (SIM-1442)
+  * Fixed crash if no proposal was active before first dark time filter swap (SIM-1441)
+  * Made OpSim stop early if user specified no proposals (SIM-1386)
+  * Clarified OpSim command line usage message (SIM-1449)
 
 Code features:
-  * Updated many configuration files to current standards
+  * Updated many configuration files to current standards (SIM-1295)
 
 Documentation updates:
-  * Added Conda and Docker installation instructions
-  * OpSim installation and running directions made to match current practice
-  * Updates to DB architecture and configuration file documentation
+  * Added Conda and Docker installation instructions (SIM-1436)
+  * OpSim installation and running directions made to match current practice (SIM-1384, SIM-1475)
+  * Updates to DB architecture and configuration file documentation (SIM-1296)
 
 Release Notes for Opsim3.3.2                             Aug 11, 2015
 ==================================
