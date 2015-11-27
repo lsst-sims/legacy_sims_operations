@@ -1,5 +1,5 @@
 import sys, re, time, socket
-import math
+import numpy as np
 import MySQLdb as mysqldb
 import os
 from socket import gethostname
@@ -36,15 +36,25 @@ def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
           'i':24.08,
           'z':23.97,
           'y':23.55}
+    dCm_infinity = {'u':0.56,
+                    'g':0.12,
+                    'r':0.06,
+                    'i':0.05,
+                    'z':0.03,
+                    'y':0.02}
     kAtm = {'u':0.52,
             'g':0.19,
             'r':0.10,
             'i':0.07,
             'z':0.05,
             'y':0.17}
-    # Using Kem's SkyBrightness
-    m5 = (Cm[visitFilter] + 0.50*(filtsky-21) + 2.5*math.log10(0.7/FWHMeff) +
-          1.25*math.log10(expTime/30) - kAtm[visitFilter]*(airmass-1) + 1.1*tauCloud)
+    # Calculate adjustment if readnoise is significant for exposure time
+    # (see overview paper, equation 7)
+    T = expTime / 30.0
+    dCm = dCm_infinity[visitFilter] - 1.25*np.log10(1 + (10**(0.8*dCm_infinity[visitFilter]) - 1)/T)
+    # Calculate fiducial m5
+    m5 = (Cm[visitFilter] + dCm + 0.50*(filtsky-21.0) + 2.5*np.log10(0.7/FWHMeff) +
+          1.25*np.log10(expTime/30.0) - kAtm[visitFilter]*(airmass-1.2) + 1.1*tauCloud)
     return m5
 
 def create_output_table(cursor, database, hname, sessionID):
@@ -122,7 +132,7 @@ def create_output_table(cursor, database, hname, sessionID):
             mphase = float(ret[k][25]);
             saz = float(ret[k][27]);
             salt = float(ret[k][26]);
-            mphase = math.acos((mphase/50)-1)*180/math.pi;
+            mphase = np.acos((mphase/50)-1)*180/np.pi;
             # 5 sigma calculations
             visitFilter = ret[k][3];
             FWHMeff = float(ret[k][10]);
@@ -137,7 +147,7 @@ def create_output_table(cursor, database, hname, sessionID):
             sql += 'filtSkyBrightness, rotSkyPos, rotTelPos, lst, altitude, azimuth, dist2Moon, solarElong, moonRA, moonDec, '
             sql += 'moonAlt, moonAZ, moonPhase, sunAlt, sunAz, phaseAngle, rScatter, mieScatter, moonIllum, '
             sql += 'moonBright, darkBright, rawSeeing, wind, humidity, slewDist, slewTime, fiveSigmaDepth) values '
-            sql += '(%d, %d, %d, %d, %f, %f, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)' % (ret[k][0], ret[k][1], prp[i][0], ret[k][2], math.radians(fld[0][0]), math.radians(fld[0][1]), ret[k][3], ret[k][4], ret[k][5], ret[k][6], ret[k][7], ret[k][8], ret[k][9], FWHMeff, FWHMgeom, ret[k][11], ret[k][12], ret[k][13], ret[k][14], ret[k][15], rtp[1][0], ret[k][16], ret[k][17], ret[k][18], ret[k][19], ret[k][20], ret[k][21], ret[k][22], ret[k][23], ret[k][24], ret[k][25], ret[k][26], ret[k][27], ret[k][28], ret[k][29], ret[k][30], ret[k][31], ret[k][32], ret[k][33], ret[k][34], ret[k][35], ret[k][36], slw[0][1], slw[0][0], m5)
+            sql += '(%d, %d, %d, %d, %f, %f, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)' % (ret[k][0], ret[k][1], prp[i][0], ret[k][2], np.radians(fld[0][0]), np.radians(fld[0][1]), ret[k][3], ret[k][4], ret[k][5], ret[k][6], ret[k][7], ret[k][8], ret[k][9], FWHMeff, FWHMgeom, ret[k][11], ret[k][12], ret[k][13], ret[k][14], ret[k][15], rtp[1][0], ret[k][16], ret[k][17], ret[k][18], ret[k][19], ret[k][20], ret[k][21], ret[k][22], ret[k][23], ret[k][24], ret[k][25], ret[k][26], ret[k][27], ret[k][28], ret[k][29], ret[k][30], ret[k][31], ret[k][32], ret[k][33], ret[k][34], ret[k][35], ret[k][36], slw[0][1], slw[0][0], m5)
             insertDbData(cursor, sql)
 
 if __name__ == "__main__":
