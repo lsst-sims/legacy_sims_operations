@@ -132,7 +132,7 @@ def create_output_table(cursor, database, hname, sessionID):
             mphase = float(ret[k][25]);
             saz = float(ret[k][27]);
             salt = float(ret[k][26]);
-            mphase = np.acos((mphase/50)-1)*180/np.pi;
+            mphase = np.arccos((mphase/50)-1)*180/np.pi;
             # 5 sigma calculations
             visitFilter = ret[k][3];
             FWHMeff = float(ret[k][10]);
