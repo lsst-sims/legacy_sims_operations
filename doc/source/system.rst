@@ -60,6 +60,7 @@ schedDown.conf
 
 unschedDown.conf
 ----------------
+Unscheduled downtime is a single realization of an algorithm which draws random numbers on each day and evaluates whether and how long (integer days) observing stops due to any of four types of events. A minor event, such as a power supply failure, causes a closure for the remainder of the night and next day, and happens 5 out of 365 days. An intermediate event, such as the repair to the filter mechanism, rotator, hexapod or shutter, causes a closure for 3 nights and happens 2 out of 365 days. A major event triggers a closure for 7 nights and occurs 1 out of 730 days. A catastrophic event, such as replacing a raft, triggers a closure for 14 nights and occurs once in 10 years.
 
 .. include:: ../../conf/system/unschedDown.conf
    :literal:
