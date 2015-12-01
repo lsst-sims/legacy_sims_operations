@@ -54,7 +54,7 @@ def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
     dCm = dCm_infinity[visitFilter] - 1.25*np.log10(1 + (10**(0.8*dCm_infinity[visitFilter]) - 1)/T)
     # Calculate fiducial m5
     m5 = (Cm[visitFilter] + dCm + 0.50*(filtsky-21.0) + 2.5*np.log10(0.7/FWHMeff) +
-          1.25*np.log10(expTime/30.0) - kAtm[visitFilter]*(airmass-1.2) + 1.1*tauCloud)
+          1.25*np.log10(expTime/30.0) - kAtm[visitFilter]*(airmass-1.0) + 1.1*tauCloud)
     return m5
 
 def create_output_table(cursor, database, hname, sessionID):
