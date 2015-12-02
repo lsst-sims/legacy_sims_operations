@@ -4,7 +4,8 @@ import MySQLdb as mysqldb
 
 # this is just the minimum expected expMJD for any opsim.
 # this was hardcoded so the 'night' value always refers to the same 'night' from opsim to opsim
-minexpmjd = 49353.0
+#minexpmjd = 49353.0
+minexpmjd = 59580.0
 
 def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbname='LSST'):
     # connect to lsst_pointings (or other) mysql db, using account that has 'alter table' privileges
