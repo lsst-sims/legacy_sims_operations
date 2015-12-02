@@ -48,7 +48,7 @@ if __name__ == '__main__':
 	cursor = conn.cursor()
 	dirpath = sys.argv[0].split("schema_tools")[0]
 
-	command_string = "sqlite3 %s_%s_sqlite.db < %sschema_tools/v3_0-sqlite.sql" % (hname, sessionID, dirpath)
+	command_string = "sqlite3 %s_%s_sqlite.db < %sschema_tools/v3_4-sqlite.sql" % (hname, sessionID, dirpath)
 	os.system(command_string)
 
 	import_table(cursor, "Cloud", "", "")

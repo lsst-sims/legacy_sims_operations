@@ -1,5 +1,5 @@
 import sys, re, time, socket
-import math
+import numpy as np
 import MySQLdb as mysqldb
 import os
 from socket import gethostname
@@ -27,27 +27,34 @@ def getDbData(cursor, sql):
 def insertDbData(cursor, sql):
     cursor.execute(sql)
 
-def calc_m5(visitFilter, filtsky, seeing, expTime, airmass, tauCloud):
+def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
     # Set up expected extinction (kAtm) and m5 normalization values (Cm) for each filter.
     # The Cm values must be changed when telescope and site parameters are updated.
-    Cm = {'u':23.60,
-          'g':24.57,
-          'r':24.57,
-          'i':24.47,
-          'z':24.19,
-          'y':23.45,
-          'y1':23.74}
-    kAtm = {'u':0.48,
-            'g':0.21,
-            'r':0.10,
-            'i':0.07,
-            'z':0.06,
-            'y':0.06,
-            'y1':0.11}
-    tauCloud = 0.;
-    # Using Kem's SkyBrightness
-    m5 = (Cm[visitFilter] + 0.50*(filtsky-21) + 2.5*math.log10(0.7/seeing) +
-          1.25*math.log10(expTime/30) - kAtm[visitFilter]*(airmass-1) + 1.1*tauCloud)
+    Cm = {'u':22.34,
+          'g':23.99,
+          'r':24.11,
+          'i':24.05,
+          'z':23.95,
+          'y':23.55}
+    dCm_infinity = {'u':0.56,
+                    'g':0.12,
+                    'r':0.06,
+                    'i':0.05,
+                    'z':0.03,
+                    'y':0.02}
+    kAtm = {'u':0.50,
+            'g':0.20,
+            'r':0.12,
+            'i':0.10,
+            'z':0.07,
+            'y':0.18}
+    # Calculate adjustment if readnoise is significant for exposure time
+    # (see overview paper, equation 7)
+    Tscale = expTime / 30.0
+    dCm = dCm_infinity[visitFilter] - 1.25*np.log10(1 + (10**(0.8*dCm_infinity[visitFilter]) - 1)/Tscale)
+    # Calculate fiducial m5
+    m5 = (Cm[visitFilter] + dCm + 0.50*(filtsky-21.0) + 2.5*np.log10(0.7/FWHMeff) +
+          1.25*np.log10(Tscale) - kAtm[visitFilter]*(airmass-1.0) + 1.1*tauCloud)
     return m5
 
 def create_output_table(cursor, database, hname, sessionID):
@@ -73,7 +80,7 @@ def create_output_table(cursor, database, hname, sessionID):
     sql = 'create table %s (obsHistID int(10) unsigned not null, sessionID int(10) unsigned not null, ' %(summarytable)
     sql += 'propID int(10), fieldID int(10) unsigned not null, fieldRA double, fieldDec double, '
     sql += 'filter varchar(8), expDate int(10) unsigned, expMJD double, night int(10) unsigned, '
-    sql += 'visitTime double, visitExpTime double, finRank double, finSeeing double, transparency double, '
+    sql += 'visitTime double, visitExpTime double, finRank double, FWHMeff double,  FWHMgeom double, transparency double, '
     sql += 'airmass double, vSkyBright double, filtSkyBrightness double, rotSkyPos double, rotTelPos double, lst double, '
     sql += 'altitude double, azimuth double, dist2Moon double, solarElong double, moonRA double, moonDec double, '
     sql += 'moonAlt double, moonAZ double, moonPhase double, sunAlt double, sunAz double, phaseAngle double, '
@@ -125,21 +132,22 @@ def create_output_table(cursor, database, hname, sessionID):
             mphase = float(ret[k][25]);
             saz = float(ret[k][27]);
             salt = float(ret[k][26]);
-            mphase = math.acos((mphase/50)-1)*180/math.pi;
+            mphase = np.arccos((mphase/50)-1)*180/np.pi;
             # 5 sigma calculations
             visitFilter = ret[k][3];
-            seeing = float(ret[k][10]);
+            FWHMeff = float(ret[k][10]);
+            FWHMgeom = 0.822*FWHMeff + 0.52;
             airmass = float(ret[k][12]);
             filtsky = float(ret[k][14]);
             expTime = float(ret[k][8]);
             tauCloud = 0
-            m5 = calc_m5(visitFilter, filtsky, seeing, expTime, airmass, tauCloud)
+            m5 = calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud)
             sql = 'insert into %s (obsHistID, sessionID, propID, fieldID, fieldRA, fieldDec, filter, ' %(summarytable)
-            sql += 'expDate, expMJD, night, visitTime, visitExpTime, finRank, finSeeing, transparency, airmass, vSkyBright, '
+            sql += 'expDate, expMJD, night, visitTime, visitExpTime, finRank, FWHMeff, FWHMgeom, transparency, airmass, vSkyBright, '
             sql += 'filtSkyBrightness, rotSkyPos, rotTelPos, lst, altitude, azimuth, dist2Moon, solarElong, moonRA, moonDec, '
             sql += 'moonAlt, moonAZ, moonPhase, sunAlt, sunAz, phaseAngle, rScatter, mieScatter, moonIllum, '
             sql += 'moonBright, darkBright, rawSeeing, wind, humidity, slewDist, slewTime, fiveSigmaDepth) values '
-            sql += '(%d, %d, %d, %d, %f, %f, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)' % (ret[k][0], ret[k][1], prp[i][0], ret[k][2], math.radians(fld[0][0]), math.radians(fld[0][1]), ret[k][3], ret[k][4], ret[k][5], ret[k][6], ret[k][7], ret[k][8], ret[k][9], ret[k][10], ret[k][11], ret[k][12], ret[k][13], ret[k][14], ret[k][15], rtp[1][0], ret[k][16], ret[k][17], ret[k][18], ret[k][19], ret[k][20], ret[k][21], ret[k][22], ret[k][23], ret[k][24], ret[k][25], ret[k][26], ret[k][27], ret[k][28], ret[k][29], ret[k][30], ret[k][31], ret[k][32], ret[k][33], ret[k][34], ret[k][35], ret[k][36], slw[0][1], slw[0][0], m5)
+            sql += '(%d, %d, %d, %d, %f, %f, "%s", %d, %f, %d, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)' % (ret[k][0], ret[k][1], prp[i][0], ret[k][2], np.radians(fld[0][0]), np.radians(fld[0][1]), ret[k][3], ret[k][4], ret[k][5], ret[k][6], ret[k][7], ret[k][8], ret[k][9], FWHMeff, FWHMgeom, ret[k][11], ret[k][12], ret[k][13], ret[k][14], ret[k][15], rtp[1][0], ret[k][16], ret[k][17], ret[k][18], ret[k][19], ret[k][20], ret[k][21], ret[k][22], ret[k][23], ret[k][24], ret[k][25], ret[k][26], ret[k][27], ret[k][28], ret[k][29], ret[k][30], ret[k][31], ret[k][32], ret[k][33], ret[k][34], ret[k][35], ret[k][36], slw[0][1], slw[0][0], m5)
             insertDbData(cursor, sql)
 
 if __name__ == "__main__":
