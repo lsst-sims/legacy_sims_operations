@@ -30,11 +30,11 @@ def insertDbData(cursor, sql):
 def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
     # Set up expected extinction (kAtm) and m5 normalization values (Cm) for each filter.
     # The Cm values must be changed when telescope and site parameters are updated.
-    Cm = {'u':22.32,
-          'g':24.01,
-          'r':24.13,
-          'i':24.08,
-          'z':23.97,
+    Cm = {'u':22.34,
+          'g':23.99,
+          'r':24.11,
+          'i':24.05,
+          'z':23.95,
           'y':23.55}
     dCm_infinity = {'u':0.56,
                     'g':0.12,
@@ -42,19 +42,19 @@ def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
                     'i':0.05,
                     'z':0.03,
                     'y':0.02}
-    kAtm = {'u':0.52,
-            'g':0.19,
-            'r':0.10,
-            'i':0.07,
-            'z':0.05,
-            'y':0.17}
+    kAtm = {'u':0.50,
+            'g':0.20,
+            'r':0.12,
+            'i':0.10,
+            'z':0.07,
+            'y':0.18}
     # Calculate adjustment if readnoise is significant for exposure time
     # (see overview paper, equation 7)
-    T = expTime / 30.0
-    dCm = dCm_infinity[visitFilter] - 1.25*np.log10(1 + (10**(0.8*dCm_infinity[visitFilter]) - 1)/T)
+    Tscale = expTime / 30.0
+    dCm = dCm_infinity[visitFilter] - 1.25*np.log10(1 + (10**(0.8*dCm_infinity[visitFilter]) - 1)/Tscale)
     # Calculate fiducial m5
     m5 = (Cm[visitFilter] + dCm + 0.50*(filtsky-21.0) + 2.5*np.log10(0.7/FWHMeff) +
-          1.25*np.log10(expTime/30.0) - kAtm[visitFilter]*(airmass-1.0) + 1.1*tauCloud)
+          1.25*np.log10(Tscale) - kAtm[visitFilter]*(airmass-1.0) + 1.1*tauCloud)
     return m5
 
 def create_output_table(cursor, database, hname, sessionID):
