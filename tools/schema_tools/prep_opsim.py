@@ -2,11 +2,6 @@ import os
 
 import MySQLdb as mysqldb
 
-# this is just the minimum expected expMJD for any opsim.
-# this was hardcoded so the 'night' value always refers to the same 'night' from opsim to opsim
-#minexpmjd = 49353.0
-minexpmjd = 59580.0
-
 def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbname='LSST'):
     # connect to lsst_pointings (or other) mysql db, using account that has 'alter table' privileges
     # connect to the database - this is modular to allow for easier modification from machine/machine
@@ -56,49 +51,6 @@ def add_indexes(database, simname):
     # will create night index when add night information
     # also will add hexdith* indexes when add dither information
     print "Done adding indexes"
-    cursor.close()
-
-def add_nights(database, simname):
-    ## Adding a night index is incredibly useful for calculating pairs or
-    ##    finding images which fall within the same night
-    #connect to the database
-    cursor = connect_db(dbname=database)
-    # check the minimum expmjd against "standard minimum"
-    sqlquery = "select min(expmjd) from %s" % ( simname)
-    cursor.execute(sqlquery)
-    sqlresults = cursor.fetchall()
-    opminexpmjd = sqlresults[0][0]
-    opminexpmjd = float(opminexpmjd)
-
-    # this will print a message, but will not fail if expmjd < minexpmjd
-    if (opminexpmjd<minexpmjd):
-        print "Minimum expMJD %f ; expected min %f" %(opminexpmjd, minexpmjd)
-        print "This is a bit of a problem ... but I'm going ahead anyway"
-
-    # constant to subtract from each expmjd to get start of night
-    localmidnight = 0.16    # at cerro pachon
-    const = minexpmjd + localmidnight - 0.5
-    # or use nights consistent with mops
-    const = localmidnight - 0.5
-
-    # check if night column exists
-    sqlquery = "describe %s"%(simname)
-    cursor.execute(sqlquery)
-    sqlresults = cursor.fetchall()
-    # if night column already exists, this will exit. That could be modified, but safest
-    for result in sqlresults:
-        if (result[0]=='night'):
-            print "night column already exists - skipping adding nights"
-            break
-    else:
-        print "Adding night column"
-        # add a column for night
-        sqlquery = "alter table %s add night int" %(simname)
-        cursor.execute(sqlquery)
-        # add the night info into the table
-        sqlquery = "update %s set night = floor(expmjd- %s)" %(simname, const)
-        cursor.execute(sqlquery)
-
     cursor.close()
 
 def remove_dither(simname, dropdatacol = False):
@@ -221,5 +173,4 @@ if __name__ == "__main__":
     opsimname = "summary_" + hname + "_" + sessionID
     #print "Updating %s" %(opsimname)
     add_indexes(database, opsimname)
-    #add_nights(database, opsimname)
     add_dither(database, opsimname, overwrite=False)
