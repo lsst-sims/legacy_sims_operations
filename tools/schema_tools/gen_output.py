@@ -30,12 +30,12 @@ def insertDbData(cursor, sql):
 def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
     # Set up expected extinction (kAtm) and m5 normalization values (Cm) for each filter.
     # The Cm values must be changed when telescope and site parameters are updated.
-    Cm = {'u':22.34,
-          'g':23.99,
-          'r':24.11,
-          'i':24.05,
-          'z':23.95,
-          'y':23.55}
+    Cm = {'u':22.94,
+          'g':24.46,
+          'r':24.48,
+          'i':24.34,
+          'z':24.18,
+          'y':23.73}
     dCm_infinity = {'u':0.56,
                     'g':0.12,
                     'r':0.06,
@@ -43,8 +43,8 @@ def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
                     'z':0.03,
                     'y':0.02}
     kAtm = {'u':0.50,
-            'g':0.20,
-            'r':0.12,
+            'g':0.21,
+            'r':0.13,
             'i':0.10,
             'z':0.07,
             'y':0.18}
