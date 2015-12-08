@@ -57,23 +57,30 @@ def calc_m5_opsim(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
             'z':0.07,
             'y':0.18}
 
+    msky = {'u':22.95,
+            'g':22.24,
+            'r':21.20,
+            'i':20.47,
+            'z':19.60,
+            'y':18.63}
+
     # Calculate adjustment if readnoise is significant for exposure time
     # (see overview paper, equation 7)
-    Tscale = expTime / 30.0
+    Tscale = expTime / 30.0 * np.power(10.0, -0.4*(filtsky - msky[visitFilter]))
     dCm = dCm_infinity[visitFilter] - 1.25*np.log10(1 + (10**(0.8*dCm_infinity[visitFilter]) - 1)/Tscale)
     # Calculate fiducial m5
     m5 = (Cm[visitFilter] + dCm + 0.50*(filtsky-21.0) + 2.5*np.log10(0.7/FWHMeff) +
-          1.25*np.log10(Tscale) - kAtm[visitFilter]*(airmass-1.0) + 1.1*tauCloud)
+          1.25*np.log10(expTime/30.0) - kAtm[visitFilter]*(airmass-1.0) + 1.1*tauCloud)
     # Calculate m5 without airmass
     m5_x1 = (Cm[visitFilter] + dCm + 0.50*(filtsky-21.0) + 2.5*np.log10(0.7/FWHMeff) +
-          1.25*np.log10(Tscale))
+          1.25*np.log10(expTime/30.0))
     return m5, m5_x1
 
 
 if __name__ == '__main__':
 
     # Replace this with the filename for your sqlite database.
-    dbFile = '/Users/lynnej/opsim/db/ewok_1003_sqlite.db'
+    dbFile = '/Users/lynnej/opsim/db/ewok_1004_sqlite.db'
     opsdb = OpsimDatabase(dbFile)
 
     hardware, system, darksky = setup_photUtils()
@@ -90,18 +97,27 @@ if __name__ == '__main__':
         m5_pre = data['fiveSigmaDepth']
 
         plt.figure()
-        plt.plot(m5_phot, m5_ops, 'k.')
+        plt.plot(m5_phot, (m5_phot-m5_ops), 'k.')
+        plt.plot(m5_phot, (m5_phot-m5_ops_x1), 'r.')
         plt.title('%s band' %f)
+        plt.ylabel('m5 photUtils - m5 ops')
         plt.xlabel('m5 photUtils')
-        plt.ylabel('m5 ops')
         plt.savefig('m5_%s.png' %f)
 
         plt.figure()
-        plt.plot(m5_pre, m5_ops, 'k.')
+        plt.plot(data['filtSkyBrightness'], (m5_phot-m5_ops), 'k.')
         plt.title('%s band' %f)
-        plt.xlabel('m5 database')
-        plt.ylabel('m5 ops')
-        print 'done with', f
+        plt.xlabel('skybrightness')
+        plt.ylabel('m5 photUtils - m5 ops')
+        plt.savefig('m5_sky_%s.png' %f)
+
+        plt.figure()
+        plt.plot(data['FWHMeff'], (m5_phot-m5_ops), 'k.')
+        plt.title('%s band' %f)
+        plt.xlabel('FWHMeff')
+        plt.ylabel('m5 photUtils - m5 ops')
+        plt.savefig('m5_fwhm_%s.png' %f)
+        print 'Done with %s' %f
 
     #plt.show()
 
