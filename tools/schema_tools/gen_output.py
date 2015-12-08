@@ -48,13 +48,19 @@ def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
             'i':0.10,
             'z':0.07,
             'y':0.18}
+    msky = {'u':22.95,
+            'g':22.24,
+            'r':21.20,
+            'i':20.47,
+            'z':19.60,
+            'y':18.63}
     # Calculate adjustment if readnoise is significant for exposure time
     # (see overview paper, equation 7)
-    Tscale = expTime / 30.0
+    Tscale = expTime / 30.0 * np.power(10.0, -0.4*(filtsky - msky[visitFilter]))
     dCm = dCm_infinity[visitFilter] - 1.25*np.log10(1 + (10**(0.8*dCm_infinity[visitFilter]) - 1)/Tscale)
     # Calculate fiducial m5
     m5 = (Cm[visitFilter] + dCm + 0.50*(filtsky-21.0) + 2.5*np.log10(0.7/FWHMeff) +
-          1.25*np.log10(Tscale) - kAtm[visitFilter]*(airmass-1.0) + 1.1*tauCloud)
+          1.25*np.log10(expTime/30.0) - kAtm[visitFilter]*(airmass-1.0) + 1.1*tauCloud)
     return m5
 
 def create_output_table(cursor, database, hname, sessionID):
