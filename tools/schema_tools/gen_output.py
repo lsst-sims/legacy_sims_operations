@@ -30,6 +30,9 @@ def insertDbData(cursor, sql):
 def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
     # Set up expected extinction (kAtm) and m5 normalization values (Cm) for each filter.
     # The Cm values must be changed when telescope and site parameters are updated.
+    #
+    # These values are calculated using $SYSENG_THROUGHPUTS/python/calcM5.py.
+    # This set of values are calculated using v1.0 of the SYSENG_THROUGHPUTS repo.
     Cm = {'u':22.94,
           'g':24.46,
           'r':24.48,
@@ -142,7 +145,9 @@ def create_output_table(cursor, database, hname, sessionID):
             # 5 sigma calculations
             visitFilter = ret[k][3];
             FWHMeff = float(ret[k][10]);
-            FWHMgeom = 0.822*FWHMeff + 0.52;
+            # Calculation of FWHMgeom based on Bo & Zeljko's
+            #  fit between apparent (FWHMgeom) and Neff (FWHMeff) values
+            FWHMgeom = 0.822*FWHMeff + 0.052;
             airmass = float(ret[k][12]);
             filtsky = float(ret[k][14]);
             expTime = float(ret[k][8]);
