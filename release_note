@@ -1,3 +1,17 @@
+Release Notes for OpSim3.3.5                             Dec 17, 2015
+==================================
+Code features:
+  * SiteCP.conf updated to start OpSim in 2022 (SIM-1667)
+  * Added 20 year unscheduled downtime configuration file (SIM-1633)
+  * Updated configuration files for reference run (SIM-1642)
+
+Post-processing tools:
+  * Updated to latest formulation for m5 (SIM-1540)
+
+Installation tools:
+  * Updated cloud table script to 20 years (SIM-1646)
+
+
 Release Notes for Opsim3.3.4                             Nov 25, 2015
 ==================================
 Code features:
