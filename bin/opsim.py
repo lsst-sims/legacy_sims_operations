@@ -324,6 +324,13 @@ def startLsst(args):
         instrumentConf = DefaultInstrumentConfigFile
         print("    instrumentConf:%s default" % (instrumentConf))
 
+    if 'astroskyConf' in configDict:
+        astroskyConf = configDict["astroskyConf"]
+        print("    astroskyConf:%s" % (astroskyConf))
+    else:
+        astroskyConf = DefaultASConfigFile
+        print("    astroskyConf:%s default" % (astroskyConf))
+
     if 'weakLensConf' in configDict:
         weakLensConf = configDict["weakLensConf"]
         print("    weakLensConf:%s" % (weakLensConf))
@@ -474,6 +481,21 @@ def startLsst(args):
         siteConf = "./SiteCP.conf"
         print("    siteConf:%s default" % (siteConf))
 
+    # Need to fix up all of the configuration files to be in the same location as the LSST conf file.
+    top_dir, _ = confLSST.split('survey')
+    siteConf = os.path.join(top_dir, siteConf)
+    instrumentConf = os.path.join(top_dir, instrumentConf)
+    unschedDownConf = os.path.join(top_dir, unschedDownConf)
+    schedDownConf = os.path.join(top_dir, schedDownConf)
+    schedulerConf = os.path.join(top_dir, schedulerConf)
+    schedulingDataConf = os.path.join(top_dir, schedulingDataConf)
+    astroskyConf = os.path.join(top_dir, astroskyConf)
+    filtersConf = os.path.join(top_dir, filtersConf)
+    for i in range(len(weakLensConf)):
+        weakLensConf[i] = os.path.join(top_dir, weakLensConf[i])
+    for i in range(len(WLpropConf)):
+        WLpropConf[i] = os.path.join(top_dir, WLpropConf[i])
+
     try:
         # Fetch Site Specific Configuration file
         configDict, pairs = readConfFile(siteConf)
@@ -618,8 +640,8 @@ def startLsst(args):
                     weakLensConf=weakLensConf, superNovaConf=superNovaConf,
                     superNovaSubSeqConf=superNovaSubSeqConf, kuiperBeltConf=kuiperBeltConf,
                     WLpropConf=WLpropConf, instrumentConf=instrumentConf, schedulerConf=schedulerConf,
-                    schedulingDataConf=schedulingDataConf, dbTableDict=dbTableDict, log=log, logfile=logfile,
-                    verbose=verbose)
+                    schedulingDataConf=schedulingDataConf, astroskyConf=astroskyConf, dbTableDict=dbTableDict,
+                    log=log, logfile=logfile, verbose=verbose)
 
     # Activate the Simulator
 #    Simulation.activate (sim, sim.start (), 0.0)
