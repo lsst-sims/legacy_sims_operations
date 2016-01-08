@@ -2,6 +2,7 @@
 import logging
 import os
 import requests
+import subprocess
 import time
 
 from lsst.sims.operations import __version__
@@ -201,7 +202,59 @@ def startLsst(args):
     # Adding startupComment
     storeParam(lsstDB, SID, 0, 'Comment', 0, "startupComment", startup_comment)
 
-    # store config in DB
+    # Find the SHA1 of the configuration and add it to the Config table.
+    top_dir, _ = confLSST.split('survey')
+    top_dir = os.path.realpath(top_dir)
+    old_dir = os.path.realpath(os.curdir)
+    os.chdir(top_dir)
+
+    try:
+        p = subprocess.Popen(["git", "log", "-n 1", "--pretty=format:%h"], stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        out, err = p.communicate()
+
+        if len(out) == 0 or p.returncode != 0:
+            sha1 = "unknown"
+        else:
+            sha1 = out
+
+        storeParam(lsstDB, SID, 0, 'Config', 0, "sha1", sha1)
+    except OSError:
+        raise RuntimeError("The git command is not found. If you are using the correct configuration "
+                           "you need to have git.")
+
+    # Check to see if there are any changed files.
+    p = subprocess.Popen(["git", "status", "--short"], stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    out, err = p.communicate()
+
+    if len(out) == 0:
+        changed_files = "None"
+    elif p.returncode != 0:
+        changed_files = "Files Changed"
+    else:
+        changed_files = out
+
+    storeParam(lsstDB, SID, 0, 'Config', 0, "changedFiles", changed_files)
+
+    cfiles = [j.strip() for j in changed_files.strip().split(os.linesep)]
+    for i, cfile in enumerate(cfiles):
+        if cfile.startswith("M "):
+            cfile = cfile.strip("M ")
+            p = subprocess.Popen(["git", "diff", "-U0", "-w", cfile], stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+            out, err = p.communicate()
+
+            if p.returncode != 0:
+                diff_out = "Diff found"
+            else:
+                diff_out = out
+
+            storeParam(lsstDB, SID, 0, 'Config', i, "fileDiff", cfile, comment=diff_out[:512])
+
+    os.chdir(old_dir)
+
+    # store LSST config in DB
     for line in pairs:
         storeParam(lsstDB, SID, 0, 'LSST', line['index'], line['key'], line['val'])
 
@@ -482,7 +535,6 @@ def startLsst(args):
         print("    siteConf:%s default" % (siteConf))
 
     # Need to fix up all of the configuration files to be in the same location as the LSST conf file.
-    top_dir, _ = confLSST.split('survey')
     siteConf = os.path.join(top_dir, siteConf)
     instrumentConf = os.path.join(top_dir, instrumentConf)
     unschedDownConf = os.path.join(top_dir, unschedDownConf)
