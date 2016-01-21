@@ -18,7 +18,7 @@ class TestFilters(unittest.TestCase):
         self.scale_to_neff = 1.16
         atm_neff_factor = 1.04
 
-        self.filters = F.Filters(self.db, "conf/system/Filters.conf", 1, {},
+        self.filters = F.Filters(self.db, "example_conf/system/Filters.conf", 1, {},
                                  telescope_seeing, optical_design_seeing, camera_seeing,
                                  self.scale_to_neff, atm_neff_factor, verbose=-1)
 
