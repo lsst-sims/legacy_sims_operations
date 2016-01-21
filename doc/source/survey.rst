@@ -3,7 +3,7 @@
 Survey
 ==========
 
-The directory ``$SIMS_OPERATIONS_DIR/conf/survey/`` contains configuration files
+The directory ``$OPSIM3_CONFIG_DIR/survey`` contains configuration files
 which govern the survey programs and master control of the survey. The only
 parameters you should change in LSST.conf are the run length and what observing
 modes/proposals are going to be used in the simulation.  Below are descriptions 
@@ -42,33 +42,31 @@ field/filter observations requirements.  A typical simulation with design area
 requirement and design visit requirement and 3.61-type auxiliary proposals uses
 the following proposals::
 
-    weakLensConf = ../conf/survey/GalacticPlaneProp.conf
-    weakLensConf = ../conf/survey/SouthCelestialPole-18.conf
+    weakLensConf = survey/GalacticPlaneProp.conf
+    weakLensConf = survey/SouthCelestialPole.conf
 
-    WLpropConf = ../conf/survey/Universal-18-0824.conf
-    WLpropConf = ../conf/survey/NorthEclipticSpur-18.conf
-    WLpropConf = ../conf/survey/DDcosmology1.conf
+    WLpropConf = survey/Universal.conf
+    WLpropConf = survey/NorthEclipticSpur.conf
+    WLpropConf = survey/DDcosmology.conf
 
 The following configuration files should be modified with great caution::
 
-    instrumentConf = ../conf/system/Instrument.conf
-    schedDownConf = ../conf/system/schedDown.conf
-    unschedDownConf = ../conf/system/unschedDown.conf
-    filtersConf = ../conf/system/Filters.conf
+    instrumentConf = system/Instrument.conf
+    schedDownConf = system/schedDown.conf
+    unschedDownConf = system/unschedDown.conf
+    filtersConf = system/Filters.conf
 
-The configuration files in ``$SIMS_OPERATIONS_DIR/conf/scheduler/`` can be used
+The configuration files in ``$OPSIM3_CONFIG_DIR/scheduler`` can be used
 to fine tune simulations, but should only be modified with care.  The default
 values have been derived over years and hundreds of simulations.
 
-Since the simulator can (and should be) run from a directory tree other than ``$SIMS_OPERATIONS_DIR``, the paths to the configuration files in LSST.conf should be absolute.
-
-.. include:: ../../conf/survey/LSST.conf
+.. include:: ../../example_conf/survey/LSST.conf
    :literal:
    :code: python
 
 
-Universal-18-0824B.conf
-----------------------
+Universal.conf
+--------------
 
 This proposal is the primary way the WFD observing program has been simulated.
 It currently cannot use look ahead.  The ``WLtype = True`` statement makes the
@@ -128,23 +126,23 @@ corrected to LSST bands.  A single value for z and y sky brightness is used for
 twilight observations.  
 
 
-.. include:: ../../conf/survey/Universal-18-0824B.conf
+.. include:: ../../example_conf/survey/Universal.conf
    :literal:
    :code: python
 
 
-NorthEclipticSpur-18c.conf
+NorthEclipticSpur.conf
 -------------------------
 
 This proposal collects tuples of observations north of the limits for the WFD
 observing area and along the ecliptic north of the WFD area primarily for the
 purpose of detecting NEOs.  As such, it does not collect u or y data.  It is a
 variant of the Universal proposal.  Note the necessity to allow observations at
-higher airmass and larger seeing.  The NorthEclipticSpur-18c.conf has a reduced
+higher airmass and larger seeing.  The NorthEclipticSpur.conf has a reduced
 number of requested visits in the NES to optimize the WFD and other proposals
 for the whole survey.
 
-.. include:: ../../conf/survey/NorthEclipticSpur-18c.conf
+.. include:: ../../example_conf/survey/NorthEclipticSpur.conf
    :literal:
    :code: python
 
@@ -155,24 +153,24 @@ GalacticPlaneProp.conf
 This proposal collects field/filter combinations with no regard for cadence (proposal type WL), but
 could easily be modified to be a WLprop proposal collecting in tuples.
 
-.. include:: ../../conf/survey/GalacticPlaneProp.conf
+.. include:: ../../example_conf/survey/GalacticPlaneProp.conf
    :literal:
    :code: python
 
 
-SouthCelestialPole-18.conf
---------------------------
+SouthCelestialPole.conf
+-----------------------
 
 This proposal collects field/filter combinations with no regard for cadence (proposal type WL), but
 could easily be modified to be a WLprop proposal collecting in tuples.
 
 
-.. include:: ../../conf/survey/SouthCelestialPole-18.conf
+.. include:: ../../example_conf/survey/SouthCelestialPole.conf
    :literal:
    :code: python
 
-DDcosmology1.conf
------------------
+DDcosmology.conf
+----------------
 
 This is a sequence proposal collecting sequences of observations in 5 selected fields for deep
 cosmological studies.  There are two sets of sequences since the science wants all 6 filters and
@@ -180,6 +178,6 @@ only 5 are mounted at any time.  This proposal needs a bit of modification, sinc
 the parameters mean no main sequence will finish since the missed event parameter is set to zero
 and dark time (when u is mounted) is longer than the sequence interval.
 
-.. include:: ../../conf/survey/DDcosmology1.conf
+.. include:: ../../example_conf/survey/DDcosmology.conf
    :literal:
    :code: python
