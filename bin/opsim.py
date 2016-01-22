@@ -156,6 +156,7 @@ def startLsst(args):
         confLSST = args['config']
     else:
         confLSST = DefaultLSSTConfigFile
+    confLSST = os.path.expanduser(os.path.expandvars(confLSST))
 
     # Fetch the DB table names so Session DB can be accessed immediately
     configDict, pairs = readConfFile(confLSST)
