@@ -13,7 +13,7 @@ The configuration file repository is retrieved by::
   git clone https://github.com/lsst-sims/opsim3_config.git
 
 The full path to this clone will be identified in these instructions as ``$OPSIM3_CONFIG_DIR``.
-The configuration file clone is checkout out into the master branch. This represents the configuration for the current LSST Baseline Cadence and can run a full 10 year simulation. If this is what you want to do, no modifications to the configuration files are necessary. The clone also has other simulation configurations available to it via branches. A full listing of 
+The configuration file clone is checked out into the master branch. This represents the configuration for the current LSST Baseline Cadence and can run a full 10 year simulation. If this is what you want to do, no modifications to the configuration files are necessary. The clone also has other simulation configurations available to it via branches. A full listing of
 the branches can be found `here <https://github.com/lsst-sims/opsim3_config/branches/all>`_. Each branch contains a short description of the modifications made compared to the baseline cadence configuration. The clone can be checked out to one of the branches by executing the 
 following::
 
