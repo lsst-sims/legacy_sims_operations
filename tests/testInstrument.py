@@ -13,7 +13,7 @@ class TestInstrument(unittest.TestCase):
         self.db = DB.Database(False, dbConnect=False)
 
         # Setup observatory profile
-        configDict, pairs = utilities.readConfFile("conf/system/SiteCP.conf")
+        configDict, pairs = utilities.readConfFile("example_conf/system/SiteCP.conf")
         simStartDay = 0.0
         obsProfile = (configDict["longitude"] * utilities.DEG2RAD,
                       configDict["latitude"] * utilities.DEG2RAD,
@@ -23,7 +23,8 @@ class TestInstrument(unittest.TestCase):
                       configDict["temperature"],
                       configDict["relativeHumidity"])
 
-        self.inst = Inst.Instrument(self.db, 1, {}, obsProfile, "conf/system/Instrument.conf", verbose=-1)
+        self.inst = Inst.Instrument(self.db, 1, {}, obsProfile, "example_conf/system/Instrument.conf",
+                                    verbose=-1)
 
     def tearDown(self):
         self.db.closeConnection()

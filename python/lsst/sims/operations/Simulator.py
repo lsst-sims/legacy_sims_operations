@@ -52,7 +52,8 @@ class Simulator(object):
                  scaleToNeff, atmNeffFactor, filtersConf,
                  schedDownConf, unschedDownConf, nearEarthConf, weakLensConf, superNovaConf,
                  superNovaSubSeqConf, kuiperBeltConf, WLpropConf, instrumentConf, schedulerConf,
-                 schedulingDataConf, dbTableDict, log=False, logfile='./Simulator.log', verbose=0):
+                 schedulingDataConf, astroskyConf, dbTableDict, log=False, logfile='./Simulator.log',
+                 verbose=0):
         """
         Standard initializer.
 
@@ -85,6 +86,7 @@ class Simulator(object):
         superNovaSubSeqConf: SuperNova with sub sequences config file
         instrumentConf: Instrument config file
         schedulerConf:
+        astroskyConf: Astronomical Sky conf file
         dbTableDict:    DB table names
         log:        False if not set; else log = logging.getLogger("....")
         logfile:    name (and path) of the desired log file (defaults to None)
@@ -120,6 +122,7 @@ class Simulator(object):
         self.instrumentConf = instrumentConf   # Instrument config file
         self.schedulerConf = schedulerConf
         self.schedulingDataConf = schedulingDataConf
+        self.astroskyConf = astroskyConf
         self.dbTableDict = dbTableDict  # dictionary of SQL table names
 
         # Setup logging
@@ -711,7 +714,8 @@ class Simulator(object):
                                log=self.log, logfile=self.logfile, verbose=self.verbose)
 
         # Init the Astronomical Sky
-        self.sky = AstronomicalSky(lsstDB=self.lsstDB, obsProfile=self.obsProfile, date=0.,
+        self.sky = AstronomicalSky(lsstDB=self.lsstDB, configFile=self.astroskyConf,
+                                   obsProfile=self.obsProfile, date=0.,
                                    sessionID=self.sessionID, dbTableDict=self.dbTableDict, log=self.log,
                                    logfile=self.logfile, verbose=self.verbose)
 

@@ -9,6 +9,9 @@ The current source code is in the LSST Simulations sims_operations git (Github)
 repository. However, the code is now available via :ref:`install-lsststack`, 
 :ref:`install-conda` and :ref:`install-docker`.
 
+.. note:: Since the configuration files are now in a git repository, you will 
+          need to have the git command line tool installed on your system.
+
 .. _install-instruct:
 
 Installation Instructions
@@ -138,16 +141,14 @@ run from that is not located with the installed code. You can call this
 directory whatever you like, and this documentation will refer to this directory
 as ``$RUN_DIR``. For your convenience, make sure to create a ``log`` and
 ``output`` directory at this location for easy organization of OpSim output.
-Before running the simulation, the configuration files should be retrieved from 
-``$SIMS_OPERATIONS_DIR/conf`` by recursively copying the entire directory to 
-``$RUN_DIR``. The configuration for the survey run may be done by reviewing and
+The configuration for the survey run may be done by reviewing and
 customizing values for the parameters defined in the configuration files and 
-are described in the :ref:`configuration` section. Below is an example command 
-line invocation of OpSim.
+are described in the :ref:`configuration` section. The configuration files should be 
+retrieved from the Github repository and this process will be described in that section. Below is an example command line invocation of OpSim. The ``$OPSIM3_CONFIG_DIR`` is the directory location of the configuration file repository clone.
 
 ::
 
-	opsim.py --config=conf/survey/myLSST.conf --track=no --startup_comment="Startup comment"
+	opsim.py --config=$OPSIM3_CONFIG_DIR/survey/LSST.conf --track=no --startup_comment="Startup comment"
 
 The ``config`` option specifies the location of your modified LSST.conf file. 
 The ``track`` option is necessary to avoid adding an entry into the official

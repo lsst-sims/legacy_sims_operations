@@ -2,6 +2,7 @@
 import logging
 import os
 import requests
+import subprocess
 import time
 
 from lsst.sims.operations import __version__
@@ -155,6 +156,7 @@ def startLsst(args):
         confLSST = args['config']
     else:
         confLSST = DefaultLSSTConfigFile
+    confLSST = os.path.expanduser(os.path.expandvars(confLSST))
 
     # Fetch the DB table names so Session DB can be accessed immediately
     configDict, pairs = readConfFile(confLSST)
@@ -201,7 +203,59 @@ def startLsst(args):
     # Adding startupComment
     storeParam(lsstDB, SID, 0, 'Comment', 0, "startupComment", startup_comment)
 
-    # store config in DB
+    # Find the SHA1 of the configuration and add it to the Config table.
+    top_dir, _ = confLSST.split('survey')
+    top_dir = os.path.realpath(top_dir)
+    old_dir = os.path.realpath(os.curdir)
+    os.chdir(top_dir)
+
+    try:
+        p = subprocess.Popen(["git", "log", "-n 1", "--pretty=format:%h"], stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+        out, err = p.communicate()
+
+        if len(out) == 0 or p.returncode != 0:
+            sha1 = "unknown"
+        else:
+            sha1 = out
+
+        storeParam(lsstDB, SID, 0, 'Config', 0, "sha1", sha1)
+    except OSError:
+        raise RuntimeError("The git command is not found. If you are using the correct configuration "
+                           "you need to have git.")
+
+    # Check to see if there are any changed files.
+    p = subprocess.Popen(["git", "status", "--short"], stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    out, err = p.communicate()
+
+    if len(out) == 0:
+        changed_files = "None"
+    elif p.returncode != 0:
+        changed_files = "Files Changed"
+    else:
+        changed_files = out
+
+    storeParam(lsstDB, SID, 0, 'Config', 0, "changedFiles", changed_files)
+
+    cfiles = [j.strip() for j in changed_files.strip().split(os.linesep)]
+    for i, cfile in enumerate(cfiles):
+        if cfile.startswith("M "):
+            cfile = cfile.strip("M ")
+            p = subprocess.Popen(["git", "diff", "-U0", "-w", cfile], stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE)
+            out, err = p.communicate()
+
+            if p.returncode != 0:
+                diff_out = "Diff found"
+            else:
+                diff_out = out
+
+            storeParam(lsstDB, SID, 0, 'Config', i, "fileDiff", cfile, comment=diff_out[:512])
+
+    os.chdir(old_dir)
+
+    # store LSST config in DB
     for line in pairs:
         storeParam(lsstDB, SID, 0, 'LSST', line['index'], line['key'], line['val'])
 
@@ -323,6 +377,13 @@ def startLsst(args):
     else:
         instrumentConf = DefaultInstrumentConfigFile
         print("    instrumentConf:%s default" % (instrumentConf))
+
+    if 'astroskyConf' in configDict:
+        astroskyConf = configDict["astroskyConf"]
+        print("    astroskyConf:%s" % (astroskyConf))
+    else:
+        astroskyConf = DefaultASConfigFile
+        print("    astroskyConf:%s default" % (astroskyConf))
 
     if 'weakLensConf' in configDict:
         weakLensConf = configDict["weakLensConf"]
@@ -474,6 +535,20 @@ def startLsst(args):
         siteConf = "./SiteCP.conf"
         print("    siteConf:%s default" % (siteConf))
 
+    # Need to fix up all of the configuration files to be in the same location as the LSST conf file.
+    siteConf = os.path.join(top_dir, siteConf)
+    instrumentConf = os.path.join(top_dir, instrumentConf)
+    unschedDownConf = os.path.join(top_dir, unschedDownConf)
+    schedDownConf = os.path.join(top_dir, schedDownConf)
+    schedulerConf = os.path.join(top_dir, schedulerConf)
+    schedulingDataConf = os.path.join(top_dir, schedulingDataConf)
+    astroskyConf = os.path.join(top_dir, astroskyConf)
+    filtersConf = os.path.join(top_dir, filtersConf)
+    for i in range(len(weakLensConf)):
+        weakLensConf[i] = os.path.join(top_dir, weakLensConf[i])
+    for i in range(len(WLpropConf)):
+        WLpropConf[i] = os.path.join(top_dir, WLpropConf[i])
+
     try:
         # Fetch Site Specific Configuration file
         configDict, pairs = readConfFile(siteConf)
@@ -618,8 +693,8 @@ def startLsst(args):
                     weakLensConf=weakLensConf, superNovaConf=superNovaConf,
                     superNovaSubSeqConf=superNovaSubSeqConf, kuiperBeltConf=kuiperBeltConf,
                     WLpropConf=WLpropConf, instrumentConf=instrumentConf, schedulerConf=schedulerConf,
-                    schedulingDataConf=schedulingDataConf, dbTableDict=dbTableDict, log=log, logfile=logfile,
-                    verbose=verbose)
+                    schedulingDataConf=schedulingDataConf, astroskyConf=astroskyConf, dbTableDict=dbTableDict,
+                    log=log, logfile=logfile, verbose=verbose)
 
     # Activate the Simulator
 #    Simulation.activate (sim, sim.start (), 0.0)
