@@ -9,6 +9,9 @@ The current source code is in the LSST Simulations sims_operations git (Github)
 repository. However, the code is now available via :ref:`install-lsststack`, 
 :ref:`install-conda` and :ref:`install-docker`.
 
+.. note:: Since the configuration files are now in a git repository, you will 
+          need to have the git command line tool installed on your system.
+
 .. _install-instruct:
 
 Installation Instructions
