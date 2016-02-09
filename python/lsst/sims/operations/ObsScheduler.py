@@ -658,14 +658,21 @@ class ObsScheduler(LSSTObject):
         (skyBright, distance2moon, moonAlt_RAD,
             brightProfile) = self.sky.getSkyBrightness(winner.fieldID, winner.ra, winner.dec, winner.altitude,
                                                        dateProfile, moonProfile, self.twilightProfile)
+
+        # Override above variables while keeping the brightness profile
+        (skyBright, distance2moon, moonAlt_RAD) = self.sky.getLsstVSkyBrightness(winner.ra, winner.dec,
+                                                                                 dateProfile, moonProfile)
         winner.skyBrightness = skyBright
         winner.distance2moon = distance2moon
         (winner.phaseAngle, winner.extinction, winner.rScatter, winner.mieScatter, winner.moonIllum,
             winner.moonBright, winner.darkBright) = brightProfile
 
-        winner.filterSkyBright = self.filters.computeSkyBrightnessForFilter(winner.filter, skyBright, t,
-                                                                            self.twilightProfile,
-                                                                            moonProfileAltAz)
+        #winner.filterSkyBright = self.filters.computeSkyBrightnessForFilter(winner.filter, skyBright, t,
+        #                                                                    self.twilightProfile,
+        #                                                                    moonProfileAltAz)
+        winner.filterSkyBright = self.sky.getSkyBrightnessForFilter(winner.ra, winner.dec, winner.filter,
+                                                                    winner.mjd)
+
         filterSeeingList = self.filters.computeFilterSeeing(self.seeing, winner.airmass)
         winner.seeing = filterSeeingList[winner.filter]
 

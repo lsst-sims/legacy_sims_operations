@@ -41,7 +41,10 @@ Select/Discard Fileds
 - selectEmpty
 - select
 """
+import warnings
 import numpy as np
+
+from astropy._erfa import ErfaWarning
 
 from utilities import *
 from LSSTObject import *
@@ -691,11 +694,13 @@ class AstronomicalSky(LSSTObject):
         new sky brightness model.
 
         Input:
-        ra:    The field RA (degrees)
-        dec:   The field Dec (degrees)
+        ra:    The field RA (radians)
+        dec:   The field Dec (radians)
         dateProfile: The date profile for a given date
         moonProfile: The moon profile for a given date
         """
+        warnings.simplefilter('ignore', category=ErfaWarning)
+        warnings.simplefilter('ignore', category=UserWarning)
         (date, mjd, lst_RAD) = dateProfile
 
         (moonRA_RAD, moonDec_RAD, moonPhase_PERCENT) = moonProfile
@@ -721,15 +726,17 @@ class AstronomicalSky(LSSTObject):
         Compute the sky brightness for the field for the given filter.
 
         Input:
-        ra: The field RA (radians)
-        dec: The field Dec (radians)
+        ra: The field RA (degrees)
+        dec: The field Dec (degrees)
         ofilter: The observation filter (ugrizy)
         mjd: The MJD of the observation
 
         Return:
         The sky brightness for the field/filter
         """
-        self.sb.setRaDecMjd(np.array([ra]), np.array([dec]), mjd)
+        warnings.simplefilter('ignore', category=ErfaWarning)
+        warnings.simplefilter('ignore', category=UserWarning)
+        self.sb.setRaDecMjd(np.array([ra]), np.array([dec]), mjd, degrees=True)
         mags = self.sb.returnMags()[0]
         return mags[self.FILTERS[ofilter]]
 

@@ -414,10 +414,13 @@ class SchedulingData(LSSTObject):
                     (ra, dec) = self.dictOfAllFields[field]
                     for t in self.lookAhead_times[n]:
                         (am, alt, az, pa) = self.sky.airmasst(t, ra, dec)
-                        (br, dist2moon, moonAlt,
-                            brprofile) = self.sky.getSkyBrightness(0, ra, dec, alt, self.dateProfile[t],
-                                                                   self.moonProfile[n],
-                                                                   self.twilightProfile[n])
+                        #(br, dist2moon, moonAlt,
+                        #    brprofile) = self.sky.getSkyBrightness(0, ra, dec, alt, self.dateProfile[t],
+                        #                                           self.moonProfile[n],
+                        #                                           self.twilightProfile[n])
+                        (br, dist2moon, moonAlt) = self.sky.getLsstVSkyBrightness(ra, dec,
+                                                                                  self.dateProfile[t],
+                                                                                  self.moonProfile[n])
 
                         self.alt[t][field] = alt
                         self.az[t][field] = az
