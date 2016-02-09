@@ -41,9 +41,12 @@ Select/Discard Fileds
 - selectEmpty
 - select
 """
+import numpy as np
 
 from utilities import *
 from LSSTObject import *
+
+from lsst.sims.skybrightness import SkyModel
 
 class AstronomicalSky(LSSTObject):
     # Class variables
@@ -57,6 +60,8 @@ class AstronomicalSky(LSSTObject):
                'Uranus': 7,
                'Neptune': 8,
                'Pluto': 9}
+
+    FILTERS = {'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5}
 
     def __init__(self, lsstDB, obsProfile, date, sessionID, dbTableDict, configFile=DefaultASConfigFile,
                  log=False, logfile='./AstronomicalSky.log', verbose=-1):
@@ -177,6 +182,8 @@ class AstronomicalSky(LSSTObject):
 
         self.n1dp92104 = (1. / 0.92104)
         self.log34p08 = math.log(34.08)
+
+        self.sb = SkyModel(mags=True, preciceAltAz=True)
 
         return
 
@@ -677,6 +684,54 @@ class AstronomicalSky(LSSTObject):
         brightProfile = alpha, k, rs, ms, i, moonBr, skyBr
 
         return (totBr, distance2moon_RAD, moonAlt_RAD, brightProfile)
+
+    def getLsstVSkyBrightness(self, ra, dec, dateProfile, moonProfile):
+        """
+        Compute the V band sky brightness from the LSST g and r filters via (g+r)/2 via the
+        new sky brightness model.
+
+        Input:
+        ra:    The field RA (degrees)
+        dec:   The field Dec (degrees)
+        dateProfile: The date profile for a given date
+        moonProfile: The moon profile for a given date
+        """
+        (date, mjd, lst_RAD) = dateProfile
+
+        (moonRA_RAD, moonDec_RAD, moonPhase_PERCENT) = moonProfile
+
+        # Compute moon altitude in radians
+        moonha_RAD = lst_RAD - moonRA_RAD
+        #(moonAz_RAD,d1,d2,moonAlt_RAD,d4,d5,d6,d7,d8) = \
+        #        slalib.sla_altaz(moonha_RAD, moonDec_RAD, self.latitude_RAD)
+        (moonAz_RAD, d1, d2, moonAlt_RAD, d4, d5, d6, d7, d8) = \
+            pal.altaz(moonha_RAD, moonDec_RAD, self.latitude_RAD)
+
+        distance2moon_RAD = pal.dsep(moonRA_RAD, moonDec_RAD, ra * DEG2RAD, dec * DEG2RAD)
+
+        self.sb.setRaDecMjd(np.array([ra]), np.array([dec]), mjd, degrees=True)
+        # Only need first entry since asking for one coordinate pair
+        mags = self.sb.returnMags()[0]
+        sky_brightness = 0.5 * (mags[1] + mags[2])
+
+        return (sky_brightness, distance2moon_RAD, moonAlt_RAD)
+
+    def getSkyBrightnessForFilter(self, ra, dec, ofilter, mjd):
+        """
+        Compute the sky brightness for the field for the given filter.
+
+        Input:
+        ra: The field RA (radians)
+        dec: The field Dec (radians)
+        ofilter: The observation filter (ugrizy)
+        mjd: The MJD of the observation
+
+        Return:
+        The sky brightness for the field/filter
+        """
+        self.sb.setRaDecMjd(np.array([ra]), np.array([dec]), mjd)
+        mags = self.sb.returnMags()[0]
+        return mags[self.FILTERS[ofilter]]
 
     def airmass(self, dateProfile, ra, dec):
         """

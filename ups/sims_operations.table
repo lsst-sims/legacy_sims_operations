@@ -9,6 +9,7 @@ setupRequired(mysql)
 setupRequired(mysqlpython)
 setupRequired(palpy)
 setupRequired(lsst)
+setupRequired(sims_skybrightness)
 
 # The following is boilerplate for all packages.
 # Pure-Python packages only need the last line.
