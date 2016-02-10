@@ -1,3 +1,4 @@
+import math
 import unittest
 
 import lsst.sims.operations.Database as DB
@@ -48,6 +49,15 @@ class TestAstronomicalSky(unittest.TestCase):
         mjd = 59580.033829
         sb = self.sky.getSkyBrightnessForFilter(self.ra, self.dec, ofilter, mjd)
         self.assertAlmostEqual(sb, 16.46207046, delta=1e-7)
+
+    def testNanLsstVSkyBrightness(self):
+        date = 23482.0
+        dp = self.sky.computeDateProfile(date)
+        mp = self.sky.computeMoonProfile(date)
+        ra = math.radians(29.6710624694824)
+        dec = math.radians(-63.7820816040039)
+        (sb, moon_dist, moon_alt) = self.sky.getLsstVSkyBrightness(ra, dec, dp, mp)
+        self.assertEquals(sb, -999.0)
 
 if __name__ == "__main__":
     unittest.main()

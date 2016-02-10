@@ -66,6 +66,8 @@ class AstronomicalSky(LSSTObject):
 
     FILTERS = {'u': 0, 'g': 1, 'r': 2, 'i': 3, 'z': 4, 'y': 5}
 
+    BAD_SKY_BRIGHTNESS = -999.0
+
     def __init__(self, lsstDB, obsProfile, date, sessionID, dbTableDict, configFile=DefaultASConfigFile,
                  log=False, logfile='./AstronomicalSky.log', verbose=-1):
         """
@@ -718,7 +720,8 @@ class AstronomicalSky(LSSTObject):
         # Only need first entry since asking for one coordinate pair
         mags = self.sb.returnMags()[0]
         sky_brightness = 0.5 * (mags[1] + mags[2])
-
+        if np.isnan(sky_brightness):
+            sky_brightness = self.BAD_SKY_BRIGHTNESS
         return (sky_brightness, distance2moon_RAD, moonAlt_RAD)
 
     def getSkyBrightnessForFilter(self, ra, dec, ofilter, mjd):
@@ -738,7 +741,10 @@ class AstronomicalSky(LSSTObject):
         warnings.simplefilter('ignore', category=UserWarning)
         self.sb.setRaDecMjd(np.array([ra]), np.array([dec]), mjd, degrees=True)
         mags = self.sb.returnMags()[0]
-        return mags[self.FILTERS[ofilter]]
+        mag_filter = mags[self.FILTERS[ofilter]]
+        if np.isnan(mag_filter):
+            mag_filter = self.BAD_SKY_BRIGHTNESS
+        return mag_filter
 
     def airmass(self, dateProfile, ra, dec):
         """
