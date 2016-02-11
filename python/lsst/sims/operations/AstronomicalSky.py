@@ -188,7 +188,7 @@ class AstronomicalSky(LSSTObject):
         self.n1dp92104 = (1. / 0.92104)
         self.log34p08 = math.log(34.08)
 
-        self.sb = SkyModel(mags=True, preciceAltAz=True)
+        self.sb = SkyModel(mags=True, preciseAltAz=True)
 
         return
 
@@ -690,14 +690,16 @@ class AstronomicalSky(LSSTObject):
 
         return (totBr, distance2moon_RAD, moonAlt_RAD, brightProfile)
 
-    def getLsstVSkyBrightness(self, ra, dec, dateProfile, moonProfile):
+    def getLsstVSkyBrightness(self, ra, dec, alt, az, dateProfile, moonProfile):
         """
         Compute the V band sky brightness from the LSST g and r filters via (g+r)/2 via the
         new sky brightness model.
 
         Input:
-        ra:    The field RA (radians)
-        dec:   The field Dec (radians)
+        ra:    The field RA (degrees)
+        dec:   The field Dec (degrees)
+        alt:   The field Altitude (degrees)
+        az:    The field Azimuth (degrees)
         dateProfile: The date profile for a given date
         moonProfile: The moon profile for a given date
         """
@@ -716,7 +718,8 @@ class AstronomicalSky(LSSTObject):
 
         distance2moon_RAD = pal.dsep(moonRA_RAD, moonDec_RAD, ra * DEG2RAD, dec * DEG2RAD)
 
-        self.sb.setRaDecMjd(np.array([ra]), np.array([dec]), mjd, degrees=True)
+        self.sb.setRaDecAltAzMjd(np.array([ra]), np.array([dec]), np.array([alt]),
+                                 np.array([az]), mjd, degrees=True)
         # Only need first entry since asking for one coordinate pair
         mags = self.sb.returnMags()[0]
         sky_brightness = 0.5 * (mags[1] + mags[2])
@@ -724,13 +727,15 @@ class AstronomicalSky(LSSTObject):
             sky_brightness = self.BAD_SKY_BRIGHTNESS
         return (sky_brightness, distance2moon_RAD, moonAlt_RAD)
 
-    def getSkyBrightnessForFilter(self, ra, dec, ofilter, mjd):
+    def getSkyBrightnessForFilter(self, ra, dec, alt, az, ofilter, mjd):
         """
         Compute the sky brightness for the field for the given filter.
 
         Input:
         ra: The field RA (degrees)
         dec: The field Dec (degrees)
+        alt:   The field Altitude (degrees)
+        az:    The field Azimuth (degrees)
         ofilter: The observation filter (ugrizy)
         mjd: The MJD of the observation
 
@@ -739,7 +744,8 @@ class AstronomicalSky(LSSTObject):
         """
         warnings.simplefilter('ignore', category=ErfaWarning)
         warnings.simplefilter('ignore', category=UserWarning)
-        self.sb.setRaDecMjd(np.array([ra]), np.array([dec]), mjd, degrees=True)
+        self.sb.setRaDecAltAzMjd(np.array([ra]), np.array([dec]), np.array([alt]),
+                                 np.array([az]), mjd, degrees=True)
         mags = self.sb.returnMags()[0]
         mag_filter = mags[self.FILTERS[ofilter]]
         if np.isnan(mag_filter):

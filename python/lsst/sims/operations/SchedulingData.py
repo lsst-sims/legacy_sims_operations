@@ -419,6 +419,8 @@ class SchedulingData(LSSTObject):
                         #                                           self.moonProfile[n],
                         #                                           self.twilightProfile[n])
                         (br, dist2moon, moonAlt) = self.sky.getLsstVSkyBrightness(ra, dec,
+                                                                                  alt * RAD2DEG,
+                                                                                  az * RAD2DEG,
                                                                                   self.dateProfile[t],
                                                                                   self.moonProfile[n])
 
