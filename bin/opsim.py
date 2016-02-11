@@ -733,9 +733,8 @@ if (__name__ == '__main__'):
     # Profiling?
     if 'profile' in args and args['profile'].lower() == 'yes':
         print("Profile data sent to file 'ProfileData'")
-        import hotshot
-        profiler = hotshot.Profile("ProfileData")
-        profiler.runcall(startLsst, args)
+        import cProfile
+        cProfile.run('startLsst(args)', 'ProfileData')
     else:
         startLsst(args)
 
