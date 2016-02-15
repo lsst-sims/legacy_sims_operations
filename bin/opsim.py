@@ -544,10 +544,12 @@ def startLsst(args):
     schedulingDataConf = os.path.join(top_dir, schedulingDataConf)
     astroskyConf = os.path.join(top_dir, astroskyConf)
     filtersConf = os.path.join(top_dir, filtersConf)
-    for i in range(len(weakLensConf)):
-        weakLensConf[i] = os.path.join(top_dir, weakLensConf[i])
-    for i in range(len(WLpropConf)):
-        WLpropConf[i] = os.path.join(top_dir, WLpropConf[i])
+    if None not in weakLensConf:
+        for i in range(len(weakLensConf)):
+            weakLensConf[i] = os.path.join(top_dir, weakLensConf[i])
+    if None not in WLpropConf:
+        for i in range(len(WLpropConf)):
+            WLpropConf[i] = os.path.join(top_dir, WLpropConf[i])
 
     try:
         # Fetch Site Specific Configuration file
