@@ -257,7 +257,7 @@ class AstronomicalSky(LSSTObject):
         False   otherwise.
         """
         # Compute the airmass
-        (a, dummy, dummyz) = self.airmass(dateProfile, ra, dec)
+        (a, dummy, dummyz, dummypa) = self.airmass(dateProfile, ra, dec)
 
         if a > maxAirmass or a < 0.:
             return False
@@ -350,7 +350,8 @@ class AstronomicalSky(LSSTObject):
         # Convert date in MJD
         mjd = (float(date) / float(DAY)) + self.simEpoch
 
-        (sunRise, sunSet) = self.getTwilightSunriseSunset(date)
+        (sunRise, sunSet, sunRiseMJD, sunSetMJD, sunRiseTwil,
+            sunSetTwil) = self.getTwilightSunriseSunset(date)
 
         sunSetMJD = (sunSet / DAY) + self.simEpoch
         sunRiseMJD = (sunRise / DAY) + self.simEpoch
