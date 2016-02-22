@@ -42,10 +42,10 @@ env.Depends("doc", env.Alias("doc-sphinx"))
 finder = binfind.Find()
 
 opts = SCons.Script.Variables("custom.py")
-opts.AddVariables((SCons.Variables.PathVariable('MYSQL_DIR', 
+opts.AddVariables((SCons.Variables.PathVariable('MYSQL_DIR',
                                     'mysql install dir',
                                     finder.prefixFromBin('MYSQL_DIR',
-                                                         "mysqld_safe"),
+                                                         "mysqld"),
                                     SCons.Variables.PathVariable.PathIsDir)),)
 opts.Update(env)
 # This override causes issues with EUPS builds and distribution, so don't do it then.
@@ -58,7 +58,7 @@ if "EupsBuildDir" not in srcDir and "build" not in srcDir and "conda-bld" not in
 env.Replace(configuration_prefix=os.path.join(env['prefix'], "cfg"))
 
 template_target = os.path.join(env['configuration_prefix'], "templates")
-env.RecursiveInstall(template_target, os.path.join("templates", 
+env.RecursiveInstall(template_target, os.path.join("templates",
                                                    "configuration"))
 
 env.Alias("configuration", [template_target])
@@ -77,12 +77,12 @@ def get_template_targets():
                    }
 
     for src_node in fileutils.recursive_glob(template_dir_path, "*", env):
-        target_node = fileutils.replace_base_path(template_dir_path, 
+        target_node = fileutils.replace_base_path(template_dir_path,
                                                   env['configuration_prefix'],
                                                   src_node, env)
 
         if isinstance(src_node, SCons.Node.FS.File):
-            pstate.log.debug("Template SOURCE : %s, TARGET : %s" % (src_node, 
+            pstate.log.debug("Template SOURCE : %s, TARGET : %s" % (src_node,
                                                                     target_node))
             env.Substfile(target_node, src_node, SUBST_DICT=script_dict)
             target_lst.append(target_node)
