@@ -45,12 +45,11 @@ is_socket_available || exit 1
 echo "-- Removing previous data." &&
 rm -rf ${MYSQLD_DATA_DIR}/* &&
 echo "-- ." &&
-echo "-- Installing mysql database files." &&
-mysql_secure_installation --defaults-file=${OPSIM_RUN_DIR}/etc/my.cnf --user=${USER} >/dev/null ||
-{
-    echo "ERROR : mysql_install_db failed, exiting"
-    exit 1
-}
+#echo "-- Installing mysql database files." &&
+#mysql_secure_installation --defaults-file=${OPSIM_RUN_DIR}/etc/my.cnf --user=${USER} >/dev/null ||{
+#    echo "ERROR : mysql_install_db failed, exiting"
+#    exit 1
+#}
 echo "-- Starting mysql server." &&
 ${OPSIM_RUN_DIR}/etc/init.d/mysqld start &&
 sleep 5 &&
