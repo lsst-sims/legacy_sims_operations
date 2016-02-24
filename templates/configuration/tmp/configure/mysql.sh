@@ -62,6 +62,8 @@ echo "-- Setting up OpSim DB." &&
 mysql --no-defaults --sock="${MYSQLD_SOCK}" --user="root" --password="${MYSQLD_PASS}" < ${SQL_DIR}/create_opsim_db.sql &&
 echo "-- Loading user tables in OpSim DB." &&
 mysql --no-defaults --sock="${MYSQLD_SOCK}" --user="www" --password="${OPSIM_PASS}" < ${SQL_DIR}/load_opsim_db.sql &&
+echo "-- Cleaning up unneeded database items." &&
+mysql --no-defaults --sock="${MYSQLD_SOCK}" --user="root" --password="${MYSQLD_PASS}" < ${SQL_DIR}/database_cleanup.sql &&
 echo "-- Shutting down mysql server." &&
 ${OPSIM_RUN_DIR}/etc/init.d/mysqld stop ||
 {
