@@ -5,10 +5,11 @@
 # included by low-level LSST packages such as utils or daf_base.
 # Any other package whose interface is used should be listed explicitly
 # rather than assuming it will be included recursively.
+setupRequired(lsst)
 setupRequired(mysql)
 setupRequired(mysqlpython)
 setupRequired(palpy)
-setupRequired(lsst)
+setupRequired(requests)
 
 # The following is boilerplate for all packages.
 # Pure-Python packages only need the last line.
