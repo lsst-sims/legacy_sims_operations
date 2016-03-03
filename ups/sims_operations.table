@@ -6,7 +6,7 @@
 # Any other package whose interface is used should be listed explicitly
 # rather than assuming it will be included recursively.
 setupRequired(lsst)
-setupRequired(mysql)
+setupRequired(mariadb)
 setupRequired(mysqlpython)
 setupRequired(palpy)
 setupRequired(requests)
