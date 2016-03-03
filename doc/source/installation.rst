@@ -5,7 +5,7 @@
 Installing the OpSim Code
 *************************
 
-The current source code is in the LSST Simulations sims_operations git (Github)
+The current source code is in the LSST sims_operations git (Github)
 repository. However, the code is now available via :ref:`install-lsststack`, 
 :ref:`install-conda` and :ref:`install-docker`.
 
@@ -45,9 +45,23 @@ LSST Stack Install
     eups distrib install -t <tag> sims_operations
     setup sims_operations -t <tag>
 
-  Where <tag> is the name of an EUPS package tag. If you need to override the
-  hostname for the machine, create or change the environment variable
-  $OPSIM_HOSTNAME to the appropriate name.
+  Where <tag> is the name of an EUPS package tag. If you are providing your own
+  Python (not using the LSST stack provided one), you will need to declare the
+  Python requests package to EUPS by running the following command.
+
+  .. code-block:: bash
+
+    eups declare requests system -r none -m none
+
+  This needs to be done before the setup command is issued. Alternatively, you
+  can do the following before running the setup command.
+
+  .. code-block:: bash
+
+    eups distrib install requests
+
+  If you need to override the hostname for the machine, create or change the
+  environment variable $OPSIM_HOSTNAME to the appropriate name.
 
 * Change Database Passwords
 
