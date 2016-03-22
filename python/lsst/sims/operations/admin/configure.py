@@ -167,7 +167,7 @@ def _get_template_params():
             'OPSIM_PID_DIR': os.path.join(config['opsim']['run_base_dir'],
                                           "var", "run"),
             'OPSIM_USER': config['opsim']['user'],
-            'OPSIM_PASS': config['opsim']['pass'],
+            'OPSIM_PASS': config['opsim']['password'],
             'OPSIM_SCRATCH_DIR': config['opsim']['scratch_dir'],
             'MYSQL_DIR': config['mysqld']['base_dir'],
             'MYSQLD_DATA_DIR': config['mysqld']['data_dir'],
@@ -176,7 +176,7 @@ def _get_template_params():
             'MYSQLD_HOST': '127.0.0.1',
             'MYSQLD_SOCK': config['mysqld']['sock'],
             'MYSQLD_USER': config['mysqld']['user'],
-            'MYSQLD_PASS': config['mysqld']['pass'],
+            'MYSQLD_PASS': config['mysqld']['password'],
             'HOME': os.path.expanduser("~"), }
 
         logger.debug("Template input parameters:\n {0}".format(params_dict))

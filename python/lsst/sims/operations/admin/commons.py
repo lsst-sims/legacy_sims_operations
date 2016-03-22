@@ -56,7 +56,7 @@ def read_config(config_file):
 
     # TODO : manage special characters for pass (see config file comments for
     # additional information)
-    config['mysqld']['pass'] = parser.get("mysqld", "pass", raw=True)
+    config['mysqld']['password'] = parser.get("mysqld", "password", raw=True)
     if parser.has_option('mysqld', 'port'):
         config['mysqld']['port'] = parser.getint('mysqld', 'port')
 
