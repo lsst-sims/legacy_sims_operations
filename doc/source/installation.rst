@@ -249,14 +249,14 @@ file and place it in you home directory. That file looks like::
 
   [client]
   user     = www
-  pass     = changeit
+  password = changeit
   # host/port and/or socket
   host     = 127.0.0.1
   port     = 3307
   socket   = /path/to/db/sock/file/mysql.sock
 
 The ``port`` and ``socket`` entries need to be changed to the correct values
-for the existing database installation. The ``pass`` entry needs to match the
+for the existing database installation. The ``password`` entry needs to match the
 password in the database table setup script described below.
 
 .. warning::
