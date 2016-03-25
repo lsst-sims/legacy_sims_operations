@@ -217,15 +217,16 @@ Using a System Database Installation
 ------------------------------------
 
 Before installing OpSim from EUPS, the following steps need to be accomplished.
-This section assumes that you have already installed the system MySQL database 
-via your operating system's standard installation methods. The first step is 
-to navigate to ``$EUPS_PATH/site`` and create a file called ``manifest.remap``. 
+This section assumes that you have already installed the system MariaDB or MySQL
+database via your operating system's standard installation methods. The first step 
+is to navigate to ``$EUPS_PATH/site`` and create a file called ``manifest.remap``. 
 Add the following line to the file::
 
-  mysql system
+  mariadb system
 
-If you are using your own python and not the LSST stack version, you need to
-add the following line to the same file::
+The ``mariadb`` is necessary no matter which type of database you use. Its use is due 
+to the EUPS dependency. If you are using your own python and not the LSST stack version, 
+you need to add the following line to the same file::
 
   mysqlpython system
 
@@ -234,7 +235,7 @@ Please ensure that your python knows about the MySQLdb python package.
 Next, the EUPS setup needs to know about the system packages. This can be
 accomplished by running the following command::
 
-  eups declare mysql system -m none -r none -c
+  eups declare mariadb system -m none -r none -c
 
 If you are using your own python, also run the following::
 
