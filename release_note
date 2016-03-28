@@ -1,3 +1,15 @@
+Release Notes for OpSim3.3.8                             Mar 28, 2016
+==================================
+Code bug fixes:
+  * Fix tuple unpacking in AstronomicalSky (SIM-1805)
+
+Self-database installation:
+  * Switch to mariadb dependency (SIM-1804)
+  * Update configurations to use 'password' keyword (SIM-1843)
+
+Dependency updates:
+  * Added python requests module (SIM-1805)
+
 Release Notes for OpSim3.3.7                             Feb 15, 2016
 ==================================
 Code bug fixes:
