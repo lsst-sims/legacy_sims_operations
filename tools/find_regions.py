@@ -11,7 +11,7 @@ import lsst.sims.maf.plots as plots
 
 def queryFields(database):
     # Read the fields from the field table in the database.
-    opsdb = OpsimDatabase('enigma_1189_sqlite.db')
+    opsdb = OpsimDatabase(database)
     fields = opsdb.fetchFieldsFromFieldTable()
     return fields
 
@@ -69,8 +69,8 @@ def plotFields(fields, match):
                     {'colorMin':0, 'colorMax':1, 'xlabel':'Field Locations'})
     plt.show()
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
 
     fields = queryFields('enigma_1189_sqlite.db')
     # Edit this section to change the field selection.
