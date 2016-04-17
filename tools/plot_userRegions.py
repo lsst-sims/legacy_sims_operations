@@ -7,6 +7,7 @@ from matplotlib.patches import Ellipse
 import lsst.sims.maf.slicers as slicers
 import lsst.sims.maf.plots as plots
 
+
 def readUserRegions(confFile):
     fieldRA = []
     fieldDec = []
@@ -21,6 +22,7 @@ def readUserRegions(confFile):
     fieldRA = np.array(fieldRA, dtype=float)
     fieldDec = np.array(fieldDec, dtype=float)
     return fieldRA, fieldDec
+
 
 def plotFields(fieldRA, fieldDec):
     slicer = slicers.OpsimFieldSlicer()
@@ -44,7 +46,7 @@ def plotFields(fieldRA, fieldDec):
             fieldLocs.data[i] = colors[prop]
         skymap = plots.BaseSkyMap()
         fignum = skymap(fieldLocs, slicer,
-                        {'metricIsColor': True, 'bgcolor': 'lightgray', 'raCen':0},
+                        {'metricIsColor': True, 'bgcolor': 'lightgray', 'raCen': 0},
                         fignum=fignum)
     plt.figure(fignum)
     labelcolors = []
