@@ -84,6 +84,7 @@ Accessors
 - getFieldCoordinates
 """
 
+import os
 from math import *
 from utilities import *
 from LSSTObject import *
@@ -445,8 +446,11 @@ class Proposal(object):
             self.log.info('Proposal: getPropID()')
 
         # Get the short hostname
-        import socket
-        self.host = socket.gethostname().split('.', 1)[0]
+        self.host = os.getenv('OPSIM_HOSTNAME')
+        if self.host is None or self.host == "":
+            import socket
+            self.host = socket.gethostname().split('.', 1)[0]
+        self.host = self.host.replace('-', '_')
 
         # Get the object ID of self
         self.objID = id(self)

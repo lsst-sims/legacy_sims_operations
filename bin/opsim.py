@@ -53,6 +53,7 @@ def getSessionID(lsstDB, sessionTbl, code_test, track_run, startup_comment):
         import socket
         host = socket.gethostname()
     host = host.split('.')[0]
+    host = host.replace('-', '_')
     user = os.getenv('USER')
     (yy, mm, dd, h, m, s, wday, yday, dst) = time.gmtime()
     date = '%d-%d-%d %02d:%02d:%02d' % (yy, mm, dd, h, m, s)
