@@ -1,0 +1,22 @@
+sudo: false
+language: python
+matrix:
+  include:
+    # This is the ltd-mason documentation deployment build
+    - python: "3.5"
+      env: LTD_MASON_BUILD=true
+install:
+  - pip install sphinx
+  - pip install ltd-mason==0.2.0.rc0
+script:
+  - sphinx-build -b html -a -n -W doc/source doc/build
+  - ltd-mason-travis --html-dir doc/build
+env:
+  global:
+    - LTD_MASON_BUILD=false  # disable builds in regular text matrix
+    - LTD_MASON_PRODUCT="sims-operations"
+    - LTD_KEEPER_URL="https://keeper.lsst.codes"
+    # travis encrypt "LTD_MASON_AWS_ID=... LTD_MASON_AWS_SECRET=..."
+    - secure: "K332NczWP7D7qczaqXmcFq1nNT6/PeZ14rtRK0sFDo7/7u6KwLvhe5biXOgmKJmoOFlXoBg93uRn3tewRKvVpffPzrWwOlOHMNPR90X6uOubFxnd/IXFSWXOtEoKguKv71kTJANJvjhJkEtKm0cjrfAIBo8hMiiOqR9782oB/FQ="
+    # travis encrypt "LTD_KEEPER_USER=... LTD_KEEPER_PASSWORD=..."
+    - secure: "B3bdOBOnrhb+YFaFKG0LDZ5ETGb8MnH3VdmkmrM9BNmcO9X8q39gqI9cXVaOFrqLHCBkAtLZus5pGeEetxG/87gAE04JDPWjSMCkMyszUMn8fpv3WgRGxmhKxNAlHHVFOiRJLaE2j58YnQtcXYLyIeGWe3QH6Zk+LHHaOJqtqeU="
