@@ -55,12 +55,13 @@ The model for the weather is based on 10 years of cloud data
 from Cerro Tololo where four times per night a telescope operator estimated 
 the cloud coverage on the sky in discrete 8ths. The column ``c_date`` is the 
 time of observation in seconds since the beginning of the 10 years, and the 
-column ``cloud`` is the sky coverage fraction.  The simulator implements this 
-model by selecting ``cloud`` at the time ``c_date`` which immediate precedes
-the start time of a proposed observation. Observing proceeds while this 
-value does not
-exceed a specification in the configuration files (usually set to 0.7). If 
-``cloud`` exceeds the specified value, then observing pauses for 300 seconds,
+column ``cloud`` is the sky coverage fraction. A value of 0 indicates the sky
+is completely clear, and a value of 1 indicates the sky is completely cloudy.
+The simulator implements this model by selecting ``cloud`` at the time ``c_date`` 
+which immediate precedes the start time of a proposed observation. Observing 
+proceeds while this value does not exceed a specification in the configuration 
+files (usually set to 0.7). If ``cloud`` exceeds the specified value, then 
+observing pauses for 300 seconds,
 after which it is re-evaluated.  ::
 
    +---------+------------+------+-----+---------+----------------+
