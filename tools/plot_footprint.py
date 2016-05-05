@@ -102,7 +102,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Python script to plot the expected footprint of a survey, based on the configuration files."
                                      " Uses the userRegions in each configuration file, combined with the expected exclusions due to"
                                      " galactic exclusions (taperL, taperB, peakL) and airmass constraints (MaxAirmass) or dec hard limits"
-                                     " (MaxReach).")
+                                     " (MaxReach). \n"
+                                     "This doesn't fetch the field tesselation from the Field table, so essentially is assuming that "
+                                     "the user regions are already coming from this tesselation (that there is a field at or near the "
+                                     "userRegion location.")
     parser.add_argument('--confFile', type=str, default=None, help='Plot the expected footprint for this single configuration file.'
                         ' If None (default), then plots footprints for all configuration files in the directory.')
     parser.add_argument('--skipExclusions', dest='skipExclusions', action='store_true', default=False,
