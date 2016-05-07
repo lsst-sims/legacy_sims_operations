@@ -473,12 +473,12 @@ class ObsScheduler(LSSTObject):
                     else:
                         if filter not in self.targetRank[fieldID]:
                             self.targetRank[fieldID][filter] = rank
-                            self.targetProps[fieldID][filter] = [propId]
+                            self.targetProps[fieldID][filter] = [propID]
                             self.targetXblk[fieldID][filter] = propIDforXblk
                             totPotentialTargets += 1
                         else:
                             self.targetRank[fieldID][filter] += rank
-                            self.targetProps[fieldID][filter].append(propId)
+                            self.targetProps[fieldID][filter].append(propID)
                             if propIDforXblk is not None:
                                 self.targetXblk[fieldID][filter] = propIDforXblk
 
@@ -508,11 +508,15 @@ class ObsScheduler(LSSTObject):
                 if rank <= 0.0:
                     continue
                 filter = key
-                # Choose the maximum exposure time for the proposals interested in this field/filter.
-                expTime = max([self.expTime[propID] for propID in self.targetProps[fieldID][key]])
+                propIDforXblk = self.targetXblk[fieldID][filter]
+                if propIDforXblk is None:
+                    # Choose the maximum exposure time for the proposals interested in this field/filter.
+                    expTime = max([self.expTime[propID] for propID in self.targetProps[fieldID][key]])
+                else:
+                    # Or if it was an exclusive block, use the proper exposure time for that proposal.
+                    expTime = self.expTime[propIDforXblk]
                 # And multiply by the exposure factor.
                 expTime *= self.filters.ExposureFactor[key]
-                propIDforXblk = self.targetXblk[fieldID][filter]
                 ra = self.targets[fieldID][0]
                 dec = self.targets[fieldID][1]
 
