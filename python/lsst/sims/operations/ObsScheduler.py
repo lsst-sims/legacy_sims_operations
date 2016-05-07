@@ -393,6 +393,7 @@ class ObsScheduler(LSSTObject):
         if self.reuseRanking <= 0:
             # Dictionary of {fieldID: {filter: totRank}}
             self.targetRank = {}
+            self.targetProps = {}
             self.targetXblk = {}
 
             # Recompute sky data?
@@ -431,6 +432,8 @@ class ObsScheduler(LSSTObject):
 
             totPotentialTargets = 0
 
+            self.expTime = {}
+
             for proposal in self.proposals_list:
                 if not proposal.IsActive(date, self.nightCnt):
                     continue
@@ -443,7 +446,7 @@ class ObsScheduler(LSSTObject):
                 if not targetObs:
                     continue
 
-                self.expTime = proposal.exposureTime
+                self.expTime[proposal.propID] = proposal.exposureTime
                 propID = proposal.propID
 
                 for obs in targetObs:
@@ -464,15 +467,18 @@ class ObsScheduler(LSSTObject):
 
                     if fieldID not in self.targetRank:
                         self.targetRank[fieldID] = {filter: rank}
+                        self.targetProps[fieldID] = {filter: [propID]}
                         self.targetXblk[fieldID] = {filter: propIDforXblk}
                         totPotentialTargets += 1
                     else:
                         if filter not in self.targetRank[fieldID]:
                             self.targetRank[fieldID][filter] = rank
+                            self.targetProps[fieldID][filter] = [propId]
                             self.targetXblk[fieldID][filter] = propIDforXblk
                             totPotentialTargets += 1
                         else:
                             self.targetRank[fieldID][filter] += rank
+                            self.targetProps[fieldID][filter].append(propId)
                             if propIDforXblk is not None:
                                 self.targetXblk[fieldID][filter] = propIDforXblk
 
@@ -495,13 +501,17 @@ class ObsScheduler(LSSTObject):
 
         fields = sorted(self.targetRank.iterkeys())
         for fieldID in fields:
+            # keyList = the list of filters proposed for each field.
             keyList = sorted(self.targetRank[fieldID].iterkeys())
             for key in keyList:
                 rank = self.targetRank[fieldID][key]
                 if rank <= 0.0:
                     continue
                 filter = key
-                expTime = float(self.expTime)
+                # Choose the maximum exposure time for the proposals interested in this field/filter.
+                expTime = max([self.expTime[propID] for propID in self.targetProps[fieldID][key]])
+                # And multiply by the exposure factor.
+                expTime *= self.filters.ExposureFactor[key]
                 propIDforXblk = self.targetXblk[fieldID][filter]
                 ra = self.targets[fieldID][0]
                 dec = self.targets[fieldID][1]
@@ -530,7 +540,6 @@ class ObsScheduler(LSSTObject):
 
         # Return the best ranking
         if maxrank > 0:
-            win_exposureTime *= self.filters.ExposureFactor[win_filter]
             t = win_exposureTime
             s = win_slewTime
             self.winner = Observation(ra=win_ra, dec=win_dec, fieldID=win_fieldID, filter=win_filter,
