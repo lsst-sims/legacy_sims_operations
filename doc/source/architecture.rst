@@ -74,8 +74,8 @@ after which it is re-evaluated.  ::
 
 **Seeing**
 
-The seeing model is based on seeing observations taken on Cerro Pachon for a 
-total of one year.  A semi-analytic technique
+The seeing model is based on seeing observations taken on Cerro Pachon from May 2004
+to January 2006.  A semi-analytic technique
 was applied to this data to estimate the seeing over a 10-year period of time
 in intervals of 5 minutes. 
 This model will be replaced with 10 years of actual seeing measurements 
