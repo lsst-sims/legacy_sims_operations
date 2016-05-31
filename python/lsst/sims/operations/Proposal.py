@@ -741,14 +741,15 @@ class Proposal(object):
         self.last_observed_wasForThisProposal = False
 
         winner = None
-        # Find obs in self.winners
+        # Find obs in self.winners, count if exposure time was equal to or greater than desired exposure time.
         for o in self.winners:
             # if (o.fieldID == obs.fieldID and o.filter == obs.filter and o.exposureTime == obs.exposureTime):
             if (o.fieldID == obs.fieldID and o.filter == obs.filter):
-                winner = o
-                # print "Proposal: closeObs date=%d field=%d filter=%s propID=%d dist2moon=%f" %\
-                #       (obs.date, obs.fieldID, obs.filter, self.propID, o.distance2moon)
-                self.winners.remove(o)
+                if o.exposureTime <= obs.exposureTime:
+                    winner = o
+                    # print "Proposal: closeObs date=%d field=%d filter=%s propID=%d dist2moon=%f" %\
+                    #       (obs.date, obs.fieldID, obs.filter, self.propID, o.distance2moon)
+                    self.winners.remove(o)
                 break
         # If the observation was not found among the winners,
         # look for it in the losers set.
@@ -757,8 +758,9 @@ class Proposal(object):
                 # if o.fieldID == obs.fieldID and o.filter == obs.filter and
                 # o.exposureTime >= obs.exposureTime:
                 if o.fieldID == obs.fieldID and o.filter == obs.filter:
-                    winner = o
-                    self.loosers.remove(o)
+                    if o.exposureTime <= obs.exposureTime:
+                        winner = o
+                        self.loosers.remove(o)
                     break
             # if winner is not None:
             #     # It found it! Serendipitus
