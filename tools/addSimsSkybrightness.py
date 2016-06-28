@@ -22,6 +22,7 @@ def convert_ecliptic(ra, dec):
     ecLon = ecLon % (2 * np.pi)
     return ecLat, ecLon
 
+
 def read_opsim(dbFileName):
     conn = sqlite3.connect(dbFileName)
     # Opsim angles are in radians.
@@ -33,7 +34,7 @@ def read_opsim(dbFileName):
     eclipLat, eclipLon = convert_ecliptic(df.fieldRA, df.fieldDec)
     df['eclipLat'] = eclipLat
     df['eclipLon'] = eclipLon
-        # Grab LSST longitude/latitude for ra/dec to alt/az conversion.
+    # Grab LSST longitude/latitude for ra/dec to alt/az conversion.
     telescope = Site('LSST')
     sunEclipLon = np.zeros(len(df))
     for i, row in df.iterrows():
@@ -43,6 +44,7 @@ def read_opsim(dbFileName):
         sunEclLat, sunEclipLon[i] = convert_ecliptic(sunRA[0], sunDec[0])
     df['sunEclipLon'] = sunEclipLon
     return df
+
 
 def add_skybright(df):
     skyModel = skybrightness.SkyModel(mags=True)
@@ -62,9 +64,10 @@ def add_skybright(df):
                            eclipLat=np.array([dfi.eclipLat]),
                            degrees=False)
         mags = skyModel.returnMags()
-        sims_skybright[j] = mags[dfi['filter']][0]
+        sims_skybright[i] = mags[dfi['filter']][0]
     df['sims_skybright'] = sims_skybright
     return sims_skybright
+
 
 def add_m5(df):
     m5 = np.zeros(len(df))
@@ -74,6 +77,7 @@ def add_m5(df):
                             df.visitExpTime.as_matrix()[match], df.airmass.as_matrix()[match])
     df['sims_m5'] = m5
     return df
+
 
 def write_opsim(df, dbFileName):
     # Could have written data back to sqlite using pandas, to_sql, but it's not clear if that would
