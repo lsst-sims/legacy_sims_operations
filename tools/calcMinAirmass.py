@@ -17,8 +17,8 @@ plus_1hr = np.arccos(np.cos(min_z) * np.cos(ha_offset))
 ha_offset = np.radians(30)
 plus_2hr = np.arccos(np.cos(min_z) * np.cos(ha_offset))
 
-airmass_1hr = 1/ np.cos(plus_1hr)
-airmass_2hr = 1./np.cos(plus_2hr)
+airmass_1hr = 1. / np.cos(plus_1hr)
+airmass_2hr = 1. / np.cos(plus_2hr)
 
 plt.plot(field_dec, min_airmass, 'k-', label='zenith')
 plt.plot(field_dec, airmass_1hr, 'r:', label='+1hr')

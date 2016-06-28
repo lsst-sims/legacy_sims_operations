@@ -8,30 +8,30 @@ def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
     #
     # These values are calculated using $SYSENG_THROUGHPUTS/python/calcM5.py.
     # This set of values are calculated using v1.0 of the SYSENG_THROUGHPUTS repo.
-    Cm = {'u':22.94,
-          'g':24.46,
-          'r':24.48,
-          'i':24.34,
-          'z':24.18,
-          'y':23.73}
-    dCm_infinity = {'u':0.56,
-                    'g':0.12,
-                    'r':0.06,
-                    'i':0.05,
-                    'z':0.03,
-                    'y':0.02}
-    kAtm = {'u':0.50,
-            'g':0.21,
-            'r':0.13,
-            'i':0.10,
-            'z':0.07,
-            'y':0.18}
-    msky = {'u':22.95,
-            'g':22.24,
-            'r':21.20,
-            'i':20.47,
-            'z':19.60,
-            'y':18.63}
+    Cm = {'u': 22.94,
+          'g': 24.46,
+          'r': 24.48,
+          'i': 24.34,
+          'z': 24.18,
+          'y': 23.73}
+    dCm_infinity = {'u': 0.56,
+                    'g': 0.12,
+                    'r': 0.06,
+                    'i': 0.05,
+                    'z': 0.03,
+                    'y': 0.02}
+    kAtm = {'u': 0.50,
+            'g': 0.21,
+            'r': 0.13,
+            'i': 0.10,
+            'z': 0.07,
+            'y': 0.18}
+    msky = {'u': 22.95,
+            'g': 22.24,
+            'r': 21.20,
+            'i': 20.47,
+            'z': 19.60,
+            'y': 18.63}
     # Calculate adjustment if readnoise is significant for exposure time
     # (see overview paper, equation 7)
     Tscale = expTime / 30.0 * np.power(10.0, -0.4*(filtsky - msky[visitFilter]))
@@ -40,6 +40,7 @@ def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
     m5 = (Cm[visitFilter] + dCm + 0.50*(filtsky-21.0) + 2.5*np.log10(0.7/FWHMeff) +
           1.25*np.log10(expTime/30.0) - kAtm[visitFilter]*(airmass-1.0) + 1.1*tauCloud)
     return m5
+
 
 def calc_FWHMeff(visitFilter, rawSeeing, airmass):
     """Convert the raw seeing from the seeing database into FWHMeff for a particular observation."""
