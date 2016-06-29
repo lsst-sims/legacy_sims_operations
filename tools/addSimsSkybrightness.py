@@ -66,7 +66,7 @@ def add_skybright(df):
         mags = skyModel.returnMags()
         sims_skybright[i] = mags[dfi['filter']][0]
     df['sims_skybright'] = sims_skybright
-    return sims_skybright
+    return df
 
 
 def add_m5(df):
