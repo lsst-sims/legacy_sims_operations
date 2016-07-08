@@ -7,19 +7,19 @@ def calc_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud=0):
     # The Cm values must be changed when telescope and site parameters are updated.
     #
     # These values are calculated using $SYSENG_THROUGHPUTS/python/calcM5.py.
-    # This set of values are calculated using v1.0 of the SYSENG_THROUGHPUTS repo.
-    Cm = {'u': 22.94,
-          'g': 24.46,
-          'r': 24.48,
-          'i': 24.34,
-          'z': 24.18,
-          'y': 23.73}
-    dCm_infinity = {'u': 0.56,
-                    'g': 0.12,
-                    'r': 0.06,
-                    'i': 0.05,
-                    'z': 0.03,
-                    'y': 0.02}
+    # This set of values are calculated using v1.2 of the SYSENG_THROUGHPUTS repo.
+    Cm = {'u': 22.74,
+          'g': 24.38,
+          'r': 24.43,
+          'i': 24.30,
+          'z': 24.15,
+          'y': 23.70}
+    dCm_infinity = {'u': 0.75,
+                    'g': 0.19,
+                    'r': 0.10,
+                    'i': 0.07,
+                    'z': 0.05,
+                    'y': 0.04}
     kAtm = {'u': 0.50,
             'g': 0.21,
             'r': 0.13,
