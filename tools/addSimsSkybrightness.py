@@ -3,6 +3,8 @@ import sqlite3
 import numpy as np
 import pandas as pd
 
+import argparse
+
 from lsst.sims.utils import Site
 import lsst.sims.skybrightness as skybrightness
 
@@ -84,34 +86,35 @@ def write_opsim(df, dbFileName):
     # let me insert just the additional columns.
     conn = sqlite3.connect(dbFileName)
     cur = conn.cursor()
-    # Add columns if they don't exist
-    try:
-        query = 'select sims_skybrightness from summary limit 1'
-        cur.execute(query)
-    except sqlite3.OperationalError:
-        query = 'alter table summary add column "sims_skybrightness" real'
-        cur.execute(query)
-    try:
-        query = 'select sims_m5 from summary limit 1'
-        cur.execute(query)
-    except sqlite3.OperationalError:
-        query = 'alter table summary add column "sims_m5" real'
-        cur.execute(query)
-    # Populate columns.
+    # Add index on obsHistID
+    query = 'create index obsHistID_idx on summary(obsHistID)'
+    cur.execute(query)
+    conn.commit()
+    # Replace filtSkyBrightness and fiveSigmaDepth values with new values.
+    # First set columns to NULL so we know if we failed at some point.
+    query = "update summary set filtSkyBrightness='NULL', fiveSigmaDepth='NULL'"
+    cur.execute(query)
+    # Populate columns with new values.
     for i, row in df.iterrows():
-        query = 'update summary set sims_skybrightness = %f, sims_m5 = %f ' \
+        query = 'update summary set filtSkyBrightness = %f, fiveSigmaDepth = %f ' \
                 'where obsHistID = %d' % (row.sims_skybright, row.sims_m5, row.obsHistID)
         cur.execute(query)
+    conn.commit()
     conn.close()
 
 
 if __name__ == '__main__':
-    dbFile = '/Users/lynnej/opsim/db/minion_1016_sqlite.db'
+
+    parser = argparse.ArgumentParser(description='Replace filtSkyBrightness and fiveSigmaDepth with values based on sims_skybrightness')
+    parser.add_argument('dbFile', type=str, default=None, help='full file path to the opsim sqlite file')
+    parser.set_defaults()
+    args = parser.parse_args()
+
     print('Reading data')
-    df = read_opsim(dbFile)
-    print('Adding skybrightness')
+    df = read_opsim(args.dbFile)
+    print('Adding skybrightness - this could take a while')
     df = add_skybright(df)
     print('Adding new m5')
     df = add_m5(df)
     print('Saving to disk')
-    write_opsim(df, dbFile)
+    write_opsim(df, args.dbFile)
