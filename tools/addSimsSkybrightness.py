@@ -10,6 +10,11 @@ import lsst.sims.skybrightness as skybrightness
 
 from opsimUtils import calc_m5
 
+import time
+def dtime(time_prev):
+    return (time.time() - time_prev, time.time())
+
+
 
 def convert_ecliptic(ra, dec):
     ecinc = np.radians(23.439291)
@@ -51,6 +56,7 @@ def read_opsim(dbFileName):
 def add_skybright(df):
     skyModel = skybrightness.SkyModel(mags=True)
     sims_skybright = np.zeros(len(df), float)
+    t = time.time()
     for i, dfi in df.iterrows():
         airmass = dfi.airmass
         alts = dfi.altitude
@@ -64,9 +70,11 @@ def add_skybright(df):
                            moonAz=dfi.moonAZ, sunAlt=dfi.sunAlt, sunAz=dfi.sunAz,
                            sunEclipLon=dfi.sunEclipLon, eclipLon=np.array([dfi.eclipLon]),
                            eclipLat=np.array([dfi.eclipLat]),
-                           degrees=False)
+                           degrees=False, filterNames=[dfi['filter']])
         mags = skyModel.returnMags()
         sims_skybright[i] = mags[dfi['filter']][0]
+    dt, t = dtime(t)
+    print('%f seconds to calculate %d skybrightnesses' % (dt, i))
     df['sims_skybright'] = sims_skybright
     return df
 
