@@ -108,6 +108,14 @@ def write_opsim(df, dbFileName):
                 'where obsHistID = %d' % (row.sims_skybright, row.sims_m5, row.obsHistID)
         cur.execute(query)
     conn.commit()
+    # Find the session id, then add a comment about updating the sky brightness.
+    query = 'select sessionID from Session'
+    res = cur.execute(query)
+    sessionID = int(res[0])
+    query = "insert into Config (moduleName, paramIndex, paramName, paramValue, comment, Session_sessionID, nonPropID) values"
+    query += "('Comment', 1, 'SkyBrightness', 'sims_skybrightness', '', sessionID, '0');"
+    cur.execute(query)
+    conn.commit()
     conn.close()
 
 
