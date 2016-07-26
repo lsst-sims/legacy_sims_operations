@@ -92,9 +92,10 @@ be helpful.
 - **MaxNumberActiveSequences** is set to a ridiculously high number and is
   irrelevant.
 
-- **RestartLostSequences** is more relevant to WLpropConf proposals without
+- **RestartLostSequences** is not relevant for ``WLtype = True`` proposals. For
+  WLpropConf proposals without
   ``WLtype = True``.  ``RestartLostSequences`` will restart a sequence which is
-  lost due to its missing too many observations.  It is irrelevant for ``WLtype = true`` proposals.
+  lost due to missing too many observations.
 
 - **RestartCompleteSequences** is relevant to restart a time sequence when too many epoch have been lost and the sequence dies.  It is also relevant for a ``WLtype = true`` proposal where it will restart collection of field/filter pairs after the requested number have been collected.
 
