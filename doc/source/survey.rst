@@ -81,7 +81,7 @@ result in sky conditions changing enough that field/filter combinations are
 taken which probably shouldn't be.  Small values for ``reuseRankingCount``
 slows down the simulation due to the constant reevaluation of the field/filters
 ranking.  We have found a value of 10 works well. This means that all possible
-ld/filter combinations are ranked based on the internal proposal logic, the
+field/filter combinations are ranked based on the internal proposal logic, the
 relative importance of each proposal and the slew time to reach them.  The top
 10 are chosen; number 1 is observed.  The remaining 9 are reranked and the top
 field observed and so on until the 10 are exhausted.
