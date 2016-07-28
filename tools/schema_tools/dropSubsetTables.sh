@@ -27,4 +27,5 @@ $mysqlcmd -e "drop table if exists $1.tSlewState_$2_$3"
 $mysqlcmd -e "drop table if exists $1.tSlewMaxSpeeds_$2_$3"
 
 # Removing dat files
-/bin/rm *_$2_$3.dat Cloud.dat Seeing.dat Field.dat
+/bin/rm *_$2_$3.dat 
+#/bin/rm Cloud.dat Seeing.dat Field.dat
