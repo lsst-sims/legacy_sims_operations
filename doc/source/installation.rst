@@ -28,7 +28,7 @@ LSST Stack Install
 
     mkdir -p ~/lsst
     cd ~/lsst
-    curl -O https://sw.lsstcorp.org/eupspkg/newinstall.sh
+    curl -OL https://raw.githubusercontent.com/lsst/lsst/12.0/scripts/newinstall.sh
     # script below will ask some questions. Unless you know what you're doing,
     # and you need a fine tuned setup, please answer 'yes' everywhere.
     bash newinstall.sh
