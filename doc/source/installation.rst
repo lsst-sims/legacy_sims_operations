@@ -19,20 +19,15 @@ Installation Instructions
 
 .. _install-lsststack:
 
-LSST Stack Install
-~~~~~~~~~~~~~~~~~~
+LSST Science Pipelines Install
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Install the LSST Stack Setup
+* Install the LSST Science Pipelines
 
-  .. code-block:: bash
-
-    mkdir -p ~/lsst
-    cd ~/lsst
-    curl -OL https://raw.githubusercontent.com/lsst/lsst/12.0/scripts/newinstall.sh
-    # script below will ask some questions. Unless you know what you're doing,
-    # and you need a fine tuned setup, please answer 'yes' everywhere.
-    bash newinstall.sh
-    source loadLSST.bash
+  Installation instructions can be found on the 
+  `LSST Science Pipelines <https://pipelines.lsst.io/install/>`_
+  pages.
+  
 
 * Install the OpSim code
 
