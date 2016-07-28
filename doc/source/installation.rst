@@ -25,8 +25,8 @@ LSST Science Pipelines Install
 * Install the LSST Science Pipelines
 
   Installation instructions can be found on the 
-  `LSST Science Pipelines <https://pipelines.lsst.io/install/>`_
-  pages.
+  `LSST Science Pipelines <https://pipelines.lsst.io/install/newinstall.sh>`_
+  pages. Complete the instructions through step 3.
   
 
 * Install the OpSim code
