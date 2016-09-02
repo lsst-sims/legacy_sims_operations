@@ -259,7 +259,9 @@ password in the database table setup script described below.
 
   **DO NOT** run the ``opsim-configure.py`` command above as is it unnecessary.
 
-To finish the setup you need to create the OpsimDB and populate some tables.
+If you have a pre-existing OpsimDB database that is already populated 
+(e.g. in the case where you are updating EUPS), then STOP HERE.  Otherwise,
+to finish the setup you need to create the OpsimDB and populate some tables.
 Copy the ``setup_db.sh`` script from the ``$SIMS_OPERATIONS_DIR/tools``
 directory and edit the password variable at the top. Then execute the
 following::
