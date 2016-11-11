@@ -152,9 +152,9 @@ def offsetRandom(noffsets, inHex=True):
         
     return zip(np.radians(xOff),np.radians(yOff))
 
-def add_dither(database, simname, dithType, overwrite=True):
+def add_translationalDither(database, simname, dithType, overwrite=True):
     """ 
-    Adds dither columns to the database. Two options:
+    Adds translational dither columns to the database. Two options:
         1. HexDither: Krughoff-Jones dithering pattern: dither offsets form a 217 point lattice.
                       Dithers are implemented on PerNight timescale.
                       Columns added: hexDitheredRA, hexDitheredDec
@@ -268,5 +268,5 @@ if __name__ == "__main__":
     opsimname = "summary_" + hname + "_" + sessionID
     #print "Updating %s" %(opsimname)
     add_indexes(database, opsimname)
-    add_dither(database, opsimname, dithType= 'hex', overwrite=False)    # PerNight
-    add_dither(database, opsimname, dithType= 'random', overwrite=False)  # FieldPerVisit
+    add_translationalDither(database, opsimname, dithType= 'hex', overwrite=False)    # PerNight
+    add_translationalDither(database, opsimname, dithType= 'random', overwrite=False)  # FieldPerVisit
