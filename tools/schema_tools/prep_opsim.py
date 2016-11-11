@@ -101,6 +101,53 @@ def offsetHex():
             vertex_count += 1
     return offsets
 
+def offsetRandom(noffsets, inHex=True):
+    """ 
+    Returns random dither offsets in radians.
+    
+    Required input
+    --------------
+    * noffsets: int: number of offsets needed.
+    
+    Optional input
+    --------------
+    * inHex: bool: set to False if dont want to restrict the dithers to within
+                   the hexagon inscribing the FOV. Default: True
+                  
+    """
+    import numpy as np
+    from lsst.sims.maf.stackers import inHexagon
+    # some constants for the dithering
+    fov = 3.5
+    
+    maxDither= fov/2.
+    # modified version of _generateRandomOffsets function private to RandomDitherFieldPerVisitStacker
+    # in lsst.sims.maf.stackers.
+    xOut = np.array([], float)
+    yOut = np.array([], float)
+    maxTries = 100
+    tries = 0
+    while (len(xOut) < noffsets) and (tries < maxTries):
+        dithersRad = np.sqrt(np.random.rand(noffsets * 2)) * maxDither
+        dithersTheta = np.random.rand(noffsets * 2) * np.pi * 2.0
+        xOff = dithersRad * np.cos(dithersTheta)
+        yOff = dithersRad * np.sin(dithersTheta)
+        if inHex:
+            # Constrain dither offsets to be within hexagon.
+            idx = inHexagon(xOff, yOff, maxDither)
+            xOff = xOff[idx]
+            yOff = yOff[idx]
+        xOut = np.concatenate([xOut, xOff])
+        yOut = np.concatenate([yOut, yOff])
+        tries += 1
+    if len(xOut) < noffsets:
+        raise ValueError('Could not find enough random points within the hexagon in %d tries. '
+                         'Try another random seed?' % (maxTries))
+    xOff = xOut[0:noffsets]
+    yOff = yOut[0:noffsets]
+        
+    return zip(np.radians(xOff),np.radians(yOff))
+
 def add_dither(database, simname, overwrite=True):
     ## Add the Krughoff-Jones dithering pattern to the opsim output
     ## adds three columns (ditheredRA, ditheredDec, and vertex) and indexes
