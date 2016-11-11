@@ -253,6 +253,66 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
     cursor.execute(sqlquery)
     cursor.close()
 
+def add_rotationalDither(database, simname, overwrite=True):
+    """
+    Adds a rotational dither column to the database (called ditheredRotTelPos).
+
+    Dither stategy: random offset between +/-(pi/2) radians after every filter change.
+
+    Required inputs
+    ---------------
+    * database
+    * simname
+
+    Optional input
+    --------------
+    * overwrite: bool: Default: True
+
+    """
+    # adds one column (ditheredRotTelPos) and indexes
+    newcols = ['ditheredRotTelPos']
+    
+    # connect to the database
+    cursor =  connect_db(dbname=database)
+    # check if dither columns exist
+    sqlquery = "describe %s"%(simname)
+    cursor.execute(sqlquery)
+    sqlresults = cursor.fetchall()
+    for result in sqlresults:
+        if (result[0] in newcols):
+            newcols.remove(result[0])
+            if overwrite:
+                print '%s column already exists, but will overwrite.' %(result[0])
+            else:
+                print "%s column already exists - skipping adding dithering" %(result[0])
+                break
+    if len(newcols)>0:
+        print 'Adding dither columns'
+        for n in newcols:
+            # add columns for dithering
+            sqlquery = 'alter table %s add %s double' %(simname, n)
+            cursor.execute(sqlquery)
+            
+    # want to implement rotational dither after every filter changed
+    # get the obsHistID to track each visit. get filter to track filter change.
+    sqlquery = "select distinct obsHistID, filter from %s"%(simname)
+    cursor.execute(sqlquery)
+    sqlresults = cursor.fetchall()
+
+    for index, result in enumerate(sqlresults):
+        if (index>0): # no data for previous filter for index=0, so ignore it.
+            filterBand= results[1]
+            if (filterBand[index-1]!=filterBand[index]):    # i.e. if there is a filter change
+                rotOffset= np.random.rand()*np.pi-np.pi/2.   # random offset between +/-pi/2 radians
+                obsHistID = int(result[0])
+                sqlquery= "update %s set "+ newcols[0] +" = rotTelPos + %f, where obsHistID = %i"%(simname, rotOffset, obsHistID)
+                cursor.execute(sqlquery)
+    # add indexes
+    print "Adding rotational dithering indexes"
+    sqlquery = "create index "+ newcols[0] +"_idx on %s("+ newcols[0] +")" %(simname)
+    cursor.execute(sqlquery)
+    cursor.close()
+    
 if __name__ == "__main__":
 
     # Give this the opsim name, then will update opsim to add useful information & indexes
