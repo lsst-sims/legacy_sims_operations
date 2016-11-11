@@ -193,7 +193,7 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
             newcols.remove(result[0])
             if overwrite:
                 print '%s column already exists, but will overwrite.' %(result[0])
-            if overwrite==False:
+            else:
                 print "%s column already exists - skipping adding dithering" %(result[0])
                 break
     if len(newcols)>0:
@@ -219,7 +219,7 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
         sqlquery = "select distinct(obsHistID) from %s"%(simname)
         cursor.execute(sqlquery)
         sqlresults = cursor.fetchall()
-    
+
     for index, result in enumerate(sqlresults):
         if (dithType=='hex'):
             night = int(result[0])
@@ -314,9 +314,7 @@ def add_rotationalDither(database, simname, overwrite=True):
     cursor.close()
     
 if __name__ == "__main__":
-
     # Give this the opsim name, then will update opsim to add useful information & indexes
-
     import sys
 
     if len(sys.argv)<3:
@@ -330,3 +328,4 @@ if __name__ == "__main__":
     add_indexes(database, opsimname)
     add_translationalDither(database, opsimname, dithType= 'hex', overwrite=False)    # PerNight
     add_translationalDither(database, opsimname, dithType= 'random', overwrite=False)  # FieldPerVisit
+    add_rotationalDither(database, opsimname, overwrite=False)  # random rotational dithers.
