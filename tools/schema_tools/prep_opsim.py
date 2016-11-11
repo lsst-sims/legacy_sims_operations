@@ -264,4 +264,5 @@ if __name__ == "__main__":
     opsimname = "summary_" + hname + "_" + sessionID
     #print "Updating %s" %(opsimname)
     add_indexes(database, opsimname)
-    add_dither(database, opsimname, overwrite=False)
+    add_dither(database, opsimname, dithType= 'hex', overwrite=False)    # PerNight
+    add_dither(database, opsimname, dithType= 'random', overwrite=False)  # FieldPerVisit
