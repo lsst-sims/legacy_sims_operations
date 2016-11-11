@@ -70,6 +70,10 @@ def remove_dither(simname, dropdatacol = False):
     return
 
 def offsetHex():
+    """ 
+    Returns translational hex dither offsets (217 points) in radians.
+               
+    """
     import numpy
     # some constants for the dithering
     fov = 3.5
@@ -103,7 +107,7 @@ def offsetHex():
 
 def offsetRandom(noffsets, inHex=True):
     """ 
-    Returns random dither offsets in radians.
+    Returns translational random dither offsets in radians.
     
     Required input
     --------------
