@@ -157,10 +157,10 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
     Adds translational dither columns to the database. Two options:
         1. HexDither: Krughoff-Jones dithering pattern: dither offsets form a 217 point lattice.
                       Dithers are implemented on PerNight timescale.
-                      Columns added: hexDitheredRA, hexDitheredDec
+                      Columns added: hexDitherPerNightRA, hexDitherPerNightDec
         2. RandomDither: random dithers within the hexagon inscribing the circular FOV.
                          Dithers are implemented on FieldPerVisit timescale.
-                         Columns added: randDitheredRA, randDitheredDec
+                         Columns added: randomDitherFieldPerVisitRA, randomDitherFieldPerVisitDec
     
     Required inputs
     ---------------
@@ -173,12 +173,12 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
     * overwrite: bool: Default: True
                   
     """
-    ## adds three columns (<dithType>ditheredRA, <dithType>ditheredDec, and vertex) and indexes
+    ## adds three columns (<dithType>Dither<timescale>RA, <dithType>Dither<timescale>Dec, and vertex) and indexes
     # first check to ensure correct dithType is requested.
     if (dithType=='hex'):
-        newcols = ['hexDitheredRA', 'hexDitheredDec']
+        newcols = ['hexDitherPerNightRA', 'hexDitherPerNightDec']
     elif (dithType=='random'):
-        newcols = ['randDitheredRA', 'randDitheredDec']
+        newcols = ['randomDitherFieldPerVisitRA', 'randomDitherFieldPerVisitDec']
     else:
         print "Incorrect dithType: it should be either 'hex' or 'random'."
         return
@@ -326,6 +326,6 @@ if __name__ == "__main__":
     opsimname = "summary_" + hname + "_" + sessionID
     #print "Updating %s" %(opsimname)
     add_indexes(database, opsimname)
-    add_translationalDither(database, opsimname, dithType= 'hex', overwrite=False)    # PerNight
-    add_translationalDither(database, opsimname, dithType= 'random', overwrite=False)  # FieldPerVisit
+    add_translationalDither(database, opsimname, dithType= 'hex', overwrite=False)    # SequentialHexDitherPerNight
+    add_translationalDither(database, opsimname, dithType= 'random', overwrite=False)  # RandomDitherFieldPerVisit
     add_rotationalDither(database, opsimname, overwrite=False)  # random rotational dithers.
