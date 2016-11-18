@@ -53,19 +53,54 @@ def add_indexes(database, simname):
     print "Done adding indexes"
     cursor.close()
 
-def remove_dither(simname, dropdatacol = False):
-    print "Removing existing dithering indexes and columns."
+def remove_dither(simname, dithType, dropdatacol= False):
+    """
+    Remove the indices (and possibly the data) for the added columns of the specified dither type.
+
+    Required inputs
+    ---------------
+    * simname
+    * dithType: str: either 'hex' (for translational hex dithers) or
+                            'random' (for transalational random dithers) or
+                            'rot' (for random rotational dithers).
+
+    Optional input
+    --------------
+    * dropdatacol: bool: set to True if want to drop the data.
+                         Default: False
+
+    """
+    if (dithType=='hex'):
+        newcols = ['hexDitherPerNightRA', 'hexDitherPerNightDec']
+    elif (dithType=='random'):
+        newcols = ['randomDitherFieldPerVisitRA', 'randomDitherFieldPerVisitDec']
+    elif (dithType== 'rot'):
+        newcols = ['ditheredRotTelPos']
+    else:
+        print "Incorrect dithType: it should be either 'hex' or 'random' or 'rot'."
+        return
+
+    print "Removing existing dithering indexes and columns for " + dithType + "dithers."
     cursor = connect_db()
-    sqlquery = "drop index ditheredRA_idx on %s" %(simname)
-    cursor.execute(sqlquery)
-    sqlquery = "drop index ditheredDec_idx on %s" %(simname)
-    cursor.execute(sqlquery)
-    sqlquery = "drop index ditheredRADec_idx on %s" %(simname)
-    cursor.execute(sqlquery)
-    if dropdatacol:
-        print "Removed indexes - now will remove columns ditheredRA/dec."
-        sqlquery = "alter table %s drop column ditheredRA, drop column ditheredDec" %(simname)
+
+    if (len(newcols)>1):   # translational dithers add two columns: RA, Dec
+        sqlquery = "drop index " + newcols[0] + "_idx on %s" %(simname)   # <>RA_idx
         cursor.execute(sqlquery)
+        sqlquery = "drop index " + newcols[1] + "_idx on %s" %(simname)   # <>Dec_idx
+        cursor.execute(sqlquery)
+        sqlquery = "drop index " + newcols[0] + "Dec_idx on %s" %(simname)  # <>RADec_idx
+        cursor.execute(sqlquery)
+        if dropdatacol:
+            print "Removed indexes - now will remove columns for the dithered RA/dec."
+            sqlquery = "alter table %s drop column " + newcols[0] + ", drop column " + newcols[1] %(simname)
+            cursor.execute(sqlquery)
+    else:   # rotational dithers add only one column.
+        sqlquery = "drop index " + newcols[0] + "_idx on %s" %(simname)
+        cursor.execute(sqlquery)
+        if dropdatacol:
+            print "Removed indexes - now will remove columns for the dithered rotational angle."
+            sqlquery = "alter table %s drop column " + newcols[0] %(simname)
+            cursor.execute(sqlquery)
     cursor.close()
     return
 
