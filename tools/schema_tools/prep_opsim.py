@@ -63,7 +63,6 @@ def remove_dither(simname, dithType, dropdatacol= False):
     * dithType: str: either 'hex' (for translational hex dithers) or
                             'random' (for transalational random dithers) or
                             'rot' (for random rotational dithers).
-
     Optional input
     --------------
     * dropdatacol: bool: set to True if want to drop the data.
@@ -77,8 +76,7 @@ def remove_dither(simname, dithType, dropdatacol= False):
     elif (dithType== 'rot'):
         newcols = ['ditheredRotTelPos']
     else:
-        print "Incorrect dithType: it should be either 'hex' or 'random' or 'rot'."
-        return
+        raise ValueError("Incorrect dithType: it should be either 'hex' or 'random' or 'rot'.")
 
     print "Removing existing dithering indexes and columns for " + dithType + "dithers."
     cursor = connect_db()
@@ -158,7 +156,6 @@ def offsetRandom(noffsets, inHex=True):
     from lsst.sims.maf.stackers import inHexagon
     # some constants for the dithering
     fov = 3.5
-    
     maxDither= fov/2.
     # modified version of _generateRandomOffsets function private to RandomDitherFieldPerVisitStacker
     # in lsst.sims.maf.stackers.
@@ -184,7 +181,6 @@ def offsetRandom(noffsets, inHex=True):
                          'Try another random seed?' % (maxTries))
     xOff = xOut[0:noffsets]
     yOff = yOut[0:noffsets]
-        
     return zip(np.radians(xOff),np.radians(yOff))
 
 def add_translationalDither(database, simname, dithType, overwrite=True):
@@ -205,8 +201,9 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
     
     Optional input
     --------------
-    * overwrite: bool: Default: True
-                  
+    * overwrite: bool: set to False if don't want to overwrite the columns if they exist.
+                       Default: True
+
     """
     ## adds three columns (<dithType>Dither<timescale>RA, <dithType>Dither<timescale>Dec, and vertex) and indexes
     # first check to ensure correct dithType is requested.
@@ -215,8 +212,7 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
     elif (dithType=='random'):
         newcols = ['randomDitherFieldPerVisitRA', 'randomDitherFieldPerVisitDec']
     else:
-        print "Incorrect dithType: it should be either 'hex' or 'random'."
-        return
+        raise ValueError("Incorrect dithType: it should be either 'hex' or 'random'.")
     # connect to the database
     cursor =  connect_db(dbname=database)
     # check if dither columns exist
@@ -240,9 +236,8 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
               
     # find the right offsets.
     if (dithType=='hex'):
-        # want to change vertex on night/night basis, so pull all night values from db
+        # want to change vertex on per night basis, so pull all night values from db
         sqlquery = "select distinct(night) from %s"%(simname)
-        #print sqlquery
         cursor.execute(sqlquery)
         sqlresults = cursor.fetchall()
         # go through each night individually
@@ -280,11 +275,11 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
     cursor.execute(sqlquery)
     # add indexes
     print "Adding dithering indexes"
-    sqlquery = "create index "+ newcols[0] +"_idx on %s("+ newcols[0] +")" %(simname)
+    sqlquery = "create index "+ newcols[0] +"_idx on %s("+ newcols[0] +")" %(simname)    # <>RA_idx
     cursor.execute(sqlquery)
-    sqlquery = "create index "+ newcols[1] +"_idx on %s("+ newcols[1] +")" %(simname)
+    sqlquery = "create index "+ newcols[1] +"_idx on %s("+ newcols[1] +")" %(simname)    # <>Dec_idx
     cursor.execute(sqlquery)
-    sqlquery = "create index "+ newcols[0] +"Dec_idx on %s("+ newcols[0] +", "+ newcols[1] +")" %(simname)
+    sqlquery = "create index "+ newcols[0] +"Dec_idx on %s("+ newcols[0] +", "+ newcols[1] +")" %(simname)   # <>RADec_idx
     cursor.execute(sqlquery)
     cursor.close()
 
@@ -301,7 +296,8 @@ def add_rotationalDither(database, simname, overwrite=True):
 
     Optional input
     --------------
-    * overwrite: bool: Default: True
+    * overwrite: bool: set to False if don't want to overwrite the columns if they exist.
+                       Default: True
 
     """
     # adds one column (ditheredRotTelPos) and indexes
