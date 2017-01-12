@@ -64,9 +64,10 @@ echo "[Updating the columns]"
 $mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 change filtSkyBright filtSkyBrightness double"
 $mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 change alt altitude double"
 $mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 change az azimuth double"
-$mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 add ditheredRA double"
-$mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 add ditheredDec double"
 $mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 add fiveSigmaDepth double"
+# Let's not copy dithering columns back to ObsHistory.
+#$mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 add ditheredRA double"
+#$mysqlcmd -e "alter table $database.tObsHistory_${host}_$1 add ditheredDec double"
 #$mysqlcmd -e "alter table $database.tProposal_${host}_$1 add tag varchar(256)"
 echo "####################################################################"
 
@@ -93,7 +94,7 @@ echo "####################################################################"
 
 # Copying over fiveSigmaDepth, ditheredRA, ditheredDec values from output to ObsHistory
 #echo "####################################################################"
-echo "[Fixing fiveSigmaDepth, ditheredRA, ditheredDec values from output to ObsHistory]"
+echo "[Fixing fiveSigmaDepth values from output to ObsHistory]"
 time $python $rundir/schema_tools/move_data_output_obshistory.py $host $database $1
 echo "####################################################################"
 
