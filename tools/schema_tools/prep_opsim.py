@@ -18,7 +18,7 @@ def add_indexes(database, simname):
     ## adds some useful indexes for calculating values from opsim
     # set up a dictionary to hold the index info
     index_done = {}
-    indexlist = ("fieldID", "expMJD", "filter", "fieldRA", "fieldDec", "fieldRADec", "night", "rotTelPos")
+    indexlist = ("obsHistID", "fieldID", "expMJD", "filter", "fieldRA", "fieldDec", "fieldRADec", "night", "rotTelPos")
     for ind in indexlist:
         index_done[ind] = False
     # connect to the db
