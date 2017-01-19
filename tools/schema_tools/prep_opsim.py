@@ -103,7 +103,7 @@ def remove_dither(simname, dithType, dropdatacol=False):
     cursor.close()
     return
 
-def offsetHex():
+def offsetHex(inHex=True):
     """
     Returns translational hex dither offsets (217 points) in radians.
 
@@ -119,6 +119,9 @@ def offsetHex():
     # calculate size of each offset
     dith_size_x = fov  / (nrows)
     dith_size_y = np.sqrt(3) * fov / 2.0 / (nrows)  #sqrt 3 comes from hexagon
+    if inHex:
+        dith_size_x = 0.95 * dith_size_x
+        dith_size_y = 0.95 * dith_size_y
     # calculate the row identification number, going from 0 at center
     nid_row = np.arange(-halfrows, halfrows + 1, 1)
     # and calculate the number of vertices in each row
@@ -168,7 +171,7 @@ def inHexagon(xOff, yOff, maxDither):
     return inside
 
 
-def offsetRandom(noffsets, inHex=True):
+def offsetRandom(noffsets, randomSeed=None, inHex=True):
     """
     Returns translational random dither offsets in radians.
 
@@ -191,6 +194,8 @@ def offsetRandom(noffsets, inHex=True):
     yOut = np.array([], float)
     maxTries = 100
     tries = 0
+    if randomSeed is not None:
+        np.random.seed(randomSeed)
     while (len(xOut) < noffsets) and (tries < maxTries):
         dithersRad = np.sqrt(np.random.rand(noffsets * 2)) * maxDither
         dithersTheta = np.random.rand(noffsets * 2) * np.pi * 2.0
@@ -211,7 +216,7 @@ def offsetRandom(noffsets, inHex=True):
     yOff = yOut[0:noffsets]
     return zip(np.radians(xOff),np.radians(yOff))
 
-def add_translationalDither(database, simname, dithType, overwrite=True):
+def add_translationalDither(database, simname, dithType, inHex=True, randomSeed=None, overwrite=True):
     """
     Adds translational dither columns to the database. Two options:
         1. HexDither: Krughoff-Jones dithering pattern: dither offsets form a 217 point lattice.
@@ -282,14 +287,14 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
         cursor.execute(sqlquery)
         sqlresults = cursor.fetchall()
         # go through each night individually
-        offsets = offsetHex()
+        offsets = offsetHex(inHex=inHex)
     else:   # already have checked that dithType is either 'hex' or 'random'
         # want to change vertex on per visit basis
         # get the obsHistID to track each visit.
-        sqlquery = "select distinct(obsHistID) from %s" % (simname)
+        sqlquery = "select distinct(obsHistID) from %s order by expMJD" % (simname)
         cursor.execute(sqlquery)
         sqlresults = cursor.fetchall()
-        offsets = offsetRandom(noffsets=len(sqlresults), inHex=True)
+        offsets = offsetRandom(noffsets=len(sqlresults), randomSeed=randomSeed, inHex=inHex)
 
     for index, result in enumerate(sqlresults):
         if (dithType=='hex'):
@@ -297,7 +302,7 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
             vertex = night % len(offsets) # implement hexDither on PerNight timescale.
         else: # already have checked that dithType is either 'hex' or 'random'
             obsHistID = int(result[0])
-            vertex = index  # implement random dither on FieldPerNight timescale.
+            vertex = index  # implement random dither on FieldPerNight (every observation) timescale.
         x_off, y_off = offsets[vertex]
         #It doesn't make a ton of sense, but see http://bugs.mysql.com/bug.php?id=1665 for a discussion of the mysql modulus convention.
         #In the case where a mod can return a negative value (((N%M)+M)%M) will return what one would expect.
@@ -327,7 +332,7 @@ def add_translationalDither(database, simname, dithType, overwrite=True):
     cursor.execute(sqlquery)
     cursor.close()
 
-def add_rotationalDither(database, simname, overwrite=True):
+def add_rotationalDither(database, simname, randomSeed=None, overwrite=True):
     """
     Adds a rotational dither column to the database (called ditheredRotTelPos).
 
@@ -380,6 +385,10 @@ def add_rotationalDither(database, simname, overwrite=True):
     cursor.execute(sqlquery)
     sqlresults = cursor.fetchall()
 
+    # Set random seed, if it was defined. 
+    if randomSeed is not None:
+        np.random.seed(randomSeed)
+
     # Now modify the observations, adding a new offset where there was a filter change.
     filteridx = 1
     prevFilter = sqlresults[0][filteridx]
@@ -387,7 +396,8 @@ def add_rotationalDither(database, simname, overwrite=True):
     for i, result in enumerate(sqlresults):
         filterBand = result[filteridx]
         if (filterBand != prevFilter):    # i.e. if there is a filter change
-            rotOffset= np.random.rand() * np.pi - np.pi/2.   # calcuate a new random offset between +/-pi/2 radians
+            rotOffset= np.random.rand() * np.pi - np.pi/2.   # calculate a new random offset between +/-pi/2 radians
+            prevFilter = filterBand
         obsHistID = int(result[0])
         sqlquery = "update %s set %s = rotTelPos + %f where obsHistID = %i" %(simname, dithcols[0], rotOffset, obsHistID)
         cursor.execute(sqlquery)
@@ -410,6 +420,6 @@ if __name__ == "__main__":
     opsimname = "summary_" + hname + "_" + sessionID
     #print "Updating %s" %(opsimname)
     add_indexes(database, opsimname)
-    add_translationalDither(database, opsimname, dithType= 'hex', overwrite=False)    # SequentialHexDitherPerNight
-    add_translationalDither(database, opsimname, dithType= 'random', overwrite=False)  # RandomDitherFieldPerVisit
-    add_rotationalDither(database, opsimname, overwrite=False)  # random rotational dithers
+    add_translationalDither(database, opsimname, dithType= 'hex', inHex=True, randomSeed=42, overwrite=True)    # SequentialHexDitherPerNight
+    add_translationalDither(database, opsimname, dithType= 'random', inHex=True, randomSeed=42, overwrite=True)  # RandomDitherFieldPerVisit
+    add_rotationalDither(database, opsimname, randomSeed=42, overwrite=True)  # random rotational dithers
