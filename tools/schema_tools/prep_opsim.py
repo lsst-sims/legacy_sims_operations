@@ -53,8 +53,6 @@ def add_indexes(database, simname):
     print "Done adding indexes"
     cursor.close()
 
-
-
 def remove_dither(simname, dithType, dropdatacol=False):
     """
     Remove the indices (and possibly the data) for the added columns of the specified dither type.
@@ -63,7 +61,7 @@ def remove_dither(simname, dithType, dropdatacol=False):
     ---------------
     * simname
     * dithType: str: either 'hex' (for translational hex dithers) or
-                            'random' (for transalational random dithers) or
+                            'random' (for translational random dithers) or
                             'rot' (for random rotational dithers).
     Optional input
     --------------
@@ -169,7 +167,6 @@ def inHexagon(xOff, yOff, maxDither):
                       (yOff > -m * xOff - b) &
                       (yOff < h) & (yOff > -h))[0]
     return inside
-
 
 def offsetRandom(noffsets, randomSeed=None, inHex=True):
     """
@@ -302,7 +299,7 @@ def add_translationalDither(database, simname, dithType, inHex=True, randomSeed=
             vertex = night % len(offsets) # implement hexDither on PerNight timescale.
         else: # already have checked that dithType is either 'hex' or 'random'
             obsHistID = int(result[0])
-            vertex = index  # implement random dither on FieldPerNight (every observation) timescale.
+            vertex = index  # implement randomDither on FieldPerVisit (every observation) timescale.
         x_off, y_off = offsets[vertex]
         #It doesn't make a ton of sense, but see http://bugs.mysql.com/bug.php?id=1665 for a discussion of the mysql modulus convention.
         #In the case where a mod can return a negative value (((N%M)+M)%M) will return what one would expect.
