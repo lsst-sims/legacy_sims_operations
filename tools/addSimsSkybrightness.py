@@ -8,12 +8,12 @@ import argparse
 from lsst.sims.utils import Site
 import lsst.sims.skybrightness as skybrightness
 
-from opsimUtils import calc_m5
-
 import time
+from lsst.sims.utils import m5_flat_sed
+
+
 def dtime(time_prev):
     return (time.time() - time_prev, time.time())
-
 
 
 def convert_ecliptic(ra, dec):
@@ -83,8 +83,8 @@ def add_m5(df):
     m5 = np.zeros(len(df))
     for f in df['filter'].unique():
         match = np.where(df['filter'] == f)
-        m5[match] = calc_m5(f, df.sims_skybright.as_matrix()[match], df.FWHMeff.as_matrix()[match],
-                            df.visitExpTime.as_matrix()[match], df.airmass.as_matrix()[match])
+        m5[match] = m5_flat_sed(f, df.sims_skybright.as_matrix()[match], df.FWHMeff.as_matrix()[match],
+                                df.visitExpTime.as_matrix()[match], df.airmass.as_matrix()[match])
     df['sims_m5'] = m5
     return df
 
