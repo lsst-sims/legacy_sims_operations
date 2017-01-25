@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
-from lsst.sims.utils import photo_m5
+from lsst.sims.utils import m5_flat_sed
 
 # Convert at least some older run sqlite outputs into new format sqlite outputs (for MAF)
 
@@ -33,7 +33,7 @@ def convert_cols(data):
                 'transparency':'xparency' }
     cols_map_backup = {'ditheredRA':-99, 'ditheredDec':-99}
     cols_default = {'visitExpTime':30.0, 'solarElong':-99, 'wind':-99, 'humidity':-99, 'moonAZ':-99}
-    cols_calc = {'fiveSigmaDepth':photo_m5, 'night':calc_night}
+    cols_calc = {'fiveSigmaDepth':m5_flat_sed, 'night':calc_night}
 
     print "Needed but not present or translated."
     for c in cols_need:
@@ -65,7 +65,7 @@ def convert_cols(data):
             if c == 'fiveSigmaDepth':
                 data2[c] = np.zeros(nvisits, float)
                 for index, v in data.iterrows():
-                    data2[c][index] = photo_m5(v['filter'], v['filtSky'], v['seeing'],
+                    data2[c][index] = m5_flat_sed(v['filter'], v['filtSky'], v['seeing'],
                                                v['expTime']-4.0, v['airmass'])
             elif c == 'night':
                 data2[c] = calc_night(data['expMJD'], int(data['expMJD'].min()))

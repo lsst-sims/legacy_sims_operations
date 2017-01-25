@@ -3,7 +3,7 @@ import numpy as np
 import MySQLdb as mysqldb
 import os
 from socket import gethostname
-from lsst.sims.utils import photo_m5
+from lsst.sims.utils import m5_flat_sed
 
 
 def connect_db(hostname='localhost', username='www', passwdname='zxcvbnm', dbname='OpsimDB'):
@@ -115,7 +115,7 @@ def create_output_table(cursor, database, hname, sessionID):
             filtsky = float(ret[k][14]);
             expTime = float(ret[k][8]);
             tauCloud = 0
-            m5 = photo_m5(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud)
+            m5 = m5_flat_sed(visitFilter, filtsky, FWHMeff, expTime, airmass, tauCloud)
             sql = 'insert into %s (obsHistID, sessionID, propID, fieldID, fieldRA, fieldDec, filter, ' %(summarytable)
             sql += 'expDate, expMJD, night, visitTime, visitExpTime, finRank, FWHMeff, FWHMgeom, transparency, airmass, vSkyBright, '
             sql += 'filtSkyBrightness, rotSkyPos, rotTelPos, lst, altitude, azimuth, dist2Moon, solarElong, moonRA, moonDec, '
