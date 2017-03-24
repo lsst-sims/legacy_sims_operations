@@ -7,7 +7,7 @@
 # rather than assuming it will be included recursively.
 setupRequired(lsst)
 setupRequired(mariadb)
-setupRequired(mysqlpython)
+setupRequired(python_mysqlclient)
 setupRequired(palpy)
 setupRequired(requests)
 
