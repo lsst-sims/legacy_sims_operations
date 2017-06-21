@@ -5,7 +5,8 @@
 # included by low-level LSST packages such as utils or daf_base.
 # Any other package whose interface is used should be listed explicitly
 # rather than assuming it will be included recursively.
-setupRequired(lsst)
+setupRequired(scons)
+setupRequired(sconsUtils)
 setupRequired(mariadb)
 setupRequired(mysqlpython)
 setupRequired(palpy)
