@@ -6,7 +6,7 @@ CREATE INDEX fk_config_session_idx ON Config(Session_sessionID);
 
 CREATE TABLE Field (fieldID INTEGER PRIMARY KEY, fieldFov REAL, fieldRA REAL, fieldDec REAL, fieldGL REAL, fieldGB REAL, fieldEL REAL, fieldEB REAL);
 
-CREATE TABLE ObsHistory (obsHistID INTEGER PRIMARY KEY, Session_sessionID INTEGER, filter TEXT, expDate INTEGER, expMJD REAL, night INTEGER, visitTime REAL, visitExpTime REAL, finRank REAL, finSeeing REAL, transparency REAL, airmass REAL, vSkyBright REAL, filtSkyBrightness REAL, rotSkyPos REAL, lst REAL, altitude REAL, azimuth REAL, dist2Moon REAL, solarElong REAL, moonRA REAL, moonDec REAL, moonAlt REAL, moonAZ REAL, moonPhase REAL, sunAlt REAL, sunAZ REAL, phaseAngle REAL, rScatter REAL, mieScatter REAL, moonIllum REAL, moonBright REAL, darkBright REAL, rawSeeing REAL, wind REAL, humidity REAL, fiveSigmaDepth REAL, ditheredRA REAL, ditheredDec REAL, Field_fieldID INTEGER);
+CREATE TABLE ObsHistory (obsHistID INTEGER PRIMARY KEY, Session_sessionID INTEGER, filter TEXT, expDate INTEGER, expMJD REAL, night INTEGER, visitTime REAL, visitExpTime REAL, finRank REAL, finSeeing REAL, transparency REAL, airmass REAL, vSkyBright REAL, filtSkyBrightness REAL, rotSkyPos REAL, lst REAL, altitude REAL, azimuth REAL, dist2Moon REAL, solarElong REAL, moonRA REAL, moonDec REAL, moonAlt REAL, moonAZ REAL, moonPhase REAL, sunAlt REAL, sunAZ REAL, phaseAngle REAL, rScatter REAL, mieScatter REAL, moonIllum REAL, moonBright REAL, darkBright REAL, rawSeeing REAL, wind REAL, humidity REAL, fiveSigmaDepth REAL, Field_fieldID INTEGER);
 CREATE INDEX oh_field_filter_idx ON ObsHistory(filter);
 CREATE INDEX fk_ObsHistory_Session_idx ON ObsHistory(Session_sessionID);
 CREATE INDEX fk_ObsHistory_field_idx ON ObsHistory(Field_fieldID);
@@ -66,7 +66,7 @@ CREATE TABLE SeqHistory_MissedHistory (seqhistory_missedHistID INTEGER PRIMARY K
 CREATE INDEX fk_SeqHistory_MissedHistory_SeqHistory_idx ON SeqHistory_MissedHistory(SeqHistory_sequenceID);
 CREATE INDEX fk_SeqHistory_MissedHistory_ObsHistory_idx ON SeqHistory_MissedHistory(MissedHistory_missedHistID, MissedHistory_Session_sessionID);
 
-CREATE TABLE Summary (obsHistID INTEGER, sessionID INTEGER, propID INTEGER, fieldID INTEGER, fieldRA REAL, fieldDec REAL, filter TEXT, expDate INTEGER, expMJD REAL, night INTEGER, visitTime REAL, visitExpTime REAL, finRank REAL, FWHMeff REAL, FWHMgeom REAL, transparency REAL, airmass REAL, vSkyBright REAL, filtSkyBrightness REAL, rotSkyPos REAL, rotTelPos REAL, lst REAL, altitude REAL, azimuth REAL, dist2Moon REAL, solarElong REAL, moonRA REAL, moonDec REAL, moonAlt REAL, moonAZ REAL, moonPhase REAL, sunAlt REAL, sunAz REAL, phaseAngle REAL, rScatter REAL, mieScatter REAL, moonIllum REAL, moonBright REAL, darkBright REAL, rawSeeing REAL, wind REAL, humidity REAL, slewDist REAL, slewTime REAL, fiveSigmaDepth REAL, ditheredRA REAL, ditheredDec REAL);
+CREATE TABLE Summary (obsHistID INTEGER, sessionID INTEGER, propID INTEGER, fieldID INTEGER, fieldRA REAL, fieldDec REAL, filter TEXT, expDate INTEGER, expMJD REAL, night INTEGER, visitTime REAL, visitExpTime REAL, finRank REAL, FWHMeff REAL, FWHMgeom REAL, transparency REAL, airmass REAL, vSkyBright REAL, filtSkyBrightness REAL, rotSkyPos REAL, rotTelPos REAL, lst REAL, altitude REAL, azimuth REAL, dist2Moon REAL, solarElong REAL, moonRA REAL, moonDec REAL, moonAlt REAL, moonAZ REAL, moonPhase REAL, sunAlt REAL, sunAz REAL, phaseAngle REAL, rScatter REAL, mieScatter REAL, moonIllum REAL, moonBright REAL, darkBright REAL, rawSeeing REAL, wind REAL, humidity REAL, slewDist REAL, slewTime REAL, fiveSigmaDepth REAL, randomDitherFieldPerVisitRA REAL, randomDitherFieldPerVisitDec REAL,  hexDitherPerNightRA REAL, hexDitherPerNightDec REAL, ditheredRotTelPos REAL);
 CREATE INDEX fieldID_idx ON Summary(fieldID);
 CREATE INDEX expMJD_idx ON Summary(expMJD);
 CREATE INDEX filter_idx ON Summary(filter);
@@ -75,9 +75,14 @@ CREATE INDEX fieldDec_idx ON Summary(fieldDec);
 CREATE INDEX fieldRADec_idx ON Summary(fieldRA, fieldDec);
 CREATE INDEX night_idx ON Summary(night);
 CREATE INDEX propID_idx ON Summary(propID);
-CREATE INDEX ditheredRA_idx ON Summary(ditheredRA);
-CREATE INDEX ditheredDec_idx ON Summary(ditheredDec);
-CREATE INDEX ditheredRADec_idx ON Summary(ditheredRA, ditheredDec);
+CREATE INDEX randomDitherFieldPerVisitRA_idx ON Summary(randomDitherFieldPerVisitRA);
+CREATE INDEX randomDitherFieldPerVisitDec_idx ON Summary(randomDitherFieldPerVisitDec);
+CREATE INDEX randomDitherFieldPerVisitRADec_idx ON Summary(randomDitherFieldPerVisitRA, randomDitherFieldPerVisitDec);
+CREATE INDEX hexDitherPerNightRA_idx ON Summary(hexDitherPerNightRA);
+CREATE INDEX hexDitherPerNightDec_idx ON Summary(hexDitherPerNightDec);
+CREATE INDEX hexDitherPerNightDecRADec_idx ON Summary(hexDitherPerNightRA, hexDitherPerNightDec);
+CREATE INDEX rotTelPos_idx ON Summary(rotTelPos);
+CREATE INDEX ditheredRotTelPos_idx ON Summary(ditheredRotTelPos);
 CREATE INDEX filter_propID_idx ON Summary(filter, propID);
 
 PRAGMA synchronous=off;

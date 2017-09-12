@@ -26,8 +26,8 @@ def copy_data_over(hname, database, cursor, sessionID):
     summary = 'summary_%s_%d' % (hname, sessionID)
     # Copy data from summary back to newObsHist 
     # (note that records for same visit in summary can have multiple obsHistID's, but one will match tObsHistory table).
-    sql = 'update %s inner join %s using (obsHistID) set %s.fiveSigmaDepth=%s.fiveSigmaDepth,' % (newObsHist, summary, newObsHist, summary)
-    sql += ' %s.ditheredRA=%s.ditheredRA, %s.ditheredDec=%s.ditheredDec' % (newObsHist, summary, newObsHist, summary)
+    sql = 'update %s inner join %s using (obsHistID) set %s.fiveSigmaDepth=%s.fiveSigmaDepth' % (newObsHist, summary, newObsHist, summary)
+    #sql += ', %s.ditheredRA=%s.ditheredRA, %s.ditheredDec=%s.ditheredDec' % (newObsHist, summary, newObsHist, summary)
     cursor.execute(sql)
 
 if __name__ == "__main__":
