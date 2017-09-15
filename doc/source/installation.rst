@@ -6,8 +6,7 @@ Installing the OpSim Code
 *************************
 
 The current source code is in the LSST sims_operations git (Github)
-repository. However, the code is now available via :ref:`install-lsststack`, 
-:ref:`install-conda` and :ref:`install-docker`.
+repository. However, the code is available via :ref:`install-lsststack` and :ref:`install-docker`.
 
 .. note:: Since the configuration files are now in a git repository, you will 
           need to have the git command line tool installed on your system.
@@ -85,44 +84,6 @@ LSST Science Pipelines Install
 
 	  The above command will remove any previous configuration setup and database
 	  content!
-
-.. _install-conda:
-
-Conda Installation
-~~~~~~~~~~~~~~~~~~
-
-This installation assumes you have installed either the 
-`Anaconda Scientific Python Distribution <https://store.continuum.io/cshop/anaconda/>`_
-or `Miniconda <http://conda.pydata.org/miniconda.html>`_.
-
-First, add the LSST Conda channel to the configuration::
-
-  conda config --add channels http://eupsforge.net/conda/dev --add channels http://lsst-web.ncsa.illinois.edu/~mareuter/conda/dev
-
-Next, create a Conda environment and activate it::
-
-  conda create -n opsim python
-  source activate opsim
-
-Next, install the package::
-
-  conda install lsst-sims-operations
-
-To finish the setup, run::
-
-  source eups-setups.sh
-  setup sims_operations
-
-If you need to get out if the environment::
-
-  source deactivate
-
-OpSim requires a database for running, so continue by following the directions 
-in the :ref:`OpSim Configuration<opsim-config>` and then the :ref:`running-opsim` sections.
-
-To update the package if a new release is issued::
-
-  conda update lsst-sims-operations
 
 .. _install-docker:
 
