@@ -317,7 +317,7 @@ class Proposal(object):
         except:
             pass
 
-        super(Proposal, self).__del__()
+        del(self)
         return
 
     def IsActive(self, date, nightCnt):
