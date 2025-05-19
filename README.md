@@ -1,3 +1,5 @@
+Mostly moved to [rubin_scheduler](github.com/lsst/rubin_scheduler). 
+
 # LSST Operations Simulator v3
 This is the code repository for version 3 of the Operations Simulator. 
 
